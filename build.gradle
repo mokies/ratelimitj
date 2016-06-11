@@ -2,9 +2,11 @@ group 'moki.es'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'pmd'
+apply plugin: 'checkstyle'
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.14-rc-4'
+    gradleVersion = '2.14-rc-5'
 }
 
 sourceCompatibility = 1.8
@@ -16,9 +18,10 @@ repositories {
 dependencies {
 
     compile (
-           "biz.paluch.redis:lettuce:$lettuceVersion"
+            'org.slf4j:slf4j-api:1.7.21'
     )
 
     testCompile 'org.assertj:assertj-core:3.4.1'
-    testCompile 'junit:junit:4.11'
+    testCompile 'junit:junit:4.12'
 }
+

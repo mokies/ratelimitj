@@ -1,8 +1,11 @@
+-- Credit: http://www.dr-josiah.com/2014/11/introduction-to-rate-limiting-with_26.html
+
 local limits = cjson.decode(ARGV[1])
 local now = tonumber(ARGV[2])
 local weight = tonumber(ARGV[3] or '1')
 local longest_duration = limits[1][1] or 0
 local saved_keys = {}
+
 -- handle cleanup and limit checks
 for i, limit in ipairs(limits) do
     local duration = limit[1]
@@ -16,6 +19,7 @@ for i, limit in ipairs(limits) do
     saved.trim_before = saved.block_id - blocks + 1
     saved.count_key = duration .. ':' .. precision .. ':'
     saved.ts_key = saved.count_key .. 'o'
+
     for j, key in ipairs(KEYS) do
         local old_ts = redis.call('HGET', key, saved.ts_key)
         old_ts = old_ts and tonumber(old_ts) or saved.trim_before
@@ -49,6 +53,7 @@ for i, limit in ipairs(limits) do
         end
     end
 end
+
 -- there is enough resources, update the counts
 for i, limit in ipairs(limits) do
     local saved = saved_keys[i]
@@ -59,6 +64,7 @@ for i, limit in ipairs(limits) do
         redis.call('HINCRBY', key, saved.count_key .. saved.block_id, weight)
     end
 end
+
 -- We calculated the longest-duration limit so we can EXPIRE
 -- the whole HASH for quick and easy idle-time cleanup :)
 if longest_duration > 0 then

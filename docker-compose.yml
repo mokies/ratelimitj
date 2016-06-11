@@ -1,0 +1,7 @@
+
+redis:
+    image: redis:3.2-alpine
+    expose:
+    - "3306"
+    ports:
+    - "6379:6379"
