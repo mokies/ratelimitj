@@ -7,6 +7,7 @@ import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.api.async.RedisAsyncCommands;
 import es.moki.ratelimitj.core.AsyncRateLimiter;
 import es.moki.ratelimitj.core.RateLimiter;
+import es.moki.ratelimitj.core.SlidingWindowRule;
 import net.jcip.annotations.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,11 +35,11 @@ public class RedisRateLimit implements AutoCloseable, AsyncRateLimiter, RateLimi
 
     // TODO Might require a configuration factory.
 
-    public RedisRateLimit(RedisClient redisClient, Set<SlidingWindowRules> rules) {
+    public RedisRateLimit(RedisClient redisClient, Set<SlidingWindowRule> rules) {
         this(redisClient, rules, false);
     }
 
-    public RedisRateLimit(RedisClient redisClient, Set<SlidingWindowRules> rules, boolean useRedisTime) {
+    public RedisRateLimit(RedisClient redisClient, Set<SlidingWindowRule> rules, boolean useRedisTime) {
         async = redisClient.connect().async();
         scriptLoader = new RedisScriptLoader(async, limitScript());
         rulesJson = toJsonArray(requireNonNull(rules));
@@ -53,7 +54,7 @@ public class RedisRateLimit implements AutoCloseable, AsyncRateLimiter, RateLimi
         }
     }
 
-    private String toJsonArray(Set<SlidingWindowRules> rules) {
+    private String toJsonArray(Set<SlidingWindowRule> rules) {
         JsonArray jsonArray = Json.array().asArray();
         rules.forEach(window -> jsonArray.add(window.toJsonArray()));
         String rulesJson = jsonArray.toString();
