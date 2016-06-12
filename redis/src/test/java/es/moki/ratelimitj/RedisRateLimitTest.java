@@ -8,12 +8,13 @@ import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import rx.Observable;
 
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
@@ -22,6 +23,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
 public class RedisRateLimitTest {
 
+    private static final Logger LOG = LoggerFactory.getLogger(RedisRateLimitTest.class);
 
     private static RedisClient client;
 
@@ -32,7 +34,7 @@ public class RedisRateLimitTest {
 
     @AfterClass
     public static void after() {
-        try(StatefulRedisConnection<String, String> connection =  client.connect()) {
+        try(StatefulRedisConnection<String, String> connection = client.connect()) {
             connection.sync().flushdb();
         }
         client.shutdown();
@@ -41,53 +43,72 @@ public class RedisRateLimitTest {
     @Test
     public void shouldLimitSingleWindowAsync() throws Exception {
 
-        ImmutableSet<Window> rules = ImmutableSet.of(Window.of(10, TimeUnit.SECONDS, 5));
+        ImmutableSet<SlidingWindowRules> rules = ImmutableSet.of(SlidingWindowRules.of(10, TimeUnit.SECONDS, 5));
         RedisRateLimit rateLimiter = new RedisRateLimit(client, rules);
 
         List<CompletionStage> stageAsserts = new CopyOnWriteArrayList<>();
-        CountDownLatch latch = new CountDownLatch(5);
         Observable.defer(() -> Observable.just("ip:127.0.0.2"))
-                .repeatWhen(observable -> observable.delay(100, TimeUnit.MILLISECONDS).take(5))
                 .repeat(5)
                 .subscribe((key) -> {
-                    stageAsserts.add(rateLimiter.overLimitAsync(key)
-                            .thenAccept(result -> assertThat(result).isEqualTo(false))
-                            .thenRun(latch::countDown));
-                });
 
-        // TODO latch shouldn't be necessary if I can block on completableFuture
-        latch.await();
+                    stageAsserts.add(rateLimiter.overLimitAsync(key)
+                            .thenAccept(result -> assertThat(result).isFalse()));
+                });
 
         for (CompletionStage stage : stageAsserts) {
             stage.toCompletableFuture().get();
         }
 
-        assertThat(rateLimiter.overLimitAsync("ip:127.0.0.2").toCompletableFuture().get()).isEqualTo(true);
+        assertThat(rateLimiter.overLimitAsync("ip:127.0.0.2").toCompletableFuture().get()).isTrue();
+    }
+
+    @Test
+    public void shouldLimitDualWindowAsync() throws Exception {
+
+        ImmutableSet<SlidingWindowRules> rules = ImmutableSet.of(SlidingWindowRules.of(2, TimeUnit.SECONDS, 5), SlidingWindowRules.of(10, TimeUnit.SECONDS, 20));
+        RedisRateLimit rateLimiter = new RedisRateLimit(client, rules);
+
+        List<CompletionStage> stageAsserts = new CopyOnWriteArrayList<>();
+        Observable.defer(() -> Observable.just("ip:127.0.0.10"))
+                .repeat(5)
+                .subscribe((key) -> {
+                    LOG.debug("incrementing rate limiter");
+                    stageAsserts.add(rateLimiter.overLimitAsync(key)
+                            .thenAccept(result -> assertThat(result).isFalse()));
+                });
+
+        for (CompletionStage stage : stageAsserts) {
+            stage.toCompletableFuture().get();
+        }
+
+        assertThat(rateLimiter.overLimitAsync("ip:127.0.0.10").toCompletableFuture().get()).isTrue();
+        Thread.sleep(2000);
+        assertThat(rateLimiter.overLimitAsync("ip:127.0.0.10").toCompletableFuture().get()).isFalse();
     }
 
     @Test
     public void shouldLimitSingleWindowSync() throws Exception {
 
-        ImmutableSet<Window> rules = ImmutableSet.of(Window.of(10, TimeUnit.SECONDS, 5));
+        ImmutableSet<SlidingWindowRules> rules = ImmutableSet.of(SlidingWindowRules.of(10, TimeUnit.SECONDS, 5));
         RedisRateLimit rateLimiter = new RedisRateLimit(client, rules);
 
         IntStream.rangeClosed(1, 5).forEach(value -> {
             boolean result = rateLimiter.overLimit("ip:127.0.0.5");
-            AssertionsForClassTypes.assertThat(result).isEqualTo(false);
+            AssertionsForClassTypes.assertThat(result).isFalse();
         });
 
-        assertThat(rateLimiter.overLimit("ip:127.0.0.5")).isEqualTo(true);
+        assertThat(rateLimiter.overLimit("ip:127.0.0.5")).isTrue();
     }
 
     @Test
     public void shouldWorkWithRedisTime() throws Exception {
 
-        ImmutableSet<Window> rules = ImmutableSet.of(Window.of(10, TimeUnit.SECONDS, 5), Window.of(3600, TimeUnit.SECONDS, 1000));
+        ImmutableSet<SlidingWindowRules> rules = ImmutableSet.of(SlidingWindowRules.of(10, TimeUnit.SECONDS, 5), SlidingWindowRules.of(3600, TimeUnit.SECONDS, 1000));
         RedisRateLimit rateLimiter = new RedisRateLimit(client, rules, true);
 
         CompletionStage<Boolean> key = rateLimiter.overLimitAsync("ip:127.0.0.3");
 
-        assertThat(key.toCompletableFuture().get()).isEqualTo(false);
+        assertThat(key.toCompletableFuture().get()).isFalse();
     }
 
 }

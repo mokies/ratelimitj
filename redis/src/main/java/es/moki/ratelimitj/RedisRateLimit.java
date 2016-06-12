@@ -32,11 +32,11 @@ public class RedisRateLimit implements AutoCloseable, AsyncRateLimiter, RateLimi
 
     // TODO Might require a configuration factory.
 
-    public RedisRateLimit(RedisClient redisClient, Set<Window> rules) {
+    public RedisRateLimit(RedisClient redisClient, Set<SlidingWindowRules> rules) {
         this(redisClient, rules, false);
     }
 
-    public RedisRateLimit(RedisClient redisClient, Set<Window> rules, boolean useRedisTime) {
+    public RedisRateLimit(RedisClient redisClient, Set<SlidingWindowRules> rules, boolean useRedisTime) {
         async = redisClient.connect().async();
         scriptLoader = new RedisScriptLoader(async, limitScript());
         rulesJson = toJsonArray(requireNonNull(rules));
@@ -51,7 +51,7 @@ public class RedisRateLimit implements AutoCloseable, AsyncRateLimiter, RateLimi
         }
     }
 
-    private String toJsonArray(Set<Window> rules) {
+    private String toJsonArray(Set<SlidingWindowRules> rules) {
         JsonArray jsonArray = Json.array().asArray();
         rules.forEach(window -> jsonArray.add(window.toJsonArray()));
         String rulesJson = jsonArray.toString();

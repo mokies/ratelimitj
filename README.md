@@ -30,8 +30,6 @@ This library was inspired by the following articles on sliding window rate limit
 
 For more information on the `weight` and `precision` options, see the second blog post above.
 
-Inspired by [ratelimit.js](https://github.com/dudleycarr/ratelimit.js)
-
 Authors
 -------
 
