@@ -1,24 +1,24 @@
 package es.moki.ratelimitj;
 
 import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonArray;
 
 import java.util.concurrent.TimeUnit;
 
 public class Window {
 
-    private final long duration;
+    private final long durationSeconds;
     private final long limit;
     private final int precision;
 
-    private Window (long duration, long limit) {
-        this.duration = duration;
+    private Window (long durationSeconds, long limit) {
+        this.durationSeconds = durationSeconds;
         this.limit = limit;
-        this.precision = 1;
+        this.precision = -1;
     }
 
     private Window (Window window, int precision) {
-        this.duration = window.duration;
+        this.durationSeconds = window.durationSeconds;
         this.limit = window.limit;
         this.precision = precision;
     }
@@ -31,8 +31,12 @@ public class Window {
         return new Window(this, precision);
     }
 
-    protected JsonObject toJsonObject() {
-        return Json.object().add("duration", duration).add("limit", limit).add("precision", precision);
+    protected JsonArray toJsonArray() {
+        JsonArray array = Json.array().asArray().add(durationSeconds).add(limit);
+        if (precision != -1) {
+            array.add(precision);
+        }
+        return array;
     }
 
 }

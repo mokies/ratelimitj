@@ -25,7 +25,7 @@ for i, limit in ipairs(limits) do
         old_ts = old_ts and tonumber(old_ts) or saved.trim_before
         if old_ts > now then
             -- don't write in the past
-            return 1
+            return '1'
         end
         -- discover what needs to be cleaned up
         local decr = 0
@@ -49,7 +49,7 @@ for i, limit in ipairs(limits) do
         end
         -- check our limits
         if tonumber(cur or '0') + weight > limit[2] then
-            return 1
+            return '1'
         end
     end
 end
@@ -72,4 +72,4 @@ if longest_duration > 0 then
         redis.call('EXPIRE', key, longest_duration)
     end
 end
-return 0
+return '0'

@@ -13,14 +13,21 @@ public class WindowTest {
     public void shouldSerialiseToJson() {
         Window window = Window.of(1, TimeUnit.SECONDS, 5);
 
-        assertThat(window.toJsonObject().toString()).isEqualTo("{\"interval\":1,\"limit\":5,\"precision\":1}");
+        assertThat(window.toJsonArray().toString()).isEqualTo("[1,5]");
     }
 
     @Test
      public void shouldSerialiseToJsonWithPrecision() {
         Window window = Window.of(1, TimeUnit.SECONDS, 5).withPrecision(10);
 
-        assertThat(window.toJsonObject().toString()).isEqualTo("{\"interval\":1,\"limit\":5,\"precision\":10}");
+        assertThat(window.toJsonArray().toString()).isEqualTo("[1,5,10]");
+     }
+
+    @Test
+     public void shouldSerialiseToJsonWithDurationMinutes() {
+        Window window = Window.of(1, TimeUnit.MINUTES, 5).withPrecision(10);
+
+        assertThat(window.toJsonArray().toString()).isEqualTo("[60,5,10]");
      }
 
 }

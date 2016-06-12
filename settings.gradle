@@ -1,4 +1,5 @@
 rootProject.name = 'RateLimitJ'
 
-include 'core'
+include 'common'
+include 'redis'
 
