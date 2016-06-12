@@ -3,9 +3,22 @@ RateLimitJ
 
 [![Build Status](https://travis-ci.org/mokies/ratelimitj.svg)](https://travis-ci.org/mokies/ratelimitj)
 
+Currently under active construction
 
-Features
---------
+Feature Roadmap
+---------------
+
+| Feature        | Status       |
+| ------------- |:-------------:| 
+| Redis sliding window rate limiter | alpha  |
+| In memory sliding window rate limiter | not started |
+| Hazelcast sliding window rate limiter | not started |
+| Redis fast bucket rate limiter | not started |
+| In memory fast bucket rate limiter | not started |
+| In memory fast bucket rate limiter | not started |
+| Dropwizard glue - bundle | active development |
+| Spring glue | not started |
+
 
 
 Background
