@@ -1,7 +1,0 @@
-- Redis sliding window rate limiter
-- In memory sliding window rate limiter
-- In memory fast bucket rate limiter
-- Redis fast bucket rate limiter
-- Dropwizard glue
-- Spring glue
-- Hazelcast sliding window rte limiter

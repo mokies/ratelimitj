@@ -19,15 +19,16 @@ subprojects {
 
     dependencies {
 
-        compile (
+        compile(
                 'org.slf4j:slf4j-api:1.7.21',
                 'net.jcip:jcip-annotations:1.0'
         )
 
-        testCompile (
+        testCompile(
                 'org.assertj:assertj-core:3.4.1',
                 'junit:junit:4.12',
-                'ch.qos.logback:logback-classic:1.1.7'
+                'ch.qos.logback:logback-classic:1.1.7',
+                'com.google.guava:guava:19.0'
         )
     }
 

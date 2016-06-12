@@ -2,4 +2,5 @@ rootProject.name = 'RateLimitJ'
 
 include 'common'
 include 'redis'
+include 'dropwizard'
 

@@ -21,33 +21,31 @@ import static com.lambdaworks.redis.ScriptOutputType.VALUE;
 import static java.util.Objects.requireNonNull;
 
 @ThreadSafe
-public class RedisRateLimit implements AutoCloseable { //,RateLimit {
+public class RedisRateLimit implements AutoCloseable, AsyncRateLimiter, RateLimiter {
 
     private static final Logger LOG = LoggerFactory.getLogger(RedisRateLimit.class);
 
-    private final RedisClient client;
     private final RedisAsyncCommands<String, String> async;
     private final RedisScriptLoader scriptLoader;
     private final String rulesJson;
     private final boolean useRedisTime;
 
-    // TODO allow client to be passed in so that client can be shared. Might require a configuration factory.
+    // TODO Might require a configuration factory.
 
-    public RedisRateLimit(String redisHost, Set<Window> rules) {
-        this(redisHost, rules, false);
+    public RedisRateLimit(RedisClient redisClient, Set<Window> rules) {
+        this(redisClient, rules, false);
     }
 
-    public RedisRateLimit(String redisHost, Set<Window> rules, boolean useRedisTime) {
-        client = RedisClient.create(redisHost);
-        async = client.connect().async();
+    public RedisRateLimit(RedisClient redisClient, Set<Window> rules, boolean useRedisTime) {
+        async = redisClient.connect().async();
         scriptLoader = new RedisScriptLoader(async, limitScript());
-        this.rulesJson = toJsonArray(requireNonNull(rules));
+        rulesJson = toJsonArray(requireNonNull(rules));
         this.useRedisTime = useRedisTime;
     }
 
     private URI limitScript() {
         try {
-            return ClassLoader.getSystemResource("limit.lua").toURI();
+            return ClassLoader.getSystemResource("sliding-window-ratelimit.lua").toURI();
         } catch (URISyntaxException e) {
             throw new RuntimeException("Unable to load limit.lua", e);
         }
@@ -66,11 +64,12 @@ public class RedisRateLimit implements AutoCloseable { //,RateLimit {
     }
 
     public CompletionStage<Boolean> overLimitAsync(String key, int weight) {
+        requireNonNull(key);
 
         // TODO load script completely async
         String sha = scriptLoader.scriptSha();
 
-//        return nowEpochSeconds()
+//        return currentUnixTimeSeconds()
 //                .thenAccept(now -> {
 //                    LOG.debug("time {}", now);
 //                    async.evalsha(sha, VALUE, new String[]{key}, rulesJson, now, Integer.toString(weight));})
@@ -85,27 +84,33 @@ public class RedisRateLimit implements AutoCloseable { //,RateLimit {
         // TODO handle scenario where script is not loaded, flush scripts and test scenario
     }
 
+    @Override
     public boolean overLimit(String key) {
+        return overLimit(key, 1);
+    }
+
+    @Override
+    public boolean overLimit(String key, int weight) {
         try {
-            return overLimitAsync(key).toCompletableFuture().get(10, TimeUnit.SECONDS);
+            return overLimitAsync(key, weight).toCompletableFuture().get(10, TimeUnit.SECONDS);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-
-    private CompletionStage<String> nowEpochSeconds() {
+    private CompletionStage<String> currentUnixTimeSeconds() {
         if (useRedisTime) {
             return async.time().thenApply(strings -> strings.get(0));
         }
-        return CompletableFuture.completedFuture(Long.toString(Instant.now().getEpochSecond()));
+        return CompletableFuture.completedFuture(Long.toString(System.currentTimeMillis() / 1000L));
     }
 
     @Override
     public void close() throws Exception {
         async.close();
-        client.shutdown();
     }
+
+
 
 
 //

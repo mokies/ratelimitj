@@ -25,7 +25,7 @@ public class RedisScriptLoaderTest {
 
     @Test
     public void shouldLoadScript() throws Exception {
-        RedisScriptLoader scriptLoader = new RedisScriptLoader(async, ClassLoader.getSystemResource("limit.lua").toURI());
+        RedisScriptLoader scriptLoader = new RedisScriptLoader(async, ClassLoader.getSystemResource("sliding-window-ratelimit.lua").toURI());
 
         assertThat(scriptLoader.scriptSha()).isNotEmpty();
     }
