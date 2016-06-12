@@ -1,6 +1,6 @@
 rootProject.name = 'RateLimitJ'
 
-include 'ratelimij-core'
-include 'ratelimij-redis'
-include 'ratelimij-dropwizard'
+include 'ratelimitj-core'
+include 'ratelimitj-redis'
+include 'ratelimitj-dropwizard'
 

@@ -1,12 +1,10 @@
 group 'moki.es'
-
-
-description description 'RateLimitJ Dropwizard'
+description 'RateLimitJ Dropwizard'
 
 dependencies {
 
     compile(
-            project(':common'),
+            project(':ratelimitj-core'),
             'io.dropwizard:dropwizard-core:1.0.0-rc3',
             'io.dropwizard:dropwizard-jersey:1.0.0-rc3'
     )
