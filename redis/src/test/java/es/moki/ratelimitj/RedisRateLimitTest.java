@@ -4,6 +4,7 @@ package es.moki.ratelimitj;
 import com.google.common.collect.ImmutableSet;
 import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.api.StatefulRedisConnection;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -14,6 +15,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
@@ -37,21 +39,9 @@ public class RedisRateLimitTest {
     }
 
     @Test
-    public void shouldConnect() throws Exception {
-
-        ImmutableSet<Window> rules = ImmutableSet.of(Window.of(10, TimeUnit.SECONDS, 1));
-
-        RedisRateLimit rateLimiter = new RedisRateLimit(client, rules);
-
-        assertThat(rateLimiter.overLimitAsync("ip:127.0.0.1").toCompletableFuture().get()).isEqualTo(false);
-    }
-
-    @Test
-    public void shouldLimitSingleWindow() throws Exception {
+    public void shouldLimitSingleWindowAsync() throws Exception {
 
         ImmutableSet<Window> rules = ImmutableSet.of(Window.of(10, TimeUnit.SECONDS, 5));
-
-        // TODO close connection
         RedisRateLimit rateLimiter = new RedisRateLimit(client, rules);
 
         List<CompletionStage> stageAsserts = new CopyOnWriteArrayList<>();
@@ -60,11 +50,12 @@ public class RedisRateLimitTest {
                 .repeatWhen(observable -> observable.delay(100, TimeUnit.MILLISECONDS).take(5))
                 .repeat(5)
                 .subscribe((key) -> {
-
                     stageAsserts.add(rateLimiter.overLimitAsync(key)
                             .thenAccept(result -> assertThat(result).isEqualTo(false))
                             .thenRun(latch::countDown));
                 });
+
+        // TODO latch shouldn't be necessary if I can block on completableFuture
         latch.await();
 
         for (CompletionStage stage : stageAsserts) {
@@ -75,10 +66,23 @@ public class RedisRateLimitTest {
     }
 
     @Test
+    public void shouldLimitSingleWindowSync() throws Exception {
+
+        ImmutableSet<Window> rules = ImmutableSet.of(Window.of(10, TimeUnit.SECONDS, 5));
+        RedisRateLimit rateLimiter = new RedisRateLimit(client, rules);
+
+        IntStream.rangeClosed(1, 5).forEach(value -> {
+            boolean result = rateLimiter.overLimit("ip:127.0.0.5");
+            AssertionsForClassTypes.assertThat(result).isEqualTo(false);
+        });
+
+        assertThat(rateLimiter.overLimit("ip:127.0.0.5")).isEqualTo(true);
+    }
+
+    @Test
     public void shouldWorkWithRedisTime() throws Exception {
 
         ImmutableSet<Window> rules = ImmutableSet.of(Window.of(10, TimeUnit.SECONDS, 5), Window.of(3600, TimeUnit.SECONDS, 1000));
-
         RedisRateLimit rateLimiter = new RedisRateLimit(client, rules, true);
 
         CompletionStage<Boolean> key = rateLimiter.overLimitAsync("ip:127.0.0.3");
