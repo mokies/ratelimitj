@@ -22,6 +22,8 @@ public class RedisScriptLoader {
         this(async, scriptUri, true);
     }
 
+
+    // TODO async seems unnecessary for this class
     public RedisScriptLoader(RedisAsyncCommands<String, String> async, URI scriptUri, boolean eagerLoad) {
         this.async = requireNonNull(async);
         this.scriptUri = requireNonNull(scriptUri);
@@ -33,7 +35,6 @@ public class RedisScriptLoader {
     public RedisFuture<String> loadScript() {
          String script;
          try {
-             // TODO Load file asynchronously
              script = new String(Files.readAllBytes(Paths.get(scriptUri)));
          } catch (Exception e) {
              throw new RuntimeException(e);
@@ -55,4 +56,5 @@ public class RedisScriptLoader {
          }
          return sha;
      }
+
 }

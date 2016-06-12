@@ -66,19 +66,25 @@ public class RedisRateLimit implements AutoCloseable, AsyncRateLimiter, RateLimi
     public CompletionStage<Boolean> overLimitAsync(String key, int weight) {
         requireNonNull(key);
 
-        // TODO load script completely async
+        // TODO maybe load script completely async, but only useful the first time
         String sha = scriptLoader.scriptSha();
 
-//        return currentUnixTimeSeconds()
-//                .thenAccept(now -> {
-//                    LOG.debug("time {}", now);
-//                    async.evalsha(sha, VALUE, new String[]{key}, rulesJson, now, Integer.toString(weight));})
-//                .thenApply("1"::equals);
-
+        // TODO seeing some strange behaviour
+//         currentUnixTimeSeconds()
+//                .thenApply(currentTime -> {
+//                    LOG.debug("time {}", currentTime);
+//                    return (CompletionStage) async.evalsha(sha, VALUE, new String[]{key}, rulesJson, currentTime, Integer.toString(weight));
+//                }).thenApply(result -> {
+//                    LOG.debug("result {}", result);
+//                    return "1".equals(result);
+//                });
 
         // TODO complete async use redis time
         return  async.evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(Instant.now().getEpochSecond()), Integer.toString(weight))
-                .thenApply("1"::equals);
+                .thenApply(result -> {
+                    LOG.debug("result {}", result);
+                    return "1".equals(result);
+                });
 
 
         // TODO handle scenario where script is not loaded, flush scripts and test scenario

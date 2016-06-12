@@ -13,14 +13,18 @@ public class RedisScriptLoaderTest {
 
     private static RedisAsyncCommands<String, String> async;
 
+    private static RedisClient client;
+
     @BeforeClass
     public static void up() {
-        async = RedisClient.create("redis://localhost").connect().async();
+        client = RedisClient.create("redis://localhost");
+        async = client.connect().async();
     }
 
     @AfterClass
     public static void down() {
         async.close();
+        client.shutdown();
     }
 
     @Test
