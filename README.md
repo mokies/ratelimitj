@@ -8,8 +8,8 @@ Currently under active construction
 Feature Roadmap
 ---------------
 
-| Feature        | Status       |
-| ------------- |:-------------:| 
+| Feature       | Status      |
+| ------------- |-------------| 
 | Redis sliding window rate limiter | alpha  |
 | In memory sliding window rate limiter | not started |
 | Hazelcast sliding window rate limiter | not started |
