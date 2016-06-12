@@ -1,0 +1,21 @@
+group 'moki.es'
+
+
+description description 'RateLimitJ Dropwizard'
+
+dependencies {
+
+    compile(
+            project(':common'),
+            'io.dropwizard:dropwizard-core:1.0.0-rc3',
+            'io.dropwizard:dropwizard-jersey:1.0.0-rc3'
+    )
+    testCompile(
+            'org.assertj:assertj-core:3.4.1',
+            'junit:junit:4.12',
+            'com.google.guava:guava:19.0'
+    )
+}
+
+
+
