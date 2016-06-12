@@ -4,7 +4,11 @@ description 'RateLimitJ Dropwizard'
 dependencies {
 
     compile(
+<<<<<<< Updated upstream
             project(':ratelimitj-core'),
+=======
+            project(':ratelimit-core'),
+>>>>>>> Stashed changes
             'io.dropwizard:dropwizard-core:1.0.0-rc3',
             'io.dropwizard:dropwizard-jersey:1.0.0-rc3'
     )
