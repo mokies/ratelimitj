@@ -4,7 +4,6 @@ dependencies {
 
     compile(
             'org.slf4j:slf4j-api:1.7.21',
-            'com.eclipsesource.minimal-json:minimal-json:0.9.4'
     )
     testCompile(
             'org.assertj:assertj-core:3.4.1',

@@ -4,7 +4,7 @@ package es.moki.ratelimitj.redis;
 import com.google.common.collect.ImmutableSet;
 import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.api.StatefulRedisConnection;
-import es.moki.ratelimitj.core.SlidingWindowRule;
+import es.moki.ratelimitj.core.LimitRule;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -44,7 +44,7 @@ public class RedisRateLimitTest {
     @Test
     public void shouldLimitSingleWindowAsync() throws Exception {
 
-        ImmutableSet<SlidingWindowRule> rules = ImmutableSet.of(SlidingWindowRule.of(10, TimeUnit.SECONDS, 5));
+        ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(10, TimeUnit.SECONDS, 5));
         RedisRateLimit rateLimiter = new RedisRateLimit(client, rules);
 
         List<CompletionStage> stageAsserts = new CopyOnWriteArrayList<>();
@@ -66,7 +66,7 @@ public class RedisRateLimitTest {
     @Test
     public void shouldLimitDualWindowAsync() throws Exception {
 
-        ImmutableSet<SlidingWindowRule> rules = ImmutableSet.of(SlidingWindowRule.of(2, TimeUnit.SECONDS, 5), SlidingWindowRule.of(10, TimeUnit.SECONDS, 20));
+        ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(2, TimeUnit.SECONDS, 5), LimitRule.of(10, TimeUnit.SECONDS, 20));
         RedisRateLimit rateLimiter = new RedisRateLimit(client, rules);
 
         List<CompletionStage> stageAsserts = new CopyOnWriteArrayList<>();
@@ -90,7 +90,7 @@ public class RedisRateLimitTest {
     @Test
     public void shouldLimitSingleWindowSync() throws Exception {
 
-        ImmutableSet<SlidingWindowRule> rules = ImmutableSet.of(SlidingWindowRule.of(10, TimeUnit.SECONDS, 5));
+        ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(10, TimeUnit.SECONDS, 5));
         RedisRateLimit rateLimiter = new RedisRateLimit(client, rules);
 
         IntStream.rangeClosed(1, 5).forEach(value -> {
@@ -104,7 +104,7 @@ public class RedisRateLimitTest {
     @Test
     public void shouldWorkWithRedisTime() throws Exception {
 
-        ImmutableSet<SlidingWindowRule> rules = ImmutableSet.of(SlidingWindowRule.of(10, TimeUnit.SECONDS, 5), SlidingWindowRule.of(3600, TimeUnit.SECONDS, 1000));
+        ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(10, TimeUnit.SECONDS, 5), LimitRule.of(3600, TimeUnit.SECONDS, 1000));
         RedisRateLimit rateLimiter = new RedisRateLimit(client, rules, true);
 
         CompletionStage<Boolean> key = rateLimiter.overLimitAsync("ip:127.0.0.3");

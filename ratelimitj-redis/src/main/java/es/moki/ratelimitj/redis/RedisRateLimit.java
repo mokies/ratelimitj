@@ -1,13 +1,11 @@
 package es.moki.ratelimitj.redis;
 
 
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonArray;
 import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.api.async.RedisAsyncCommands;
 import es.moki.ratelimitj.core.AsyncRateLimiter;
 import es.moki.ratelimitj.core.RateLimiter;
-import es.moki.ratelimitj.core.SlidingWindowRule;
+import es.moki.ratelimitj.core.LimitRule;
 import net.jcip.annotations.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +26,7 @@ public class RedisRateLimit implements AutoCloseable, AsyncRateLimiter, RateLimi
 
     private static final Logger LOG = LoggerFactory.getLogger(RedisRateLimit.class);
 
+    private final LimitRuleJsonSerialiser ruleSerialiser = new LimitRuleJsonSerialiser();
     private final RedisAsyncCommands<String, String> async;
     private final RedisScriptLoader scriptLoader;
     private final String rulesJson;
@@ -35,14 +34,14 @@ public class RedisRateLimit implements AutoCloseable, AsyncRateLimiter, RateLimi
 
     // TODO Might require a configuration factory.
 
-    public RedisRateLimit(RedisClient redisClient, Set<SlidingWindowRule> rules) {
+    public RedisRateLimit(RedisClient redisClient, Set<LimitRule> rules) {
         this(redisClient, rules, false);
     }
 
-    public RedisRateLimit(RedisClient redisClient, Set<SlidingWindowRule> rules, boolean useRedisTime) {
+    public RedisRateLimit(RedisClient redisClient, Set<LimitRule> rules, boolean useRedisTime) {
         async = redisClient.connect().async();
         scriptLoader = new RedisScriptLoader(async, limitScript());
-        rulesJson = toJsonArray(requireNonNull(rules));
+        rulesJson = ruleSerialiser.encode(rules);
         this.useRedisTime = useRedisTime;
     }
 
@@ -52,14 +51,6 @@ public class RedisRateLimit implements AutoCloseable, AsyncRateLimiter, RateLimi
         } catch (URISyntaxException e) {
             throw new RuntimeException("Unable to load limit.lua", e);
         }
-    }
-
-    private String toJsonArray(Set<SlidingWindowRule> rules) {
-        JsonArray jsonArray = Json.array().asArray();
-        rules.forEach(window -> jsonArray.add(window.toJsonArray()));
-        String rulesJson = jsonArray.toString();
-        LOG.debug("Rules {}", rulesJson);
-        return rulesJson;
     }
 
     public CompletionStage<Boolean> overLimitAsync(String key) {
