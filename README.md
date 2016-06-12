@@ -12,7 +12,7 @@ Feature Roadmap
 | ------------- |-------------| 
 | Redis sliding window rate limiter | alpha  |
 | In memory sliding window rate limiter | not started |
-| Hazelcast sliding window rate limiter | not started |
+| Hazelcast sliding window rate limiter | started |
 | Redis fast bucket rate limiter | not started |
 | In memory fast bucket rate limiter | not started |
 | In memory fast bucket rate limiter | not started |
