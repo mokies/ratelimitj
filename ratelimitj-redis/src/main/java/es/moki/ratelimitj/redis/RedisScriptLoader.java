@@ -1,13 +1,12 @@
 package es.moki.ratelimitj.redis;
 
 
-import com.lambdaworks.redis.RedisFuture;
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
 import com.lambdaworks.redis.api.async.RedisAsyncCommands;
 
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.concurrent.TimeUnit;
+import java.io.IOException;
+import java.net.URL;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.Objects.requireNonNull;
@@ -15,16 +14,15 @@ import static java.util.Objects.requireNonNull;
 public class RedisScriptLoader {
 
     private final RedisAsyncCommands<String, String> async;
-    private final URI scriptUri;
+    private final String scriptUri;
     private final AtomicReference<String> scriptSha = new AtomicReference<>();
 
-    public RedisScriptLoader(RedisAsyncCommands<String, String> async, URI scriptUri) {
+    public RedisScriptLoader(RedisAsyncCommands<String, String> async, String scriptUri) {
         this(async, scriptUri, true);
     }
 
-
     // TODO async seems unnecessary for this class
-    public RedisScriptLoader(RedisAsyncCommands<String, String> async, URI scriptUri, boolean eagerLoad) {
+    public RedisScriptLoader(RedisAsyncCommands<String, String> async, String scriptUri, boolean eagerLoad) {
         this.async = requireNonNull(async);
         this.scriptUri = requireNonNull(scriptUri);
         if (eagerLoad) {
@@ -32,29 +30,31 @@ public class RedisScriptLoader {
         }
     }
 
-    public RedisFuture<String> loadScript() {
-         String script;
-         try {
-             script = new String(Files.readAllBytes(Paths.get(scriptUri)));
-         } catch (Exception e) {
-             throw new RuntimeException(e);
-         }
+    public String scriptSha() {
+        String sha = scriptSha.get();
 
-        return async.scriptLoad(script);
-     }
+        if (sha == null) {
+            loadScript();
+            sha = scriptSha.get();
+        }
+        return sha;
+    }
 
-     public String scriptSha()  {
-         String sha = scriptSha.get();
-         if (sha == null) {
-             RedisFuture<String> shaFuture = loadScript();
-             shaFuture.thenAccept(scriptSha::set);
-             try {
-                sha = shaFuture.get(10, TimeUnit.SECONDS);
-             } catch (Exception e) {
-                 throw new RuntimeException(e);
-             }
-         }
-         return sha;
-     }
+    private void loadScript() {
+        String script;
+        try {
+            script = readScriptFile();
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to load Redis LUA script file", e);
+        }
+
+        scriptSha.set(async.getStatefulConnection().sync().scriptLoad(script));
+    }
+
+    private String readScriptFile() throws IOException {
+        // TODO remove guava depedency - java file loading is a mess!
+        URL url = Resources.getResource(scriptUri);
+        return Resources.toString(url, Charsets.UTF_8);
+    }
 
 }

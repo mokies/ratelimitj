@@ -1,6 +1,9 @@
 package es.moki.ratelimitj.core;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.OptionalInt;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class LimitRule {
@@ -15,10 +18,18 @@ public class LimitRule {
         this.precision = OptionalInt.empty();
     }
 
-    private LimitRule(LimitRule limitRule, int precision) {
-        this.durationSeconds = limitRule.durationSeconds;
-        this.limit = limitRule.limit;
+    private LimitRule(int durationSeconds, long limit, int precision) {
+        this.durationSeconds = durationSeconds;
+        this.limit = limit;
         this.precision = OptionalInt.of(precision);
+    }
+
+    public static Set<LimitRule> acceptableUseRuleSet() {
+        return Collections.unmodifiableSet(new HashSet<LimitRule>() {{
+            add(new LimitRule(1, 10));
+            add(new LimitRule(60, 120));
+            add(new LimitRule(3600, 240, 60));
+        }});
     }
 
     public static LimitRule of(int duration, TimeUnit timeUnit, long limit) {
@@ -26,7 +37,7 @@ public class LimitRule {
     }
 
     public LimitRule withPrecision(int precision) {
-        return new LimitRule(this, precision);
+        return new LimitRule(this.durationSeconds, this.limit, precision);
     }
 
     public int getDurationSeconds() {

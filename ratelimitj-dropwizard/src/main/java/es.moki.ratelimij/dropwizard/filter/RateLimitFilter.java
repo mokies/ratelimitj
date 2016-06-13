@@ -1,4 +1,4 @@
-package es.moki.ratelimij.dropwizard;
+package es.moki.ratelimij.dropwizard.filter;
 
 
 import es.moki.ratelimitj.core.RateLimiter;
