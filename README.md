@@ -8,6 +8,7 @@ The RateLimitJ project aims to provide a modular rate limiting solution allowing
 RateLimitJ is currently under active construction and provides the following pluggable modules:
 
 * [Redis sliding window rate limiter](ratelimitj-redis)
+* [Dropwizard integration](ratelimitj-dropwizard)
 
 Dependancies
 ============
@@ -24,7 +25,6 @@ Feature Roadmap
 | Hazelcast sliding window rate limiter | active prototyping |
 | In memory sliding window rate limiter | active prototyping |
 | Redis fast bucket rate limiter | not started |
-| In memory fast bucket rate limiter | not started |
 | In memory fast bucket rate limiter | not started |
 | Spring integration | not started |
 
