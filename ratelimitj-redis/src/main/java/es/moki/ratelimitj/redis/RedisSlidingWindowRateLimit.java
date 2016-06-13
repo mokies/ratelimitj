@@ -22,9 +22,9 @@ import static com.lambdaworks.redis.ScriptOutputType.VALUE;
 import static java.util.Objects.requireNonNull;
 
 @ThreadSafe
-public class RedisRateLimit implements AutoCloseable, AsyncRateLimiter, RateLimiter {
+public class RedisSlidingWindowRateLimit implements AutoCloseable, AsyncRateLimiter, RateLimiter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RedisRateLimit.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RedisSlidingWindowRateLimit.class);
 
     private final LimitRuleJsonSerialiser ruleSerialiser = new LimitRuleJsonSerialiser();
     private final RedisAsyncCommands<String, String> async;
@@ -34,11 +34,11 @@ public class RedisRateLimit implements AutoCloseable, AsyncRateLimiter, RateLimi
 
     // TODO Might require a configuration factory.
 
-    public RedisRateLimit(RedisClient redisClient, Set<LimitRule> rules) {
+    public RedisSlidingWindowRateLimit(RedisClient redisClient, Set<LimitRule> rules) {
         this(redisClient, rules, false);
     }
 
-    public RedisRateLimit(RedisClient redisClient, Set<LimitRule> rules, boolean useRedisTime) {
+    public RedisSlidingWindowRateLimit(RedisClient redisClient, Set<LimitRule> rules, boolean useRedisTime) {
         async = redisClient.connect().async();
         scriptLoader = new RedisScriptLoader(async, limitScript());
         rulesJson = ruleSerialiser.encode(rules);

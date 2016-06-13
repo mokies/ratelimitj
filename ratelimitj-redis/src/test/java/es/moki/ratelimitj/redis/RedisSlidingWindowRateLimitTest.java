@@ -22,9 +22,9 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
-public class RedisRateLimitTest {
+public class RedisSlidingWindowRateLimitTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RedisRateLimitTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RedisSlidingWindowRateLimitTest.class);
 
     private static RedisClient client;
 
@@ -45,7 +45,7 @@ public class RedisRateLimitTest {
     public void shouldLimitSingleWindowAsync() throws Exception {
 
         ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(10, TimeUnit.SECONDS, 5));
-        RedisRateLimit rateLimiter = new RedisRateLimit(client, rules);
+        RedisSlidingWindowRateLimit rateLimiter = new RedisSlidingWindowRateLimit(client, rules);
 
         List<CompletionStage> stageAsserts = new CopyOnWriteArrayList<>();
         Observable.defer(() -> Observable.just("ip:127.0.0.2"))
@@ -67,7 +67,7 @@ public class RedisRateLimitTest {
     public void shouldLimitDualWindowAsync() throws Exception {
 
         ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(2, TimeUnit.SECONDS, 5), LimitRule.of(10, TimeUnit.SECONDS, 20));
-        RedisRateLimit rateLimiter = new RedisRateLimit(client, rules);
+        RedisSlidingWindowRateLimit rateLimiter = new RedisSlidingWindowRateLimit(client, rules);
 
         List<CompletionStage> stageAsserts = new CopyOnWriteArrayList<>();
         Observable.defer(() -> Observable.just("ip:127.0.0.10"))
@@ -91,7 +91,7 @@ public class RedisRateLimitTest {
     public void shouldLimitSingleWindowSync() throws Exception {
 
         ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(10, TimeUnit.SECONDS, 5));
-        RedisRateLimit rateLimiter = new RedisRateLimit(client, rules);
+        RedisSlidingWindowRateLimit rateLimiter = new RedisSlidingWindowRateLimit(client, rules);
 
         IntStream.rangeClosed(1, 5).forEach(value -> {
             boolean result = rateLimiter.overLimit("ip:127.0.0.5");
@@ -105,7 +105,7 @@ public class RedisRateLimitTest {
     public void shouldWorkWithRedisTime() throws Exception {
 
         ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(10, TimeUnit.SECONDS, 5), LimitRule.of(3600, TimeUnit.SECONDS, 1000));
-        RedisRateLimit rateLimiter = new RedisRateLimit(client, rules, true);
+        RedisSlidingWindowRateLimit rateLimiter = new RedisSlidingWindowRateLimit(client, rules, true);
 
         CompletionStage<Boolean> key = rateLimiter.overLimitAsync("ip:127.0.0.3");
 
