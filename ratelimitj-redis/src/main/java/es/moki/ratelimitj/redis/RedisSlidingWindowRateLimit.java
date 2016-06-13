@@ -47,6 +47,7 @@ public class RedisSlidingWindowRateLimit implements AutoCloseable, AsyncRateLimi
         return overLimitAsync(key, 1);
     }
 
+    // TODO support multi keys
     public CompletionStage<Boolean> overLimitAsync(String key, int weight) {
         requireNonNull(key);
 

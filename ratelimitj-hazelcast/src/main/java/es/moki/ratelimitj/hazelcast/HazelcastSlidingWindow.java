@@ -20,6 +20,7 @@ public class HazelcastSlidingWindow {
         this.hc = hc;
     }
 
+    // TODO support muli keys
     public boolean isOverLimit(String key, Set<LimitRule> rules, int weight) {
 
         // TODO assert must have at least one rule
@@ -31,7 +32,9 @@ public class HazelcastSlidingWindow {
 
         long now = System.currentTimeMillis();
         long longestDurection = rules.stream().findFirst().get().getDurationSeconds();
-        List<Saved> savedKeys = new ArrayList<>();
+        List<SavedKey> savedKeyKeys = new ArrayList<>();
+
+        ConcurrentMap<String, Long> hcKeyMap = hc.getMap(key);
 
         // TODO perform each rule calculation in parallel
         for (LimitRule rule : rules) {
@@ -41,18 +44,17 @@ public class HazelcastSlidingWindow {
             precision = Math.min(precision, duration);
             long blocks = (long) Math.ceil(duration / precision);
 
-            Saved saved = new Saved();
-            saved.blockId = (long) Math.floor(now / precision);
-            saved.trimBefore = saved.blockId - blocks + 1;
-            saved.countKey = "" + duration + ':' + precision + ':';
-            saved.tsKey = saved.countKey + 'o';
-            savedKeys.add(saved);
+            SavedKey savedKey = new SavedKey();
+            savedKey.blockId = (long) Math.floor(now / precision);
+            savedKey.trimBefore = savedKey.blockId - blocks + 1;
+            savedKey.countKey = "" + duration + ':' + precision + ':';
+            savedKey.tsKey = savedKey.countKey + 'o';
+            savedKeyKeys.add(savedKey);
 
-            ConcurrentMap<String, Long> hcKeyMap = hc.getMap(key);
-            Long oldTs = hcKeyMap.get(saved.tsKey);
+            Long oldTs = hcKeyMap.get(savedKey.tsKey);
 
             //oldTs = Optional.ofNullable(oldTs).orElse(saved.trimBefore);
-            oldTs = oldTs != null ? oldTs : saved.trimBefore;
+            oldTs = oldTs != null ? oldTs : savedKey.trimBefore;
 
             if (oldTs > now) {
                 // don't write in the past
@@ -62,11 +64,11 @@ public class HazelcastSlidingWindow {
             // discover what needs to be cleaned up
             long decr = 0;
             List<String> dele = new ArrayList<>();
-            long trim = Math.min(saved.trimBefore, oldTs + blocks);
+            long trim = Math.min(savedKey.trimBefore, oldTs + blocks);
 
             // TODO suspect I have an off by one error here
             for (long oldBlock = oldTs; oldBlock == trim - 1; oldBlock++) {
-                String bkey = saved.countKey + oldBlock;
+                String bkey = savedKey.countKey + oldBlock;
                 Long bcount = hcKeyMap.get(bkey);
                 if (bcount != null) {
                     decr = decr + bcount;
@@ -79,10 +81,10 @@ public class HazelcastSlidingWindow {
             if (!dele.isEmpty()) {
                 dele.stream().forEach(hcKeyMap::remove);
                 final long decrement = decr;
-                cur = hcKeyMap.computeIfPresent(saved.countKey, (k, v) -> v - decrement);
+                cur = hcKeyMap.computeIfPresent(savedKey.countKey, (k, v) -> v - decrement);
             } else {
                 // cur = redis.call('HGET', key, saved.count_key)
-                cur = hcKeyMap.get(saved.countKey);
+                cur = hcKeyMap.get(savedKey.countKey);
             }
 
             // check our limits
@@ -92,6 +94,11 @@ public class HazelcastSlidingWindow {
         }
 
         // there is enough resources, update the counts
+        for (SavedKey savedKey : savedKeyKeys) {
+            for (
+            //update the current timestamp, count, and bucket count
+                hcKeyMap.put(savedKey.tsKey, savedKey.trimBefore);
+        }
 
 //        for i, limit in ipairs(limits) do
 //            local saved = saved_keys[i]
@@ -107,7 +114,7 @@ public class HazelcastSlidingWindow {
     }
 
 
-    private static class Saved {
+    private static class SavedKey {
 
         long blockId;
         long trimBefore;
