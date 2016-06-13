@@ -3,7 +3,7 @@ RateLimitJ
 
 [![Build Status](https://travis-ci.org/mokies/ratelimitj.svg)](https://travis-ci.org/mokies/ratelimitj)
 
-The RateLimitJ project aims to provide a modular design allowing for adaptability between backend storage and application frameworks in the Java ecosystem.
+The RateLimitJ project aims to provide a modular rate limiting solution allowing for adaptability between backend storage and application frameworks in the Java ecosystem.
 
 RateLimitJ is currently under active construction and provides the following pluggable modules:
 
