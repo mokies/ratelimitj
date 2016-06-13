@@ -3,7 +3,7 @@ description 'RateLimitJ Hazelcast'
 dependencies {
 
     compile(
-            project(':ratelimitj-core'),
+            project(':ratelimitj-api'),
 
             'com.hazelcast:hazelcast:3.7-EA'
     )

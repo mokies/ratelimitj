@@ -3,7 +3,7 @@ description 'RateLimitJ Redis'
 dependencies {
 
     compile(
-            project(':ratelimitj-core'),
+            project(':ratelimitj-api'),
             'biz.paluch.redis:lettuce:4.2.0.Final',
             'com.eclipsesource.minimal-json:minimal-json:0.9.4',
     )

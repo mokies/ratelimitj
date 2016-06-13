@@ -12,8 +12,5 @@ public class HazelcastRateLimiter implements RateLimiter {
         return false;
     }
 
-    @Override
-    public void close() throws Exception {
-        // do nothing
-    }
+ 
 }

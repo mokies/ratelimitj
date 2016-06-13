@@ -1,4 +1,4 @@
-description 'RateLimitJ Core'
+description 'RateLimitJ API'
 
 dependencies {
 

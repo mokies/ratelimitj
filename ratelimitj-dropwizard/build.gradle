@@ -4,7 +4,7 @@ description 'RateLimitJ Dropwizard'
 dependencies {
 
     compile(
-            project(':ratelimitj-core'),
+            project(':ratelimitj-api'),
             "io.dropwizard:dropwizard-core:$dropwizardVersion",
             "io.dropwizard:dropwizard-jersey:$dropwizardVersion"
     )
