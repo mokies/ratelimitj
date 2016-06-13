@@ -1,6 +1,6 @@
 package es.moki.ratelimitj.core;
 
-public interface RateLimiter extends AutoCloseable {
+public interface RateLimiter {
 
     boolean overLimit(String key);
 

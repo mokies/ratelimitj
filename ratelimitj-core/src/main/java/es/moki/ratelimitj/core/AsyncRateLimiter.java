@@ -3,7 +3,7 @@ package es.moki.ratelimitj.core;
 
 import java.util.concurrent.CompletionStage;
 
-public interface AsyncRateLimiter extends AutoCloseable {
+public interface AsyncRateLimiter {
 
     CompletionStage<Boolean> overLimitAsync(String key);
 

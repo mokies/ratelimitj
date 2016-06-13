@@ -3,9 +3,7 @@ package es.moki.ratelimitj.core;
 
 import rx.Observable;
 
-import java.util.concurrent.CompletionStage;
-
-public class ReactiveRateLimiter {
+public interface ReactiveRateLimiter {
 
     Observable<Boolean> overLimitReactive(String key);
 
