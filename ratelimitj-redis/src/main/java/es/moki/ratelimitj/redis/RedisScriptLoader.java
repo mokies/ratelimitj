@@ -4,6 +4,7 @@ package es.moki.ratelimitj.redis;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import com.lambdaworks.redis.api.async.RedisAsyncCommands;
+import com.lambdaworks.redis.api.sync.RedisCommands;
 
 import java.io.IOException;
 import java.net.URL;
@@ -13,7 +14,7 @@ import static java.util.Objects.requireNonNull;
 
 public class RedisScriptLoader {
 
-    private final RedisAsyncCommands<String, String> async;
+    private final RedisCommands<String, String> async;
     private final String scriptUri;
     private final AtomicReference<String> scriptSha = new AtomicReference<>();
 
@@ -23,7 +24,8 @@ public class RedisScriptLoader {
 
     // TODO async seems unnecessary for this class
     public RedisScriptLoader(RedisAsyncCommands<String, String> async, String scriptUri, boolean eagerLoad) {
-        this.async = requireNonNull(async);
+        requireNonNull(async);
+        this.async = async.getStatefulConnection().sync();
         this.scriptUri = requireNonNull(scriptUri);
         if (eagerLoad) {
             loadScript();
@@ -34,6 +36,8 @@ public class RedisScriptLoader {
         String sha = scriptSha.get();
 
         if (sha == null) {
+            // TODO calculate sha hash and check if script already loaded in Redis
+            //async.scriptExists()
             loadScript();
             sha = scriptSha.get();
         }

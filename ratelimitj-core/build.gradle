@@ -3,6 +3,7 @@ description 'RateLimitJ Core'
 dependencies {
 
     compile(
+            'io.reactivex:rxjava:1.1.0'
     )
     testCompile(
     )
