@@ -1,7 +1,7 @@
 package es.moki.ratelimitj.hazelcast;
 
 import com.hazelcast.core.HazelcastInstance;
-import es.moki.ratelimitj.core.SlidingWindowRule;
+import es.moki.ratelimitj.core.LimitRule;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -9,15 +9,15 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
 
-public class SlidingWindow {
+public class HazelcastSlidingWindow {
 
     private final HazelcastInstance hc;
 
-    public SlidingWindow(HazelcastInstance hc) {
+    public HazelcastSlidingWindow(HazelcastInstance hc) {
         this.hc = hc;
     }
 
-    public boolean isOverLimit(String key, Set<SlidingWindowRule> rules, int weight) {
+    public boolean isOverLimit(String key, Set<LimitRule> rules, int weight) {
 
         // TODO assert must have at least one rule
 
@@ -25,7 +25,7 @@ public class SlidingWindow {
         long longestDurection = rules.stream().findFirst().get().getDurationSeconds();
         Queue<Saved> savedKeys = new LinkedList<>();
 
-        for (SlidingWindowRule rule: rules) {
+        for (LimitRule rule: rules) {
             int duration = rule.getDurationSeconds();
             longestDurection = Math.max(longestDurection, duration);
             int precision = rule.getPrecision().orElse(duration);

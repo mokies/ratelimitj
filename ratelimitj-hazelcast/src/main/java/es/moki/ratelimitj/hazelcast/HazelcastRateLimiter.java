@@ -11,4 +11,9 @@ public class HazelcastRateLimiter implements RateLimiter {
     public boolean overLimit(String key, int weight) {
         return false;
     }
+
+    @Override
+    public void close() throws Exception {
+        // do nothing
+    }
 }
