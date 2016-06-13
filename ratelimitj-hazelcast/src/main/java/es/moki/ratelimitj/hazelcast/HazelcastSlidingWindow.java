@@ -63,6 +63,7 @@ public class HazelcastSlidingWindow {
             long decr = 0;
             List<String> dele = new ArrayList<>();
             long trim = Math.min(saved.trimBefore, oldTs + blocks);
+
             // TODO suspect I have an off by one error here
             for (long oldBlock = oldTs; oldBlock == trim - 1; oldBlock++) {
                 String bkey = saved.countKey + oldBlock;
@@ -91,6 +92,16 @@ public class HazelcastSlidingWindow {
         }
 
         // there is enough resources, update the counts
+
+//        for i, limit in ipairs(limits) do
+//            local saved = saved_keys[i]
+//            for j, key in ipairs(KEYS) do
+//                -- update the current timestamp, count, and bucket count
+//                redis.call('HSET', key, saved.ts_key, saved.trim_before)
+//                redis.call('HINCRBY', key, saved.count_key, weight)
+//                redis.call('HINCRBY', key, saved.count_key .. saved.block_id, weight)
+//            end
+//        end
 
         return false;
     }
