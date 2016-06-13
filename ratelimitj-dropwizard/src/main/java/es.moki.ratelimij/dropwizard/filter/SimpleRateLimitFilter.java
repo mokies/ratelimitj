@@ -14,14 +14,14 @@ import java.util.Optional;
 import static java.util.Objects.nonNull;
 
 @RateLimited
-public class RateLimitFilter implements ContainerRequestFilter {
+public class SimpleRateLimitFilter implements ContainerRequestFilter {
 
     private final RateLimiter rateLimit;
 
     @Context
     private HttpServletRequest request;
 
-    public RateLimitFilter(RateLimiter rateLimit) {
+    public SimpleRateLimitFilter(RateLimiter rateLimit) {
         this.rateLimit = rateLimit;
     }
 

@@ -12,7 +12,7 @@ public class RateLimitFeature implements DynamicFeature {
     @Override
     public void configure(ResourceInfo resourceInfo, FeatureContext context) {
         if (resourceInfo.getResourceMethod().getAnnotation(RateLimited.class) != null) {
-            context.register(RateLimitFilter.class);
+            context.register(SimpleRateLimitFilter.class);
         }
     }
 }

@@ -84,7 +84,7 @@ public class RedisSlidingWindowRateLimit implements AutoCloseable, AsyncRateLimi
         try {
             return overLimitAsync(key, weight).toCompletableFuture().get(10, TimeUnit.SECONDS);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to determine overLimit", e);
         }
     }
 

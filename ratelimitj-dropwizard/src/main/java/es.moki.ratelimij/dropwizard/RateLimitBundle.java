@@ -1,7 +1,7 @@
 package es.moki.ratelimij.dropwizard;
 
 
-import es.moki.ratelimij.dropwizard.filter.RateLimitFilter;
+import es.moki.ratelimij.dropwizard.filter.SimpleRateLimitFilter;
 import es.moki.ratelimitj.core.RateLimiter;
 import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
@@ -20,7 +20,6 @@ public class RateLimitBundle<T extends Configuration> implements ConfiguredBundl
     @Override
     public void run(T configuration, Environment environment) throws Exception {
 
-
         environment.lifecycle().manage(new Managed() {
         			@Override
         			public void start() throws Exception {
@@ -32,13 +31,10 @@ public class RateLimitBundle<T extends Configuration> implements ConfiguredBundl
         			}
         		});
 
-        // TODO provide decoupled mechanism to bind ratelimit implementation to dropwizard
+        // TODO provide decoupled mechanism to bind Ratelimiter implementation to dropwizard
 
-        RateLimitFilter rateLimitFilter = new RateLimitFilter(rateLimit);
+        SimpleRateLimitFilter rateLimitFilter = new SimpleRateLimitFilter(rateLimit);
         environment.jersey().register(rateLimitFilter);
-
-        // TODO configure via jersey feature
-
         //environment.jersey().register(DateRequiredFeature.class);
     }
 
