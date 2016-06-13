@@ -3,10 +3,13 @@ package es.moki.ratelimitj.hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import es.moki.ratelimitj.core.LimitRule;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+
+import static java.util.Objects.requireNonNull;
 
 
 public class HazelcastSlidingWindow {
@@ -20,12 +23,18 @@ public class HazelcastSlidingWindow {
     public boolean isOverLimit(String key, Set<LimitRule> rules, int weight) {
 
         // TODO assert must have at least one rule
+        requireNonNull(key, "key cannot be null");
+        requireNonNull(rules, "rules cannot be null");
+        if (rules.isEmpty()) {
+            throw new IllegalArgumentException("at least one rule must be provided");
+        }
 
         long now = System.currentTimeMillis();
         long longestDurection = rules.stream().findFirst().get().getDurationSeconds();
-        Queue<Saved> savedKeys = new LinkedList<>();
+        List<Saved> savedKeys = new ArrayList<>();
 
-        for (LimitRule rule: rules) {
+        // TODO perform each rule calculation in parallel
+        for (LimitRule rule : rules) {
             int duration = rule.getDurationSeconds();
             longestDurection = Math.max(longestDurection, duration);
             int precision = rule.getPrecision().orElse(duration);
@@ -39,17 +48,49 @@ public class HazelcastSlidingWindow {
             saved.tsKey = saved.countKey + 'o';
             savedKeys.add(saved);
 
-            ConcurrentMap<String, String> map = hc.getMap("my-distributed-map");
-            String oldTs = map.get(saved.tsKey) ;
+            ConcurrentMap<String, Long> hcKeyMap = hc.getMap(key);
+            Long oldTs = hcKeyMap.get(saved.tsKey);
 
-//            oldTsLong = oldTs and tonumber(oldTs) or saved.trimBefore;
-            long oldTsLong = oldTs != null ? Long.parseLong(oldTs) : saved.trimBefore;
+            //oldTs = Optional.ofNullable(oldTs).orElse(saved.trimBefore);
+            oldTs = oldTs != null ? oldTs : saved.trimBefore;
 
-            if (oldTsLong > now) {
+            if (oldTs > now) {
+                // don't write in the past
                 return true;
             }
 
+            // discover what needs to be cleaned up
+            long decr = 0;
+            List<String> dele = new ArrayList<>();
+            long trim = Math.min(saved.trimBefore, oldTs + blocks);
+            // TODO suspect I have an off by one error here
+            for (long oldBlock = oldTs; oldBlock == trim - 1; oldBlock++) {
+                String bkey = saved.countKey + oldBlock;
+                Long bcount = hcKeyMap.get(bkey);
+                if (bcount != null) {
+                    decr = decr + bcount;
+                    dele.add(bkey);
+                }
+            }
+
+            // handle cleanup
+            Long cur;
+            if (!dele.isEmpty()) {
+                dele.stream().forEach(hcKeyMap::remove);
+                final long decrement = decr;
+                cur = hcKeyMap.computeIfPresent(saved.countKey, (k, v) -> v - decrement);
+            } else {
+                // cur = redis.call('HGET', key, saved.count_key)
+                cur = hcKeyMap.get(saved.countKey);
+            }
+
+            // check our limits
+            if (Optional.ofNullable(cur).orElse(0L) + weight > rule.getLimit()) {
+                return true;
+            }
         }
+
+        // there is enough resources, update the counts
 
         return false;
     }
