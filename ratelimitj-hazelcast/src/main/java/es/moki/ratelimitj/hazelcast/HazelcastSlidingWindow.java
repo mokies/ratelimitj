@@ -95,9 +95,10 @@ public class HazelcastSlidingWindow {
 
         // there is enough resources, update the counts
         for (SavedKey savedKey : savedKeyKeys) {
-            for (
+            //for (
             //update the current timestamp, count, and bucket count
-                hcKeyMap.put(savedKey.tsKey, savedKey.trimBefore);
+                //hcKeyMap.put(savedKey.tsKey, savedKey.trimBefore);
+
         }
 
 //        for i, limit in ipairs(limits) do
