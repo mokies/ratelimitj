@@ -15,4 +15,4 @@ cache:
     - $HOME/.gradle/wrapper/
 services:
   - redis-server
-script: ./gradlew build
+script: ./gradlew clean build
