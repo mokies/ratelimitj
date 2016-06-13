@@ -28,7 +28,8 @@ subprojects {
                 'org.assertj:assertj-core:3.4.1',
                 'junit:junit:4.12',
                 'ch.qos.logback:logback-classic:1.1.7',
-                'com.google.guava:guava:19.0'
+                'com.google.guava:guava:19.0',
+                'org.mockito:mockito-core:2.0.55-beta'
         )
     }
 
