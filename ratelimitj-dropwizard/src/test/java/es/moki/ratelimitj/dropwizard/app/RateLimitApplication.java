@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import com.lambdaworks.redis.RedisClient;
 import es.moki.ratelimij.dropwizard.RateLimitBundle;
 import es.moki.ratelimitj.core.LimitRule;
-import es.moki.ratelimitj.redis.RedisSlidingWindowRateLimit;
+import es.moki.ratelimitj.redis.RedisSlidingWindowRateLimiter;
 import io.dropwizard.Application;
 import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.setup.Bootstrap;
@@ -20,7 +20,7 @@ public class RateLimitApplication extends Application<RateLimitConfiguration> {
     public void initialize(Bootstrap<RateLimitConfiguration> bootstrap) {
         client = RedisClient.create("redis://localhost");
 
-        RedisSlidingWindowRateLimit redisRateLimiter = new RedisSlidingWindowRateLimit(client, ImmutableSet.of(LimitRule.of(10, TimeUnit.SECONDS, 5)));
+        RedisSlidingWindowRateLimiter redisRateLimiter = new RedisSlidingWindowRateLimiter(client, ImmutableSet.of(LimitRule.of(10, TimeUnit.SECONDS, 5)));
         bootstrap.addBundle(new RateLimitBundle<>(redisRateLimiter));
     }
 

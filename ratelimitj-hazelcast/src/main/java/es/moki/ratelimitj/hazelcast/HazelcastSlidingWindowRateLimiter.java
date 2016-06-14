@@ -2,6 +2,7 @@ package es.moki.ratelimitj.hazelcast;
 
 import com.hazelcast.core.HazelcastInstance;
 import es.moki.ratelimitj.core.LimitRule;
+import es.moki.ratelimitj.core.RateLimiter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,16 +13,19 @@ import java.util.concurrent.ConcurrentMap;
 import static java.util.Objects.requireNonNull;
 
 
-public class HazelcastSlidingWindow {
+public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
 
-    private final HazelcastInstance hc;
+    private final HazelcastInstance hz;
+    private final Set<LimitRule> rules;
 
-    public HazelcastSlidingWindow(HazelcastInstance hc) {
-        this.hc = hc;
+    public HazelcastSlidingWindowRateLimiter(HazelcastInstance hz, Set<LimitRule> rules) {
+        this.hz = hz;
+        this.rules = rules;
     }
 
     // TODO support muli keys
-    public boolean isOverLimit(String key, Set<LimitRule> rules, int weight) {
+    @Override
+    public boolean overLimit(String key, int weight) {
 
         // TODO assert must have at least one rule
         requireNonNull(key, "key cannot be null");
@@ -30,16 +34,15 @@ public class HazelcastSlidingWindow {
             throw new IllegalArgumentException("at least one rule must be provided");
         }
 
-        long now = System.currentTimeMillis();
-        long longestDurection = rules.stream().findFirst().get().getDurationSeconds();
-        List<SavedKey> savedKeyKeys = new ArrayList<>();
+        final long now = System.currentTimeMillis();
+        final long longestDuration = rules.stream().map(LimitRule::getDurationSeconds).reduce(Integer::max).get();
+        List<SavedKey> savedKeys = new ArrayList<>();
 
-        ConcurrentMap<String, Long> hcKeyMap = hc.getMap(key);
+        ConcurrentMap<String, Long> hcKeyMap = hz.getMap(key);
 
         // TODO perform each rule calculation in parallel
         for (LimitRule rule : rules) {
             int duration = rule.getDurationSeconds();
-            longestDurection = Math.max(longestDurection, duration);
             int precision = rule.getPrecision().orElse(duration);
             precision = Math.min(precision, duration);
             long blocks = (long) Math.ceil(duration / precision);
@@ -49,7 +52,7 @@ public class HazelcastSlidingWindow {
             savedKey.trimBefore = savedKey.blockId - blocks + 1;
             savedKey.countKey = "" + duration + ':' + precision + ':';
             savedKey.tsKey = savedKey.countKey + 'o';
-            savedKeyKeys.add(savedKey);
+            savedKeys.add(savedKey);
 
             Long oldTs = hcKeyMap.get(savedKey.tsKey);
 
@@ -81,9 +84,9 @@ public class HazelcastSlidingWindow {
             if (!dele.isEmpty()) {
                 dele.stream().forEach(hcKeyMap::remove);
                 final long decrement = decr;
-                cur = hcKeyMap.computeIfPresent(savedKey.countKey, (k, v) -> v - decrement);
+                // TODO should this ben just compute
+                cur = hcKeyMap.compute(savedKey.countKey, (k, v) -> v - decrement);
             } else {
-                // cur = redis.call('HGET', key, saved.count_key)
                 cur = hcKeyMap.get(savedKey.countKey);
             }
 
@@ -94,28 +97,38 @@ public class HazelcastSlidingWindow {
         }
 
         // there is enough resources, update the counts
-        for (SavedKey savedKey : savedKeyKeys) {
-            //for (
+        for (SavedKey savedKey : savedKeys) {
             //update the current timestamp, count, and bucket count
-                //hcKeyMap.put(savedKey.tsKey, savedKey.trimBefore);
-
+            hcKeyMap.put(savedKey.tsKey, savedKey.trimBefore);
+            // TODO should this ben just compute
+            hcKeyMap.compute(savedKey.countKey, (k, v) -> v + weight);
+            hcKeyMap.compute(savedKey.countKey + savedKey.blockId, (k, v) -> v + weight);
         }
 
-//        for i, limit in ipairs(limits) do
-//            local saved = saved_keys[i]
-//            for j, key in ipairs(KEYS) do
-//                -- update the current timestamp, count, and bucket count
-//                redis.call('HSET', key, saved.ts_key, saved.trim_before)
-//                redis.call('HINCRBY', key, saved.count_key, weight)
-//                redis.call('HINCRBY', key, saved.count_key .. saved.block_id, weight)
-//            end
-//        end
+        // We calculated the longest-duration limit so we can EXPIRE
+//        if (longestDuration > 0) {
+            //hcKeyMap.remove(longestDuration);
+            // TODO this map will grow indefinitely, need to find a way to evict stale keys.
+//            hz.getMap(key).
+//        }
 
+        return false;
+    }
+
+    @Override public boolean overLimit(String key) {
         return false;
     }
 
 
     private static class SavedKey {
+
+        public SavedKey() { }
+//        public SavedKey(long now, LimitRule rule) {
+//            blockId = (long) Math.floor(now / precision);
+//            trimBefore = savedKey.blockId - blocks + 1;
+//            countKey = "" + duration + ':' + precision + ':';
+//            tsKey = savedKey.countKey + 'o';
+//        }
 
         long blockId;
         long trimBefore;
