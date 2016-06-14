@@ -3,6 +3,8 @@ package es.moki.ratelimitj.hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import es.moki.ratelimitj.core.LimitRule;
 import es.moki.ratelimitj.core.RateLimiter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +16,8 @@ import static java.util.Objects.requireNonNull;
 
 
 public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(HazelcastSlidingWindowRateLimiter.class);
 
     private final HazelcastInstance hz;
     private final Set<LimitRule> rules;
@@ -101,8 +105,11 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
             //update the current timestamp, count, and bucket count
             hcKeyMap.put(savedKey.tsKey, savedKey.trimBefore);
             // TODO should this ben just compute
-            hcKeyMap.compute(savedKey.countKey, (k, v) -> v + weight);
-            hcKeyMap.compute(savedKey.countKey + savedKey.blockId, (k, v) -> v + weight);
+            Long computedCountKeyValue = hcKeyMap.compute(savedKey.countKey, (k, v) -> Optional.ofNullable(v).orElse(0L) + weight);
+            //LOG.debug("{}={}", savedKey.countKey, computedCountKeyValue);
+            Long computedCountKeyBlockIdValue = hcKeyMap.compute(savedKey.countKey + savedKey.blockId, (k, v) -> Optional.ofNullable(v).orElse(0L) + weight);
+            //LOG.debug("{}={}", savedKey.countKey + savedKey.blockId, computedCountKeyValue);
+
         }
 
         // We calculated the longest-duration limit so we can EXPIRE
@@ -116,7 +123,7 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
     }
 
     @Override public boolean overLimit(String key) {
-        return false;
+        return overLimit(key, 1);
     }
 
 

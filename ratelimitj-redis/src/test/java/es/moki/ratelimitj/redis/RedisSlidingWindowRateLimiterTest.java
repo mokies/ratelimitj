@@ -1,11 +1,13 @@
 package es.moki.ratelimitj.redis;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
 import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.api.StatefulRedisConnection;
 import es.moki.ratelimitj.core.LimitRule;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,6 +109,21 @@ public class RedisSlidingWindowRateLimiterTest {
         CompletionStage<Boolean> key = rateLimiter.overLimitAsync("ip:127.0.0.3");
 
         assertThat(key.toCompletableFuture().get()).isFalse();
+    }
+
+    @Test @Ignore
+    public void shouldPerformFastSingleWindow() throws Exception {
+
+        ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(1, TimeUnit.MINUTES, 100));
+        RedisSlidingWindowRateLimiter rateLimiter = new RedisSlidingWindowRateLimiter(client, rules);
+
+        Stopwatch started = Stopwatch.createStarted();
+        for(int i=1; i< 10000; i++){
+            rateLimiter.overLimit("ip:127.0.0.11");
+        }
+
+        started.stop();
+        System.out.println(started);
     }
 
 }
