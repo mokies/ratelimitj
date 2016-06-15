@@ -38,6 +38,7 @@ public class HazelcastSlidingWindowRateLimiterTest {
         IntStream.rangeClosed(1, 5).forEach(value -> {
             boolean result = rateLimiter.overLimit("ip:127.0.0.5");
             assertThat(result).isFalse();
+//            System.out.println(result);
         });
 
         assertThat(rateLimiter.overLimit("ip:127.0.0.5")).isTrue();
