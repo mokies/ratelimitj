@@ -24,7 +24,6 @@ public class RedisSlidingWindowRateLimiter implements AutoCloseable, AsyncRateLi
 
     private static final Logger LOG = LoggerFactory.getLogger(RedisSlidingWindowRateLimiter.class);
 
-    private final LimitRuleJsonSerialiser ruleSerialiser = new LimitRuleJsonSerialiser();
     private final RedisAsyncCommands<String, String> async;
     private final RedisScriptLoader scriptLoader;
     private final String rulesJson;
@@ -39,8 +38,13 @@ public class RedisSlidingWindowRateLimiter implements AutoCloseable, AsyncRateLi
     public RedisSlidingWindowRateLimiter(RedisClient redisClient, Set<LimitRule> rules, boolean useRedisTime) {
         async = redisClient.connect().async();
         scriptLoader = new RedisScriptLoader(async, "sliding-window-ratelimit.lua");
-        rulesJson = ruleSerialiser.encode(rules);
+        rulesJson = serialiserLimitRules(rules);
         this.useRedisTime = useRedisTime;
+    }
+
+    private String serialiserLimitRules(Set<LimitRule> rules)  {
+        LimitRuleJsonSerialiser ruleSerialiser = new LimitRuleJsonSerialiser();
+        return ruleSerialiser.encode(rules);
     }
 
     public CompletionStage<Boolean> overLimitAsync(String key) {
@@ -50,8 +54,6 @@ public class RedisSlidingWindowRateLimiter implements AutoCloseable, AsyncRateLi
     // TODO support multi keys
     public CompletionStage<Boolean> overLimitAsync(String key, int weight) {
         requireNonNull(key);
-
-        // TODO maybe load script completely async, but only useful the first time
         String sha = scriptLoader.scriptSha();
 
         // TODO seeing some strange behaviour

@@ -8,7 +8,6 @@ import com.lambdaworks.redis.api.sync.RedisCommands;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.Objects.requireNonNull;
 
@@ -16,7 +15,8 @@ public class RedisScriptLoader {
 
     private final RedisCommands<String, String> async;
     private final String scriptUri;
-    private final AtomicReference<String> scriptSha = new AtomicReference<>();
+
+    private volatile String shaInstance;
 
     public RedisScriptLoader(RedisAsyncCommands<String, String> async, String scriptUri) {
         this(async, scriptUri, true);
@@ -28,23 +28,26 @@ public class RedisScriptLoader {
         this.async = async.getStatefulConnection().sync();
         this.scriptUri = requireNonNull(scriptUri);
         if (eagerLoad) {
-            loadScript();
+            scriptSha();
         }
     }
 
-    public String scriptSha() {
-        String sha = scriptSha.get();
-
+    String scriptSha() {
+        // safe local double-checked locking - http://shipilev.net/blog/2014/safe-public-construction/
+        String sha = shaInstance;
         if (sha == null) {
-            // TODO calculate sha hash and check if script already loaded in Redis
-            //async.scriptExists()
-            loadScript();
-            sha = scriptSha.get();
+            synchronized (this) {
+                sha = shaInstance;
+                if (sha == null) {
+                    sha = loadScript();
+                    shaInstance = sha;
+                }
+            }
         }
         return sha;
     }
 
-    private void loadScript() {
+    private String loadScript() {
         String script;
         try {
             script = readScriptFile();
@@ -52,7 +55,7 @@ public class RedisScriptLoader {
             throw new RuntimeException("Unable to load Redis LUA script file", e);
         }
 
-        scriptSha.set(async.getStatefulConnection().sync().scriptLoad(script));
+        return async.getStatefulConnection().sync().scriptLoad(script);
     }
 
     private String readScriptFile() throws IOException {
