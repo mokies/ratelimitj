@@ -27,10 +27,12 @@ public class RedisSlidingWindowRateLimiterTest {
     private static final Logger LOG = LoggerFactory.getLogger(RedisSlidingWindowRateLimiterTest.class);
 
     private static RedisClient client;
+    private static StatefulRedisConnection<String, String> connect;
 
     @BeforeClass
     public static void before() {
         client = RedisClient.create("redis://localhost");
+        connect = client.connect();
     }
 
     @AfterClass
@@ -38,6 +40,7 @@ public class RedisSlidingWindowRateLimiterTest {
         try(StatefulRedisConnection<String, String> connection = client.connect()) {
             connection.sync().flushdb();
         }
+        connect.close();
         client.shutdown();
     }
 
@@ -45,7 +48,7 @@ public class RedisSlidingWindowRateLimiterTest {
     public void shouldLimitSingleWindowAsync() throws Exception {
 
         ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(10, TimeUnit.SECONDS, 5));
-        RedisSlidingWindowRateLimiter rateLimiter = new RedisSlidingWindowRateLimiter(client, rules);
+        RedisSlidingWindowRateLimiter rateLimiter = new RedisSlidingWindowRateLimiter(connect, rules);
 
         List<CompletionStage> stageAsserts = new CopyOnWriteArrayList<>();
         Observable.defer(() -> Observable.just("ip:127.0.0.2"))
@@ -67,7 +70,7 @@ public class RedisSlidingWindowRateLimiterTest {
     public void shouldLimitDualWindowAsync() throws Exception {
 
         ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(2, TimeUnit.SECONDS, 5), LimitRule.of(10, TimeUnit.SECONDS, 20));
-        RedisSlidingWindowRateLimiter rateLimiter = new RedisSlidingWindowRateLimiter(client, rules);
+        RedisSlidingWindowRateLimiter rateLimiter = new RedisSlidingWindowRateLimiter(connect, rules);
 
         List<CompletionStage> stageAsserts = new CopyOnWriteArrayList<>();
         Observable.defer(() -> Observable.just("ip:127.0.0.10"))
@@ -91,7 +94,7 @@ public class RedisSlidingWindowRateLimiterTest {
     public void shouldLimitSingleWindowSync() throws Exception {
 
         ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(10, TimeUnit.SECONDS, 5));
-        RedisSlidingWindowRateLimiter rateLimiter = new RedisSlidingWindowRateLimiter(client, rules);
+        RedisSlidingWindowRateLimiter rateLimiter = new RedisSlidingWindowRateLimiter(connect, rules);
 
         IntStream.rangeClosed(1, 5).forEach(value -> {
             assertThat(rateLimiter.overLimit("ip:127.0.0.5")).isFalse();
@@ -104,7 +107,7 @@ public class RedisSlidingWindowRateLimiterTest {
     public void shouldWorkWithRedisTime() throws Exception {
 
         ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(10, TimeUnit.SECONDS, 5), LimitRule.of(3600, TimeUnit.SECONDS, 1000));
-        RedisSlidingWindowRateLimiter rateLimiter = new RedisSlidingWindowRateLimiter(client, rules, true);
+        RedisSlidingWindowRateLimiter rateLimiter = new RedisSlidingWindowRateLimiter(connect, rules, true);
 
         CompletionStage<Boolean> key = rateLimiter.overLimitAsync("ip:127.0.0.3");
 
@@ -115,7 +118,7 @@ public class RedisSlidingWindowRateLimiterTest {
     public void shouldPerformFastSingleWindow() throws Exception {
 
         ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(1, TimeUnit.MINUTES, 100));
-        RedisSlidingWindowRateLimiter rateLimiter = new RedisSlidingWindowRateLimiter(client, rules);
+        RedisSlidingWindowRateLimiter rateLimiter = new RedisSlidingWindowRateLimiter(connect, rules);
 
         Stopwatch started = Stopwatch.createStarted();
         for(int i=1; i< 10000; i++){

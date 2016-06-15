@@ -1,7 +1,7 @@
 package es.moki.ratelimitj.redis;
 
 
-import com.lambdaworks.redis.RedisClient;
+import com.lambdaworks.redis.api.StatefulRedisConnection;
 import com.lambdaworks.redis.api.async.RedisAsyncCommands;
 import es.moki.ratelimitj.core.AsyncRateLimiter;
 import es.moki.ratelimitj.core.LimitRule;
@@ -20,7 +20,7 @@ import static com.lambdaworks.redis.ScriptOutputType.VALUE;
 import static java.util.Objects.requireNonNull;
 
 @ThreadSafe
-public class RedisSlidingWindowRateLimiter implements AutoCloseable, AsyncRateLimiter, RateLimiter {
+public class RedisSlidingWindowRateLimiter implements AsyncRateLimiter, RateLimiter {
 
     private static final Logger LOG = LoggerFactory.getLogger(RedisSlidingWindowRateLimiter.class);
 
@@ -29,15 +29,13 @@ public class RedisSlidingWindowRateLimiter implements AutoCloseable, AsyncRateLi
     private final String rulesJson;
     private final boolean useRedisTime;
 
-    // TODO Might require a configuration factory.
-
-    public RedisSlidingWindowRateLimiter(RedisClient redisClient, Set<LimitRule> rules) {
-        this(redisClient, rules, false);
+    public RedisSlidingWindowRateLimiter(StatefulRedisConnection<String, String> connection, Set<LimitRule> rules) {
+        this(connection, rules, false);
     }
 
-    public RedisSlidingWindowRateLimiter(RedisClient redisClient, Set<LimitRule> rules, boolean useRedisTime) {
-        async = redisClient.connect().async();
-        scriptLoader = new RedisScriptLoader(async, "sliding-window-ratelimit.lua");
+    public RedisSlidingWindowRateLimiter(StatefulRedisConnection<String, String> connection, Set<LimitRule> rules, boolean useRedisTime) {
+        async = connection.async();
+        scriptLoader = new RedisScriptLoader(connection, "sliding-window-ratelimit.lua");
         rulesJson = serialiserLimitRules(rules);
         this.useRedisTime = useRedisTime;
     }
@@ -54,6 +52,9 @@ public class RedisSlidingWindowRateLimiter implements AutoCloseable, AsyncRateLi
     // TODO support multi keys
     public CompletionStage<Boolean> overLimitAsync(String key, int weight) {
         requireNonNull(key);
+
+        LOG.debug("overLimitAsync for key '{}' of weight {}", key, weight);
+
         String sha = scriptLoader.scriptSha();
 
         // TODO seeing some strange behaviour
@@ -96,11 +97,6 @@ public class RedisSlidingWindowRateLimiter implements AutoCloseable, AsyncRateLi
             return async.time().thenApply(strings -> strings.get(0));
         }
         return CompletableFuture.completedFuture(Long.toString(System.currentTimeMillis() / 1000L));
-    }
-
-    @Override
-    public void close() throws Exception {
-        async.close();
     }
 
 }

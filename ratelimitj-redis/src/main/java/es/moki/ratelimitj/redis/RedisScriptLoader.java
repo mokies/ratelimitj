@@ -3,8 +3,7 @@ package es.moki.ratelimitj.redis;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
-import com.lambdaworks.redis.api.async.RedisAsyncCommands;
-import com.lambdaworks.redis.api.sync.RedisCommands;
+import com.lambdaworks.redis.api.StatefulRedisConnection;
 
 import java.io.IOException;
 import java.net.URL;
@@ -13,19 +12,18 @@ import static java.util.Objects.requireNonNull;
 
 public class RedisScriptLoader {
 
-    private final RedisCommands<String, String> async;
+    private final StatefulRedisConnection<String, String> connection;
     private final String scriptUri;
-
     private volatile String shaInstance;
 
-    public RedisScriptLoader(RedisAsyncCommands<String, String> async, String scriptUri) {
-        this(async, scriptUri, true);
+    public RedisScriptLoader(StatefulRedisConnection<String, String> connection, String scriptUri) {
+        this(connection, scriptUri, true);
     }
 
     // TODO async seems unnecessary for this class
-    public RedisScriptLoader(RedisAsyncCommands<String, String> async, String scriptUri, boolean eagerLoad) {
-        requireNonNull(async);
-        this.async = async.getStatefulConnection().sync();
+    public RedisScriptLoader(StatefulRedisConnection<String, String> connection, String scriptUri, boolean eagerLoad) {
+        requireNonNull(connection);
+        this.connection = connection;
         this.scriptUri = requireNonNull(scriptUri);
         if (eagerLoad) {
             scriptSha();
@@ -33,7 +31,8 @@ public class RedisScriptLoader {
     }
 
     String scriptSha() {
-        // safe local double-checked locking - http://shipilev.net/blog/2014/safe-public-construction/
+        // safe local double-checked locking
+        // http://shipilev.net/blog/2014/safe-public-construction/
         String sha = shaInstance;
         if (sha == null) {
             synchronized (this) {
@@ -55,7 +54,7 @@ public class RedisScriptLoader {
             throw new RuntimeException("Unable to load Redis LUA script file", e);
         }
 
-        return async.getStatefulConnection().sync().scriptLoad(script);
+        return connection.sync().scriptLoad(script);
     }
 
     private String readScriptFile() throws IOException {
