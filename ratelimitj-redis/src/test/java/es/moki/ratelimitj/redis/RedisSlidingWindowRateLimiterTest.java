@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableSet;
 import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.api.StatefulRedisConnection;
 import es.moki.ratelimitj.api.LimitRule;
-import es.moki.ratelimitj.redis.time.RedisTimeSupplier;
 import es.moki.ratelimitj.core.time.time.TimeBanditSupplier;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -15,7 +14,9 @@ import org.slf4j.LoggerFactory;
 import rx.Observable;
 
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
@@ -76,7 +77,7 @@ public class RedisSlidingWindowRateLimiterTest {
         ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(2, TimeUnit.SECONDS, 5), LimitRule.of(10, TimeUnit.SECONDS, 20));
         RedisSlidingWindowRateLimiter rateLimiter = new RedisSlidingWindowRateLimiter(connect, rules, timeBandit);
 
-        List<CompletionStage> stageAsserts = new CopyOnWriteArrayList<>();
+        Queue<CompletionStage> stageAsserts = new ConcurrentLinkedQueue<>();
         Observable.defer(() -> Observable.just("ip:127.0.0.10"))
                 .repeat(5)
                 .subscribe((key) -> {
@@ -110,26 +111,20 @@ public class RedisSlidingWindowRateLimiterTest {
     }
 
     @Test
-    public void shouldWorkWithRedisTime() throws Exception {
-
-        ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(10, TimeUnit.SECONDS, 5), LimitRule.of(3600, TimeUnit.SECONDS, 1000));
-        RedisSlidingWindowRateLimiter rateLimiter = new RedisSlidingWindowRateLimiter(connect, rules, new RedisTimeSupplier(connect));
-
-        CompletionStage<Boolean> key = rateLimiter.overLimitAsync("ip:127.0.0.3");
-
-        assertThat(key.toCompletableFuture().get()).isFalse();
-    }
-
-    @Test
     public void shouldPerformFastSingleWindow() throws Exception {
 
         ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(1, TimeUnit.MINUTES, 100));
         RedisSlidingWindowRateLimiter rateLimiter = new RedisSlidingWindowRateLimiter(connect, rules, timeBandit);
 
+        Queue<CompletionStage> stageAsserts = new ConcurrentLinkedQueue<>();
         Stopwatch started = Stopwatch.createStarted();
         for(int i=1; i< 1_000; i++){
             timeBandit.addUnixTimeMilliSeconds(1L);
-            rateLimiter.overLimitAsync("ip:127.0.0.11");
+            stageAsserts.add(rateLimiter.overLimitAsync("ip:127.0.0.11"));
+        }
+
+        for (CompletionStage stage : stageAsserts) {
+            stage.toCompletableFuture().get();
         }
 
         started.stop();
