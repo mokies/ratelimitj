@@ -3,7 +3,7 @@ package es.moki.ratelimitj.redis;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
-import es.moki.ratelimitj.core.LimitRule;
+import es.moki.ratelimitj.api.LimitRule;
 
 import java.util.OptionalInt;
 

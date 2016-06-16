@@ -1,0 +1,11 @@
+description 'RateLimitJ Core'
+
+dependencies {
+
+    compile(
+            'io.reactivex:rxjava:1.1.5',
+            'org.slf4j:slf4j-api:1.7.21',
+            'net.jcip:jcip-annotations:1.0'
+    )
+
+}

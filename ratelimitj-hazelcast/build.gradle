@@ -4,7 +4,7 @@ dependencies {
 
     compile(
             project(':ratelimitj-api'),
-
+            project(':ratelimitj-core'),
             'com.hazelcast:hazelcast:3.7-EA'
     )
     testCompile(

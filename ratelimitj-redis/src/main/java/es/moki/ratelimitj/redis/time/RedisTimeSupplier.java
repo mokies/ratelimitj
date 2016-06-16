@@ -2,19 +2,25 @@ package es.moki.ratelimitj.redis.time;
 
 
 import com.lambdaworks.redis.api.StatefulRedisConnection;
-import com.lambdaworks.redis.api.async.RedisAsyncCommands;
+import es.moki.ratelimitj.core.time.time.TimeSupplier;
 
 import java.util.concurrent.CompletionStage;
 
 public class RedisTimeSupplier implements TimeSupplier {
 
-    private final RedisAsyncCommands<String, String> async;
+    private final StatefulRedisConnection<String, String> connection;
 
     public RedisTimeSupplier(StatefulRedisConnection<String, String> connection) {
-        this.async = connection.async();
+        this.connection = connection;
     }
+
     @Override
-    public CompletionStage<Long> get() {
-        return async.time().thenApply(strings -> Long.parseLong(strings.get(0)));
+    public CompletionStage<Long> getAsync() {
+        return connection.async().time().thenApply(strings -> Long.parseLong(strings.get(0)));
+    }
+
+    @Override
+    public long get() {
+        return Long.parseLong(connection.sync().time().get(0));
     }
 }

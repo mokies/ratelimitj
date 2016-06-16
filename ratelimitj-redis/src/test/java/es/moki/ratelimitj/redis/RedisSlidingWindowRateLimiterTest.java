@@ -4,9 +4,9 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
 import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.api.StatefulRedisConnection;
-import es.moki.ratelimitj.core.LimitRule;
+import es.moki.ratelimitj.api.LimitRule;
 import es.moki.ratelimitj.redis.time.RedisTimeSupplier;
-import es.moki.ratelimitj.redis.time.TestTimeSupplier;
+import es.moki.ratelimitj.core.time.time.TimeBanditSupplier;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,7 +30,7 @@ public class RedisSlidingWindowRateLimiterTest {
     private static RedisClient client;
     private static StatefulRedisConnection<String, String> connect;
 
-    private TestTimeSupplier timeBandit = new TestTimeSupplier();
+    private TimeBanditSupplier timeBandit = new TimeBanditSupplier();
 
     @BeforeClass
     public static void before() {

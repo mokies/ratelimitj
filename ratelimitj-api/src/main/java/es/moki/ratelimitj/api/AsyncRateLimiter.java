@@ -1,4 +1,4 @@
-package es.moki.ratelimitj.core;
+package es.moki.ratelimitj.api;
 
 
 import java.util.concurrent.CompletionStage;

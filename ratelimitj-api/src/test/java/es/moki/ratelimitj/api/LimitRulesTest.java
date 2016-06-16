@@ -1,4 +1,4 @@
-package es.moki.ratelimitj.core;
+package es.moki.ratelimitj.api;
 
 import org.junit.Test;
 

@@ -1,8 +1,10 @@
 package es.moki.ratelimitj.hazelcast;
 
 import com.hazelcast.core.HazelcastInstance;
-import es.moki.ratelimitj.core.LimitRule;
-import es.moki.ratelimitj.core.RateLimiter;
+import es.moki.ratelimitj.api.LimitRule;
+import es.moki.ratelimitj.api.RateLimiter;
+import es.moki.ratelimitj.core.time.time.SystemTimeSupplier;
+import es.moki.ratelimitj.core.time.time.TimeSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,10 +23,16 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
 
     private final HazelcastInstance hz;
     private final Set<LimitRule> rules;
+    private final TimeSupplier timeSupplier;
 
     public HazelcastSlidingWindowRateLimiter(HazelcastInstance hz, Set<LimitRule> rules) {
+        this(hz, rules, new SystemTimeSupplier());
+    }
+
+    public HazelcastSlidingWindowRateLimiter(HazelcastInstance hz, Set<LimitRule> rules, TimeSupplier timeSupplier) {
         this.hz = hz;
         this.rules = rules;
+        this.timeSupplier = timeSupplier;
     }
 
     // TODO support muli keys
@@ -38,9 +46,9 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
             throw new IllegalArgumentException("at least one rule must be provided");
         }
 
-        final long now = System.currentTimeMillis();
+        final long now = timeSupplier.get();
         final long longestDuration = rules.stream().map(LimitRule::getDurationSeconds).reduce(Integer::max).get();
-        List<SavedKey> savedKeys = new ArrayList<>();
+        List<SavedKey> savedKeys = new ArrayList<>(rules.size());
 
         ConcurrentMap<String, Long> hcKeyMap = hz.getMap(key);
 

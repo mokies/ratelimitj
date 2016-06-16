@@ -1,11 +1,11 @@
-package es.moki.ratelimitj.redis.time;
+package es.moki.ratelimitj.core.time.time;
 
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class TestTimeSupplier implements TimeSupplier {
+public class TimeBanditSupplier implements TimeSupplier {
 
     private AtomicLong time = new AtomicLong(1000000000000L);
 
@@ -18,7 +18,12 @@ public class TestTimeSupplier implements TimeSupplier {
     }
 
     @Override
-    public CompletionStage<Long> get() {
-        return CompletableFuture.completedFuture(time.get()/1000);
+    public CompletionStage<Long> getAsync() {
+        return CompletableFuture.completedFuture(get());
+    }
+
+    @Override
+    public long get() {
+        return time.get()/1000;
     }
 }

@@ -1,4 +1,4 @@
-package es.moki.ratelimitj.core;
+package es.moki.ratelimitj.api;
 
 import java.util.Collections;
 import java.util.HashSet;

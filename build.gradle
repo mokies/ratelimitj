@@ -22,12 +22,6 @@ subprojects {
     sourceCompatibility = 1.8
 
     dependencies {
-
-        compile(
-                'org.slf4j:slf4j-api:1.7.21',
-                'net.jcip:jcip-annotations:1.0'
-        )
-
         testCompile(
                 'org.assertj:assertj-core:3.4.1',
                 'junit:junit:4.12',
