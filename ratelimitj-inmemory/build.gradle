@@ -1,0 +1,10 @@
+description 'RateLimitJ Hazelcast'
+
+dependencies {
+
+    compile(
+            project(':ratelimitj-api'),
+            project(':ratelimitj-core'),
+    )
+
+}

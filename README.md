@@ -20,9 +20,9 @@ Feature Roadmap
 
 | Feature       | Status      |
 | ------------- |-------------| 
-| Redis sliding window rate limiter | alpha  |
-| Dropwizard integration - bundle | alpha |
-| Hazelcast sliding window rate limiter | active prototyping |
+| Redis sliding window rate limiter | beta  |
+| Dropwizard integration - bundle | beta |
+| Hazelcast sliding window rate limiter | alpha |
 | In memory sliding window rate limiter | active prototyping |
 | Redis fast bucket rate limiter | not started |
 | In memory fast bucket rate limiter | not started |

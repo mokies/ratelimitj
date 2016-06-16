@@ -4,5 +4,6 @@ include 'ratelimitj-api'
 include 'ratelimitj-core'
 include 'ratelimitj-redis'
 include 'ratelimitj-hazelcast'
+include 'ratelimitj-inmemory'
 include 'ratelimitj-dropwizard'
 
