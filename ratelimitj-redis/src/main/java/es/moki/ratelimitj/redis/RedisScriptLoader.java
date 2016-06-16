@@ -17,10 +17,9 @@ public class RedisScriptLoader {
     private volatile String shaInstance;
 
     public RedisScriptLoader(StatefulRedisConnection<String, String> connection, String scriptUri) {
-        this(connection, scriptUri, true);
+        this(connection, scriptUri, false);
     }
 
-    // TODO async seems unnecessary for this class
     public RedisScriptLoader(StatefulRedisConnection<String, String> connection, String scriptUri, boolean eagerLoad) {
         requireNonNull(connection);
         this.connection = connection;
