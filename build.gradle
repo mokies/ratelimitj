@@ -1,10 +1,19 @@
-group 'moki.es'
+group 'es.moki'
 version '1.0-SNAPSHOT'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
+    }
+}
+apply plugin: 'io.codearte.nexus-staging'
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.14'
 }
-
 
 subprojects {
     apply plugin: 'java'
@@ -31,12 +40,91 @@ subprojects {
         )
     }
 
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                from components.java
+//    publishing {
+//        publications {
+//            mavenJava(MavenPublication) {
+//                from components.java
+//            }
+//        }
+//    }
+
+
+    if (project.hasProperty('release')) {
+
+        subprojects {
+
+            task javadocJar(type: Jar) {
+                classifier = 'javadoc'
+                from javadoc
+            }
+
+            task sourcesJar(type: Jar) {
+                classifier = 'sources'
+                from sourceSets.main.allSource
+            }
+
+            artifacts {
+                archives javadocJar, sourcesJar
             }
         }
+
+        allprojects {
+            apply plugin: 'signing'
+            apply plugin: 'maven'
+
+            // Signature of artifacts
+            signing {
+                sign configurations.archives
+            }
+
+            // OSSRH publication
+            uploadArchives {
+                repositories {
+                    mavenDeployer {
+                        // POM signature
+                        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+                        // Target repository
+                        repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                            authentication(userName: ossrhUser, password: ossrhPassword)
+                        }
+                        pom.project {
+                            name 'es.moki.ratelimitj'
+                            description 'The RateLimitJ project aims to provide a modular rate limiting solution'
+                            packaging 'jar'
+                            url 'https://github.com/mokies/ratelimitj'
+
+                            scm {
+                                connection 'scm:git:https://github.com/mokies/ratelimitj.git'
+                                developerConnection 'scm:git:git@github.com:mokies/ratelimitj.git'
+                                url 'https://github.com/mokies/ratelimitj.git'
+                            }
+
+                            licenses {
+                                license {
+                                    name 'Apache License Version 2.0'
+                                    url 'http://www.apache.org/licenses/LICENSE-2.0'
+                                    distribution 'repo'
+                                }
+                            }
+
+                            developers {
+                                developer {
+                                    id = 'mokies'
+                                    name = 'Craig Baker'
+                                    email = 'craig@moki.es'
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
+    nexusStaging {
+        username = ossrhUser
+        password = ossrhPassword
     }
 
 }
