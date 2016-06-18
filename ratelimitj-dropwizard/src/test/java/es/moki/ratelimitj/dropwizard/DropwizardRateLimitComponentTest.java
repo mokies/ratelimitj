@@ -45,10 +45,7 @@ public class DropwizardRateLimitComponentTest {
         }
 
         private LoginRequest loginForm() {
-            LoginRequest login = new LoginRequest();
-            login.username = "heisenberg";
-            login.password = "abc123";
-            return login;
+            return new LoginRequest("heisenberg", "abc123");
         }
     }
 

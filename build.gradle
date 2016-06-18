@@ -21,6 +21,14 @@ subprojects {
     apply plugin: 'maven-publish'
     apply plugin: 'maven'
     apply plugin: 'signing'
+    apply plugin: 'findbugs'
+
+    tasks.withType(FindBugs) {
+        reports {
+            xml.enabled = false
+            html.enabled = true
+        }
+    }
 
 //    apply plugin: 'checkstyle'
 

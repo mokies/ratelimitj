@@ -1,7 +1,6 @@
 package es.moki.ratelimitj.hazelcast;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.ICompletableFuture;
 import com.hazelcast.core.IMap;
 import es.moki.ratelimitj.api.LimitRule;
 import es.moki.ratelimitj.api.RateLimiter;
@@ -15,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -50,7 +48,8 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
         }
 
         final long now = timeSupplier.get();
-        final long longestDuration = rules.stream().map(LimitRule::getDurationSeconds).reduce(Integer::max).get();
+        // TODO implement cleanup
+//        final long longestDuration = rules.stream().map(LimitRule::getDurationSeconds).reduce(Integer::max).get();
         List<SavedKey> savedKeys = new ArrayList<>(rules.size());
 
         IMap<String, Long> hcKeyMap = hz.getMap(key);
@@ -110,6 +109,7 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
             }
         }
 
+        // TODO implement cleanup
         // there is enough resources, update the counts
         for (SavedKey savedKey : savedKeys) {
             //update the current timestamp, count, and bucket count
@@ -148,8 +148,8 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
             int precision = precisionOpt.orElse(duration);
             precision = Math.min(precision, duration);
 
-            this.blocks = (long) Math.ceil(duration / precision);
-            this.blockId = (long) Math.floor(now / precision);
+            this.blocks = (long) Math.ceil(duration / (double) precision);
+            this.blockId = (long) Math.floor(now / (double) precision);
             this.trimBefore = blockId - blocks + 1;
             this.countKey = "" + duration + ':' + precision + ':';
             this.tsKey = countKey + 'o';
