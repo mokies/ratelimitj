@@ -6,11 +6,9 @@ buildscript {
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
     }
 }
-plugins {
-    id 'jacoco'
-    id 'com.github.kt3k.coveralls' version '2.6.3'
-}
-
+//plugins {
+//    id 'com.github.kt3k.coveralls' version '2.6.3'
+//}
 
 group 'es.moki'
 version '1.0-SNAPSHOT'
@@ -23,11 +21,11 @@ task wrapper(type: Wrapper) {
 
 subprojects {
 
-
     apply plugin: 'java'
     apply plugin: 'pmd'
     apply plugin: 'findbugs'
     apply plugin: 'checkstyle'
+    apply plugin: 'jacoco'
 
     apply plugin: 'maven-publish'
     apply plugin: 'maven'
@@ -36,6 +34,13 @@ subprojects {
     checkstyle {
         configFile = rootProject.file('gradle/config/checkstyle/checkstyle.xml')
         toolVersion = '6.19'
+    }
+
+    jacocoTestReport {
+        reports {
+            xml.enabled = true // coveralls plugin depends on xml format report
+            html.enabled = true
+        }
     }
 
     repositories {
@@ -131,13 +136,8 @@ subprojects {
         }
     }
 
-//    jacocoTestReport {
-//        reports {
-//            xml.enabled = true // coveralls plugin depends on xml format report
-//            html.enabled = true
-//        }
-//    }
-//
+
+
 //    coveralls {
 //        sourceDirs = publishedProjects.sourceSets.main.allSource.srcDirs.flatten()
 //        jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"

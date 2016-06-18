@@ -1,5 +1,6 @@
 package es.moki.ratelimitj.hazelcast;
 
+import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 import es.moki.ratelimitj.api.LimitRule;
@@ -14,7 +15,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -40,7 +40,6 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
     @Override
     public boolean overLimit(String key, int weight) {
 
-        // TODO assert must have at least one rule
         requireNonNull(key, "key cannot be null");
         requireNonNull(rules, "rules cannot be null");
         if (rules.isEmpty()) {
@@ -49,23 +48,15 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
 
         final long now = timeSupplier.get();
         // TODO implement cleanup
-//        final long longestDuration = rules.stream().map(LimitRule::getDurationSeconds).reduce(Integer::max).get();
+        final int longestDuration = rules.stream().map(LimitRule::getDurationSeconds).reduce(Integer::max).get();
         List<SavedKey> savedKeys = new ArrayList<>(rules.size());
 
-        IMap<String, Long> hcKeyMap = hz.getMap(key);
+        IMap<String, Long> hcKeyMap = getMap(key, longestDuration);
 
         // TODO perform each rule calculation in parallel
         for (LimitRule rule : rules) {
-//            int duration = rule.getDurationSeconds();
-//            int precision = rule.getPrecision().orElse(duration);
-//            precision = Math.min(precision, duration);
-//            final long blocks = (long) Math.ceil(duration / precision);
 
             SavedKey savedKey = new SavedKey(now, rule.getDurationSeconds(), rule.getPrecision());
-//            savedKey.blockId = (long) Math.floor(now / precision);
-//            savedKey.trimBefore = savedKey.blockId - blocks + 1;
-//            savedKey.countKey = "" + duration + ':' + precision + ':';
-//            savedKey.tsKey = savedKey.countKey + 'o';
             savedKeys.add(savedKey);
 
             Long oldTs = hcKeyMap.get(savedKey.tsKey);
@@ -96,7 +87,8 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
             // handle cleanup
             Long cur;
             if (!dele.isEmpty()) {
-                dele.stream().map(hcKeyMap::removeAsync).collect(Collectors.toList());
+//                dele.stream().map(hcKeyMap::removeAsync).collect(Collectors.toList());
+                dele.stream().forEach(hcKeyMap::remove);
                 final long decrement = decr;
                 cur = hcKeyMap.compute(savedKey.countKey, (k, v) -> v - decrement);
             } else {
@@ -109,27 +101,27 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
             }
         }
 
-        // TODO implement cleanup
         // there is enough resources, update the counts
         for (SavedKey savedKey : savedKeys) {
             //update the current timestamp, count, and bucket count
-            hcKeyMap.put(savedKey.tsKey, savedKey.trimBefore);
+            hcKeyMap.set(savedKey.tsKey, savedKey.trimBefore);
             // TODO should this ben just compute
             Long computedCountKeyValue = hcKeyMap.compute(savedKey.countKey, (k, v) -> Optional.ofNullable(v).orElse(0L) + weight);
-            //LOG.debug("{}={}", savedKey.countKey, computedCountKeyValue);
+            LOG.debug("{} {}={}", key, savedKey.countKey, computedCountKeyValue);
             Long computedCountKeyBlockIdValue = hcKeyMap.compute(savedKey.countKey + savedKey.blockId, (k, v) -> Optional.ofNullable(v).orElse(0L) + weight);
-            //LOG.debug("{}={}", savedKey.countKey + savedKey.blockId, computedCountKeyValue);
+            LOG.debug("{} {}={}", key, savedKey.countKey + savedKey.blockId, computedCountKeyBlockIdValue);
 
         }
 
-        // We calculated the longest-duration limit so we can EXPIRE
-        //        if (longestDuration > 0) {
-        //hcKeyMap.remove(longestDuration);
-        // TODO this map will grow indefinitely, need to find a way to evict stale keys.
-        //            hz.getMap(key).
-        //        }
-
         return false;
+    }
+
+    private IMap<String, Long> getMap(String key, int longestDuration) {
+        MapConfig mapConfig = hz.getConfig().getMapConfig(key);
+        mapConfig.setTimeToLiveSeconds(longestDuration);
+        mapConfig.setAsyncBackupCount(1);
+        mapConfig.setBackupCount(0);
+        return hz.getMap(key);
     }
 
     @Override
