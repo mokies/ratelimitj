@@ -5,14 +5,15 @@ dependencies {
 
     compile(
             project(':ratelimitj-api'),
-            "io.dropwizard:dropwizard-core:$dropwizardVersion",
-            "io.dropwizard:dropwizard-jersey:$dropwizardVersion"
+            'io.dropwizard:dropwizard-core:1.0.0-rc3',
+            'io.dropwizard:dropwizard-jersey:1.0.0-rc3'
     )
     testCompile(
-            "io.dropwizard:dropwizard-testing:$dropwizardVersion",
+            'io.dropwizard:dropwizard-testing:1.0.0-rc3',
             project(':ratelimitj-redis'),
     )
 }
+
 
 
 
