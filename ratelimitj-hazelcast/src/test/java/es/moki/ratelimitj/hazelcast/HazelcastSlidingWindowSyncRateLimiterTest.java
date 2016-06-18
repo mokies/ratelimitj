@@ -26,7 +26,6 @@ public class HazelcastSlidingWindowSyncRateLimiterTest extends AbstractSyncRateL
         hz.shutdown();
     }
 
-
     @Override
     protected RateLimiter getRateLimiter(Set<LimitRule> rules, TimeSupplier timeSupplier) {
         return new HazelcastSlidingWindowRateLimiter(hz, rules, timeSupplier);

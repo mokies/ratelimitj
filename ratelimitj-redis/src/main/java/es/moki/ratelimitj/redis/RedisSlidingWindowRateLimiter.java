@@ -24,6 +24,8 @@ public class RedisSlidingWindowRateLimiter implements AsyncRateLimiter, RateLimi
 
     private static final Logger LOG = LoggerFactory.getLogger(RedisSlidingWindowRateLimiter.class);
 
+    private final LimitRuleJsonSerialiser serialiser = new LimitRuleJsonSerialiser();
+
     private final RedisAsyncCommands<String, String> async;
     private final RedisScriptLoader scriptLoader;
     private final String rulesJson;
@@ -41,8 +43,7 @@ public class RedisSlidingWindowRateLimiter implements AsyncRateLimiter, RateLimi
     }
 
     private String serialiserLimitRules(Set<LimitRule> rules) {
-        LimitRuleJsonSerialiser ruleSerialiser = new LimitRuleJsonSerialiser();
-        return ruleSerialiser.encode(rules);
+        return serialiser.encode(rules);
     }
 
     public CompletionStage<Boolean> overLimitAsync(String key) {
@@ -57,27 +58,13 @@ public class RedisSlidingWindowRateLimiter implements AsyncRateLimiter, RateLimi
 
         String sha = scriptLoader.scriptSha();
 
-        // TODO currently blocking, use async redis time
-        Long timeSeconds = timeSupplier.get();
-
-        // TODO seeing some strange behaviour
-//         currentUnixTimeSeconds()
-//                .thenApply(currentTime -> {
-//                    LOG.debug("time {}", currentTime);
-//                    return (CompletionStage) async.evalsha(sha, VALUE, new String[]{key}, rulesJson, currentTime, Integer.toString(weight));
-//                }).thenApply(result -> {
-//                    LOG.debug("result {}", result);
-//                    return "1".equals(result);
-//                });
-
-        // TODO complete async use redis time
-        return async.evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(timeSeconds), Integer.toString(weight))
-                .thenApply(result -> {
-                    boolean overLimit = "1".equals(result);
-                    LOG.debug("over limit {}", overLimit);
-                    return overLimit;
-                });
-
+        return timeSupplier.getAsync().thenCompose(time ->
+                async.evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight))
+        ).thenApply(result -> {
+            boolean overLimit = "1".equals(result);
+            LOG.debug("over limit {}", overLimit);
+            return overLimit;
+        });
 
         // TODO handle scenario where script is not loaded, flush scripts and test scenario
     }

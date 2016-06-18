@@ -52,6 +52,7 @@ public abstract class AbstractAsyncRateLimiterTest {
         assertThat(rateLimiter.overLimitAsync("ip:127.0.0.2").toCompletableFuture().get()).isTrue();
     }
 
+
     @Test
     public void shouldLimitDualWindowAsync() throws Exception {
 

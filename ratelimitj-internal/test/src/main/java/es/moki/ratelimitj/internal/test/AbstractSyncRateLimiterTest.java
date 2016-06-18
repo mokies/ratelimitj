@@ -28,10 +28,30 @@ public abstract class AbstractSyncRateLimiterTest {
 
         IntStream.rangeClosed(1, 5).forEach(value -> {
             timeBandit.addUnixTimeMilliSeconds(1000L);
-            assertThat(rateLimiter.overLimit("ip:127.0.0.5")).isFalse();
+            assertThat(rateLimiter.overLimit("ip:127.0.1.5")).isFalse();
         });
 
-        assertThat(rateLimiter.overLimit("ip:127.0.0.5")).isTrue();
+        assertThat(rateLimiter.overLimit("ip:127.0.1.5")).isTrue();
+    }
+
+    @Test
+    public void shouldLimitSingleWindowSyncWithMultipleKeys() throws Exception {
+
+        ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(10, TimeUnit.SECONDS, 5));
+        RateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
+
+        IntStream.rangeClosed(1, 5).forEach(value -> {
+            timeBandit.addUnixTimeMilliSeconds(1000L);
+            IntStream.rangeClosed(1, 10).forEach(
+                    keySuffix -> assertThat(rateLimiter.overLimit("ip:127.0.0." + keySuffix)).isFalse());
+        });
+
+        IntStream.rangeClosed(1, 10).forEach(
+                keySuffix -> assertThat(rateLimiter.overLimit("ip:127.0.0." + keySuffix)).isTrue());
+
+        timeBandit.addUnixTimeMilliSeconds(5000L);
+        IntStream.rangeClosed(1, 10).forEach(
+                keySuffix -> assertThat(rateLimiter.overLimit("ip:127.0.0." + keySuffix)).isFalse());
     }
 
 }
