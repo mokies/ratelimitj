@@ -53,10 +53,8 @@ public class HazelcastRateLimiterInternalTest {
         Thread.sleep(2500);
 
         System.out.println(hz.getMap("ip:127.0.0.5").size());
-        hz.getConfig().getMapConfigs();
-
-
         assertThat(hz.getMap("ip:127.0.0.5").size()).isZero();
+
 
     }
 

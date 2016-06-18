@@ -15,12 +15,12 @@ import java.util.Set;
 public class HazelcastSlidingWindowSyncRateLimiterPerformanceTest extends AbstractSyncRateLimiterPerformanceTest {
 
     private static HazelcastInstance hz;
-    private static HazelcastInstance hz2;
+//    private static HazelcastInstance hz2;
 
     @BeforeClass
     public static void before() {
         hz = Hazelcast.newHazelcastInstance();
-        hz2 = Hazelcast.newHazelcastInstance();
+//        hz2 = Hazelcast.newHazelcastInstance();
     }
 
     @AfterClass

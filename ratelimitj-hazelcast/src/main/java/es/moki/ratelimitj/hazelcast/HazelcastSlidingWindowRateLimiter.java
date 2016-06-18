@@ -36,6 +36,11 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
         this.timeSupplier = timeSupplier;
     }
 
+    @Override
+    public boolean overLimit(String key) {
+        return overLimit(key, 1);
+    }
+
     // TODO support muli keys
     @Override
     public boolean overLimit(String key, int weight) {
@@ -117,16 +122,12 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
     }
 
     private IMap<String, Long> getMap(String key, int longestDuration) {
+
         MapConfig mapConfig = hz.getConfig().getMapConfig(key);
         mapConfig.setTimeToLiveSeconds(longestDuration);
         mapConfig.setAsyncBackupCount(1);
         mapConfig.setBackupCount(0);
         return hz.getMap(key);
-    }
-
-    @Override
-    public boolean overLimit(String key) {
-        return overLimit(key, 1);
     }
 
     private static class SavedKey {
