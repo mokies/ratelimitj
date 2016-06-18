@@ -47,6 +47,11 @@ subprojects {
 
     if (project.hasProperty('release')) {
 
+        nexusStaging {
+            username = ossrhUser
+            password = ossrhPassword
+        }
+
         subprojects {
 
             task javadocJar(type: Jar) {
@@ -114,14 +119,11 @@ subprojects {
                     }
                 }
             }
-
         }
+
     }
 
-    nexusStaging {
-        username = ossrhUser
-        password = ossrhPassword
-    }
+
 
 }
 
