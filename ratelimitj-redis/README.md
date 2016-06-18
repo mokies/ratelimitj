@@ -2,6 +2,8 @@ RateLimitJ - Redis
 ==================
 
 The RateLimitJ Redis module provides an implementation of a configurable sliding window rate limiting algorithm.
+
+The Redis Module support (RateLimiter)[], (AsyncRateLimiter)[] and (ReactiveRateLimiter)[] interfaces.
  
 Usage
 =====

@@ -3,12 +3,20 @@ RateLimitJ
 
 [![Build Status](https://travis-ci.org/mokies/ratelimitj.svg)](https://travis-ci.org/mokies/ratelimitj)
 
-The RateLimitJ project aims to provide a modular rate limiting solution that provides adaptability between backend storage and application frameworks in the Java ecosystem.
+A Java library for rate limiting using extensible storage and application framework adaptors. sliding windows stored in Redis.
 
-RateLimitJ is currently under active construction and provides the following pluggable modules:
+Modules
+-------
+RateLimitJ is currently under active construction and provides the following plugable modules:
 
 * [Redis sliding window rate limiter](ratelimitj-redis)
+* [Hazelcast sliding window rate limiter](ratelimitj-hazelcast)
 * [Dropwizard integration](ratelimitj-dropwizard)
+
+Features
+--------
+* Uses an efficient sliding window algorithm for rate limiting
+* Multiple limit rules per instance
 
 Dependancies
 ============
@@ -23,12 +31,11 @@ Feature Roadmap
 | Redis sliding window rate limiter | beta  |
 | Dropwizard integration - bundle | beta |
 | Hazelcast sliding window rate limiter | alpha |
-| In memory sliding window rate limiter | active prototyping |
+| In memory sliding window rate limiter | under construction |
+| Whitelisting & blacklisting of keys | not started |
 | Redis fast bucket rate limiter | not started |
-| In memory fast bucket rate limiter | not started |
 | Spring integration | not started |
-
-
+| In memory fast bucket rate limiter | not started |
 
 Background
 ----------
