@@ -1,6 +1,8 @@
 package es.moki.ratelimitj.hazelcast;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.ICompletableFuture;
+import com.hazelcast.core.IMap;
 import es.moki.ratelimitj.api.LimitRule;
 import es.moki.ratelimitj.api.RateLimiter;
 import es.moki.ratelimitj.core.time.time.SystemTimeSupplier;
@@ -11,11 +13,12 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
-
 
 public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
 
@@ -50,20 +53,20 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
         final long longestDuration = rules.stream().map(LimitRule::getDurationSeconds).reduce(Integer::max).get();
         List<SavedKey> savedKeys = new ArrayList<>(rules.size());
 
-        ConcurrentMap<String, Long> hcKeyMap = hz.getMap(key);
+        IMap<String, Long> hcKeyMap = hz.getMap(key);
 
         // TODO perform each rule calculation in parallel
         for (LimitRule rule : rules) {
-            int duration = rule.getDurationSeconds();
-            int precision = rule.getPrecision().orElse(duration);
-            precision = Math.min(precision, duration);
-            long blocks = (long) Math.ceil(duration / precision);
+//            int duration = rule.getDurationSeconds();
+//            int precision = rule.getPrecision().orElse(duration);
+//            precision = Math.min(precision, duration);
+//            final long blocks = (long) Math.ceil(duration / precision);
 
-            SavedKey savedKey = new SavedKey();
-            savedKey.blockId = (long) Math.floor(now / precision);
-            savedKey.trimBefore = savedKey.blockId - blocks + 1;
-            savedKey.countKey = "" + duration + ':' + precision + ':';
-            savedKey.tsKey = savedKey.countKey + 'o';
+            SavedKey savedKey = new SavedKey(now, rule.getDurationSeconds(), rule.getPrecision());
+//            savedKey.blockId = (long) Math.floor(now / precision);
+//            savedKey.trimBefore = savedKey.blockId - blocks + 1;
+//            savedKey.countKey = "" + duration + ':' + precision + ':';
+//            savedKey.tsKey = savedKey.countKey + 'o';
             savedKeys.add(savedKey);
 
             Long oldTs = hcKeyMap.get(savedKey.tsKey);
@@ -79,7 +82,7 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
             // discover what needs to be cleaned up
             long decr = 0;
             List<String> dele = new ArrayList<>();
-            long trim = Math.min(savedKey.trimBefore, oldTs + blocks);
+            long trim = Math.min(savedKey.trimBefore, oldTs + savedKey.blocks);
 
             // TODO suspect I have an off by one error here
             for (long oldBlock = oldTs; oldBlock == trim - 1; oldBlock++) {
@@ -94,9 +97,8 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
             // handle cleanup
             Long cur;
             if (!dele.isEmpty()) {
-                dele.stream().forEach(hcKeyMap::remove);
+                dele.stream().map(hcKeyMap::removeAsync).collect(Collectors.toList());
                 final long decrement = decr;
-                // TODO should this ben just compute
                 cur = hcKeyMap.compute(savedKey.countKey, (k, v) -> v - decrement);
             } else {
                 cur = hcKeyMap.get(savedKey.countKey);
@@ -121,11 +123,11 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
         }
 
         // We calculated the longest-duration limit so we can EXPIRE
-//        if (longestDuration > 0) {
-            //hcKeyMap.remove(longestDuration);
-            // TODO this map will grow indefinitely, need to find a way to evict stale keys.
-//            hz.getMap(key).
-//        }
+        //        if (longestDuration > 0) {
+        //hcKeyMap.remove(longestDuration);
+        // TODO this map will grow indefinitely, need to find a way to evict stale keys.
+        //            hz.getMap(key).
+        //        }
 
         return false;
     }
@@ -134,25 +136,23 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
         return overLimit(key, 1);
     }
 
-
     private static class SavedKey {
+        final long blockId;
+        final long blocks;
+        final long trimBefore;
+        final String countKey;
+        final String tsKey;
 
-        public SavedKey() { }
-//        public SavedKey(long now, LimitRule rule) {
-//            blockId = (long) Math.floor(now / precision);
-//            trimBefore = savedKey.blockId - blocks + 1;
-//            countKey = "" + duration + ':' + precision + ':';
-//            tsKey = savedKey.countKey + 'o';
-//        }
+        public SavedKey(long now, int duration, OptionalInt precisionOpt) {
 
-        long blockId;
-        long trimBefore;
-        String countKey;
-        String tsKey;
-//        saved.block_id = Math.floor(now / precision)
-//        saved.trim_before = saved.block_id - blocks + 1
-//        saved.count_key = duration .. ':' .. precision .. ':'
-//        saved.ts_key = saved.count_key .. 'o'
+            int precision = precisionOpt.orElse(duration);
+            precision = Math.min(precision, duration);
 
+            this.blocks = (long) Math.ceil(duration / precision);
+            this.blockId = (long) Math.floor(now / precision);
+            this.trimBefore = blockId - blocks + 1;
+            this.countKey = "" + duration + ':' + precision + ':';
+            this.tsKey = countKey + 'o';
+        }
     }
 }

@@ -1,5 +1,6 @@
 package es.moki.ratelimitj.hazelcast;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -27,6 +28,9 @@ public class HazelcastSlidingWindowRateLimiterTest {
     @Before
     public void setUp() {
         hz = Hazelcast.newHazelcastInstance();
+//        HazelcastInstance hz2 = Hazelcast.newHazelcastInstance();
+//        HazelcastInstance hz3 = Hazelcast.newHazelcastInstance();
+//        HazelcastInstance hz4 = Hazelcast.newHazelcastInstance();
     }
 
     @After
@@ -63,6 +67,24 @@ public class HazelcastSlidingWindowRateLimiterTest {
         assertThat(rateLimiter.overLimit("ip:127.0.0.10")).isTrue();
         timeBandit.addUnixTimeMilliSeconds(1000L);
         assertThat(rateLimiter.overLimit("ip:127.0.0.10")).isFalse();
+    }
+
+    @Test
+    public void shouldLimitDualWindowSyncTimed() throws Exception {
+
+        Stopwatch watch = Stopwatch.createStarted();
+
+        ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(2, TimeUnit.SECONDS, 100), LimitRule.of(10, TimeUnit.SECONDS, 100));
+        HazelcastSlidingWindowRateLimiter rateLimiter = new HazelcastSlidingWindowRateLimiter(hz, rules, timeBandit);
+
+        int total = 100_000;
+        IntStream.rangeClosed(1, total).forEach(value -> {
+            timeBandit.addUnixTimeMilliSeconds(200L);
+            rateLimiter.overLimit("ip:127.0.0.10");
+
+        });
+
+        System.out.println("total time" + watch.stop() + " checks " + (total / watch.elapsed(TimeUnit.SECONDS)) + "/sec");
     }
 
 }
