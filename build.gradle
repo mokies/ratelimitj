@@ -45,15 +45,6 @@ subprojects {
         )
     }
 
-//    publishing {
-//        publications {
-//            mavenJava(MavenPublication) {
-//                from components.java
-//            }
-//        }
-//    }
-
-
     if (project.hasProperty('release')) {
 
         subprojects {
