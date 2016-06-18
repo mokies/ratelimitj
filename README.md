@@ -39,8 +39,6 @@ This library was inspired by the following articles on sliding window rate limit
 * [Introduction to Rate Limiting with Redis Part 1](http://www.dr-josiah.com/2014/11/introduction-to-rate-limiting-with.html)
 * [Introduction to Rate Limiting with Redis Part 2](http://www.dr-josiah.com/2014/11/introduction-to-rate-limiting-with_26.html)
 
-For more information on the `weight` and `precision` options, see the second blog post above.
-
 Dependancies
 --------
 
