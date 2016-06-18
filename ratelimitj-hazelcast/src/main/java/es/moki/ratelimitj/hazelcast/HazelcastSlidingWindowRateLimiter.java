@@ -132,7 +132,8 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
         return false;
     }
 
-    @Override public boolean overLimit(String key) {
+    @Override
+    public boolean overLimit(String key) {
         return overLimit(key, 1);
     }
 

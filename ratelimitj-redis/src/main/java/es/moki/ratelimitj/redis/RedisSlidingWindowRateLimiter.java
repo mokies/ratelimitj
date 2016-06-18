@@ -40,7 +40,7 @@ public class RedisSlidingWindowRateLimiter implements AsyncRateLimiter, RateLimi
         this.timeSupplier = timeSupplier;
     }
 
-    private String serialiserLimitRules(Set<LimitRule> rules)  {
+    private String serialiserLimitRules(Set<LimitRule> rules) {
         LimitRuleJsonSerialiser ruleSerialiser = new LimitRuleJsonSerialiser();
         return ruleSerialiser.encode(rules);
     }
@@ -71,7 +71,7 @@ public class RedisSlidingWindowRateLimiter implements AsyncRateLimiter, RateLimi
 //                });
 
         // TODO complete async use redis time
-        return  async.evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(timeSeconds), Integer.toString(weight))
+        return async.evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(timeSeconds), Integer.toString(weight))
                 .thenApply(result -> {
                     LOG.debug("result {}", result);
                     return "1".equals(result);

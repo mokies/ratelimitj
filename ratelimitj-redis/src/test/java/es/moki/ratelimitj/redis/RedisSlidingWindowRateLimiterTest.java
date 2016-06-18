@@ -41,7 +41,7 @@ public class RedisSlidingWindowRateLimiterTest {
 
     @AfterClass
     public static void after() {
-        try(StatefulRedisConnection<String, String> connection = client.connect()) {
+        try (StatefulRedisConnection<String, String> connection = client.connect()) {
             connection.sync().flushdb();
         }
         connect.close();
@@ -118,7 +118,7 @@ public class RedisSlidingWindowRateLimiterTest {
 
         Queue<CompletionStage> stageAsserts = new ConcurrentLinkedQueue<>();
         Stopwatch started = Stopwatch.createStarted();
-        for(int i=1; i< 1_000; i++){
+        for (int i = 1; i < 1_000; i++) {
             timeBandit.addUnixTimeMilliSeconds(1L);
             stageAsserts.add(rateLimiter.overLimitAsync("ip:127.0.0.11"));
         }

@@ -23,7 +23,8 @@ public class RateLimitApplication extends Application<RateLimitConfiguration> {
         client = RedisClient.create("redis://localhost");
         connect = client.connect();
 
-        RedisSlidingWindowRateLimiter redisRateLimiter = new RedisSlidingWindowRateLimiter(connect, ImmutableSet.of(LimitRule.of(10, TimeUnit.SECONDS, 5)));
+        RedisSlidingWindowRateLimiter redisRateLimiter =
+                new RedisSlidingWindowRateLimiter(connect, ImmutableSet.of(LimitRule.of(10, TimeUnit.SECONDS, 5)));
         bootstrap.addBundle(new RateLimitBundle<>(redisRateLimiter));
     }
 

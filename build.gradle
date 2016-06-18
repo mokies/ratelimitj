@@ -18,19 +18,16 @@ task wrapper(type: Wrapper) {
 subprojects {
     apply plugin: 'java'
     apply plugin: 'pmd'
+    apply plugin: 'findbugs'
+    apply plugin: 'checkstyle'
     apply plugin: 'maven-publish'
     apply plugin: 'maven'
     apply plugin: 'signing'
-    apply plugin: 'findbugs'
 
-    tasks.withType(FindBugs) {
-        reports {
-            xml.enabled = false
-            html.enabled = true
-        }
+    checkstyle {
+        configFile = rootProject.file('gradle/config/checkstyle/checkstyle.xml')
+        toolVersion = '6.19'
     }
-
-//    apply plugin: 'checkstyle'
 
     repositories {
         mavenCentral()

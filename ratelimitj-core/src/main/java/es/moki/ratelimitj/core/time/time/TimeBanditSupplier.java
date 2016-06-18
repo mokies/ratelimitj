@@ -24,6 +24,6 @@ public class TimeBanditSupplier implements TimeSupplier {
 
     @Override
     public long get() {
-        return time.get()/1000;
+        return time.get() / 1000;
     }
 }
