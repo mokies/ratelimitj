@@ -18,6 +18,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Deprecated
 public class HazelcastSlidingWindowRateLimiterTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(HazelcastSlidingWindowRateLimiterTest.class);

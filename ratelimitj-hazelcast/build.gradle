@@ -8,6 +8,6 @@ dependencies {
             'com.hazelcast:hazelcast:3.7-EA'
     )
     testCompile(
-
+            project(':ratelimitj-internal:test'),
     )
 }

@@ -23,6 +23,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Deprecated
 @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
 public class RedisSlidingWindowRateLimiterTest {
 

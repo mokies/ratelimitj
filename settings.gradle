@@ -5,4 +5,5 @@ include 'ratelimitj-redis'
 include 'ratelimitj-hazelcast'
 include 'ratelimitj-inmemory'
 include 'ratelimitj-dropwizard'
+include 'ratelimitj-internal:test'
 

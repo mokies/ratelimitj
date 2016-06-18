@@ -9,6 +9,7 @@ dependencies {
             'com.eclipsesource.minimal-json:minimal-json:0.9.4',
     )
     testCompile(
+            project(':ratelimitj-internal:test'),
             'org.assertj:assertj-core:3.4.1',
             'junit:junit:4.12',
             'com.google.guava:guava:19.0',

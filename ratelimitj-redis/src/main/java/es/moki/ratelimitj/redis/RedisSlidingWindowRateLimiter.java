@@ -73,8 +73,9 @@ public class RedisSlidingWindowRateLimiter implements AsyncRateLimiter, RateLimi
         // TODO complete async use redis time
         return async.evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(timeSeconds), Integer.toString(weight))
                 .thenApply(result -> {
-                    LOG.debug("result {}", result);
-                    return "1".equals(result);
+                    boolean overLimit = "1".equals(result);
+                    LOG.debug("over limit {}", overLimit);
+                    return overLimit;
                 });
 
 
