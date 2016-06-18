@@ -4,6 +4,7 @@ package es.moki.ratelimitj.hazelcast;
 import com.google.common.collect.ImmutableSet;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IMap;
 import es.moki.ratelimitj.api.LimitRule;
 import es.moki.ratelimitj.api.RateLimiter;
 import es.moki.ratelimitj.core.time.time.TimeBanditSupplier;
@@ -39,23 +40,22 @@ public class HazelcastRateLimiterInternalTest {
     }
 
     @Test
-    public void shouldCleanUpExpiredKeys() throws Exception {
+    public void shouldEventuallyCleanUpExpiredKeys() throws Exception {
         ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(2, TimeUnit.SECONDS, 5));
         RateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
 
+        String key = "ip:127.0.0.5";
+
         IntStream.rangeClosed(1, 5).forEach(value -> {
             timeBandit.addUnixTimeMilliSeconds(100L);
-            assertThat(rateLimiter.overLimit("ip:127.0.0.5")).isFalse();
+            assertThat(rateLimiter.overLimit(key)).isFalse();
         });
 
-        System.out.println(hz.getMap("ip:127.0.0.5").size());
-
-        Thread.sleep(2500);
-
-        System.out.println(hz.getMap("ip:127.0.0.5").size());
-        assertThat(hz.getMap("ip:127.0.0.5").size()).isZero();
-
-
+        IMap<Object, Object> map = hz.getMap(key);
+        while (map.size() != 0) {
+            Thread.sleep(10);
+        }
+        assertThat(map.size()).isZero();
     }
 
 }
