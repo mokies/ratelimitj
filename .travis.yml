@@ -2,21 +2,31 @@ language: java
 jdk:
   - oraclejdk8
 
-# Use updated jdk version
 addons:
   apt:
     packages:
       - oracle-java8-installer
-before_cache:
-  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
-cache:
-  directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
+
 services:
   - redis-server
+
+before_install:
+ - cp gradle.properties.ci gradle.properties
+
 script: ./gradlew clean build
+
 notifications:
   email:
     on_success: change
     on_failure: always
+
+after_success:
+  - ./gradlew jacocoTestReport coveralls
+
+before_cache:
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
