@@ -32,10 +32,10 @@ public abstract class AbstractSyncRateLimiterPerformanceTest {
         ImmutableSet<LimitRule> rules =
                 ImmutableSet.of(LimitRule.of(2, TimeUnit.SECONDS, 100), LimitRule.of(10, TimeUnit.SECONDS, 100));
         RateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
-        Random r = new Random();
+        Random rand = new Random();
 
         int total = 10_000;
-        IntStream.rangeClosed(1, total).map(i -> r.nextInt(128)).forEach(value -> {
+        IntStream.rangeClosed(1, total).map(i -> rand.nextInt(128)).forEach(value -> {
             timeBandit.addUnixTimeMilliSeconds(200L);
             rateLimiter.overLimit("ip:127.0.0." + value);
         });
