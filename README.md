@@ -16,7 +16,12 @@ RateLimitJ is currently under active construction and provides the following plu
 * Uses an efficient sliding window algorithm for rate limiting
 * Multiple limit rules per instance
 
+#### Prerequisite
+
+* RateLimitJ requires Java 8
+
 #### Roadmap
+
 | Feature       | Status      |
 | ------------- |-------------| 
 | Redis sliding window rate limiter | beta  |

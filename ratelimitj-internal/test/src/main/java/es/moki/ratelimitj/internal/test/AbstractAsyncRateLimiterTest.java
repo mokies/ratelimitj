@@ -10,12 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.Observable;
 
-import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,10 +34,18 @@ public abstract class AbstractAsyncRateLimiterTest {
 
         AsyncRateLimiter rateLimiter = getAsyncRateLimiter(rules, timeBandit);
 
-        List<CompletionStage> stageAsserts = new CopyOnWriteArrayList<>();
+        Queue<CompletionStage> stageAsserts = new ConcurrentLinkedQueue<>();
+
+
+//        Stream.generate(() -> "ip:127.0.0.2").limit(5).forEach(key -> {
+//            timeBandit.addUnixTimeMilliSeconds(1000L);
+//            stageAsserts.add(rateLimiter.overLimitAsync(key)
+//                    .thenAccept(result -> assertThat(result).isFalse()));
+//        });
+
         Observable.defer(() -> Observable.just("ip:127.0.0.2"))
                 .repeat(5)
-                .subscribe((key) -> {
+                .subscribe(key -> {
                     timeBandit.addUnixTimeMilliSeconds(1000L);
                     stageAsserts.add(rateLimiter.overLimitAsync(key)
                             .thenAccept(result -> assertThat(result).isFalse()));
@@ -62,7 +68,7 @@ public abstract class AbstractAsyncRateLimiterTest {
         Queue<CompletionStage> stageAsserts = new ConcurrentLinkedQueue<>();
         Observable.defer(() -> Observable.just("ip:127.0.0.10"))
                 .repeat(5)
-                .subscribe((key) -> {
+                .subscribe(key -> {
                     timeBandit.addUnixTimeMilliSeconds(200L);
                     log.debug("incrementing rate limiter");
                     stageAsserts.add(rateLimiter.overLimitAsync(key)

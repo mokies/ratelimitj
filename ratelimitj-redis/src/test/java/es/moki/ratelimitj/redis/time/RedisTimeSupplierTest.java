@@ -30,12 +30,12 @@ public class RedisTimeSupplierTest {
     @Test
     public void shouldGetSystemCurrentTime() {
         Long time = new RedisTimeSupplier(connect).get();
-        assertThat(time).isCloseTo(System.currentTimeMillis() / 1000L, Offset.offset(10000L));
+        assertThat(time).isCloseTo(System.currentTimeMillis() / 1000L, Offset.offset(50000L));
     }
 
     @Test
     public void shouldGetAsyncSystemCurrentTime() throws Exception {
         Long time = new RedisTimeSupplier(connect).getAsync().toCompletableFuture().get();
-        assertThat(time).isCloseTo(System.currentTimeMillis() / 1000L, Offset.offset(10000L));
+        assertThat(time).isCloseTo(System.currentTimeMillis() / 1000L, Offset.offset(50000L));
     }
 }

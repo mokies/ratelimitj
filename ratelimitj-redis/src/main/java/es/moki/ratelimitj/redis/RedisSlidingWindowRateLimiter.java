@@ -6,21 +6,24 @@ import com.lambdaworks.redis.api.async.RedisAsyncCommands;
 import es.moki.ratelimitj.api.AsyncRateLimiter;
 import es.moki.ratelimitj.api.LimitRule;
 import es.moki.ratelimitj.api.RateLimiter;
+import es.moki.ratelimitj.api.ReactiveRateLimiter;
 import es.moki.ratelimitj.core.time.time.SystemTimeSupplier;
 import es.moki.ratelimitj.core.time.time.TimeSupplier;
 import net.jcip.annotations.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rx.Observable;
 
 import java.util.Set;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 
+import static net.javacrumbs.futureconverter.java8rx.FutureConverter.*;
 import static com.lambdaworks.redis.ScriptOutputType.VALUE;
 import static java.util.Objects.requireNonNull;
 
 @ThreadSafe
-public class RedisSlidingWindowRateLimiter implements AsyncRateLimiter, RateLimiter {
+public class RedisSlidingWindowRateLimiter implements RateLimiter, AsyncRateLimiter, ReactiveRateLimiter {
 
     private static final Logger LOG = LoggerFactory.getLogger(RedisSlidingWindowRateLimiter.class);
 
@@ -37,6 +40,7 @@ public class RedisSlidingWindowRateLimiter implements AsyncRateLimiter, RateLimi
 
     public RedisSlidingWindowRateLimiter(StatefulRedisConnection<String, String> connection, Set<LimitRule> rules, TimeSupplier timeSupplier) {
         async = connection.async();
+        connection.reactive();
         scriptLoader = new RedisScriptLoader(connection, "sliding-window-ratelimit.lua");
         rulesJson = serialiserLimitRules(rules);
         this.timeSupplier = timeSupplier;
@@ -81,5 +85,15 @@ public class RedisSlidingWindowRateLimiter implements AsyncRateLimiter, RateLimi
         } catch (Exception e) {
             throw new RuntimeException("Failed to determine overLimit", e);
         }
+    }
+
+    @Override
+    public Observable<Boolean> overLimitReactive(String key) {
+        return toObservable(overLimitAsync(key).toCompletableFuture());
+    }
+
+    @Override
+    public Observable<Boolean> overLimitReactive(String key, int weight) {
+        return toObservable(overLimitAsync(key, weight).toCompletableFuture());
     }
 }
