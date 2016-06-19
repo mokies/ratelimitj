@@ -79,7 +79,6 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
             List<String> dele = new ArrayList<>();
             long trim = Math.min(savedKey.trimBefore, oldTs + savedKey.blocks);
 
-            // TODO suspect I have an off by one error here
             for (long oldBlock = oldTs; oldBlock == trim - 1; oldBlock++) {
                 String bkey = savedKey.countKey + oldBlock;
                 Long bcount = hcKeyMap.get(bkey);

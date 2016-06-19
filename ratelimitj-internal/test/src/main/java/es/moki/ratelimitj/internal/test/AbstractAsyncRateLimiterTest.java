@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,25 +32,15 @@ public abstract class AbstractAsyncRateLimiterTest {
     public void shouldLimitSingleWindowAsync() throws Exception {
 
         ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(10, TimeUnit.SECONDS, 5));
-
         AsyncRateLimiter rateLimiter = getAsyncRateLimiter(rules, timeBandit);
 
         Queue<CompletionStage> stageAsserts = new ConcurrentLinkedQueue<>();
 
-
-//        Stream.generate(() -> "ip:127.0.0.2").limit(5).forEach(key -> {
-//            timeBandit.addUnixTimeMilliSeconds(1000L);
-//            stageAsserts.add(rateLimiter.overLimitAsync(key)
-//                    .thenAccept(result -> assertThat(result).isFalse()));
-//        });
-
-        Observable.defer(() -> Observable.just("ip:127.0.0.2"))
-                .repeat(5)
-                .subscribe(key -> {
-                    timeBandit.addUnixTimeMilliSeconds(1000L);
-                    stageAsserts.add(rateLimiter.overLimitAsync(key)
-                            .thenAccept(result -> assertThat(result).isFalse()));
-                });
+        Stream.generate(() -> "ip:127.0.0.2").limit(5).forEach(key -> {
+            timeBandit.addUnixTimeMilliSeconds(1000L);
+            stageAsserts.add(rateLimiter.overLimitAsync(key)
+                    .thenAccept(result -> assertThat(result).isFalse()));
+        });
 
         for (CompletionStage stage : stageAsserts) {
             stage.toCompletableFuture().get();
@@ -66,14 +57,13 @@ public abstract class AbstractAsyncRateLimiterTest {
         AsyncRateLimiter rateLimiter = getAsyncRateLimiter(rules, timeBandit);
 
         Queue<CompletionStage> stageAsserts = new ConcurrentLinkedQueue<>();
-        Observable.defer(() -> Observable.just("ip:127.0.0.10"))
-                .repeat(5)
-                .subscribe(key -> {
-                    timeBandit.addUnixTimeMilliSeconds(200L);
-                    log.debug("incrementing rate limiter");
-                    stageAsserts.add(rateLimiter.overLimitAsync(key)
-                            .thenAccept(result -> assertThat(result).isFalse()));
-                });
+
+        Stream.generate(() -> "ip:127.0.0.10").limit(5).forEach(key -> {
+            timeBandit.addUnixTimeMilliSeconds(200L);
+            log.debug("incrementing rate limiter");
+            stageAsserts.add(rateLimiter.overLimitAsync(key)
+                    .thenAccept(result -> assertThat(result).isFalse()));
+        });
 
         for (CompletionStage stage : stageAsserts) {
             stage.toCompletableFuture().get();

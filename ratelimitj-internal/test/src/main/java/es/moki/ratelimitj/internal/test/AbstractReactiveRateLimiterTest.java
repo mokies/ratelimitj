@@ -1,6 +1,5 @@
 package es.moki.ratelimitj.internal.test;
 
-
 import com.google.common.collect.ImmutableSet;
 import es.moki.ratelimitj.api.LimitRule;
 import es.moki.ratelimitj.api.ReactiveRateLimiter;
@@ -41,6 +40,37 @@ public abstract class AbstractReactiveRateLimiterTest {
         overLimitObservable.toBlocking().subscribe(result -> assertThat(result).isFalse());
 
         rateLimiter.overLimitReactive("ip:127.0.1.5").toBlocking().subscribe(result -> assertThat(result).isTrue());
+    }
+
+    @Test
+    public void shouldLimitDualWindowAsync() throws Exception {
+
+        ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(1, TimeUnit.SECONDS, 5), LimitRule.of(10, TimeUnit.SECONDS, 10));
+        ReactiveRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
+
+        Observable
+                .just("ip:127.0.1.6")
+                .repeat(5)
+                .flatMap(key -> {
+                    timeBandit.addUnixTimeMilliSeconds(100);
+                    return rateLimiter.overLimitReactive(key);
+                })
+                .toBlocking()
+                .subscribe(result -> assertThat(result).isFalse());
+
+        timeBandit.addUnixTimeMilliSeconds(1000L);
+
+        Observable
+                .just("ip:127.0.1.6")
+                .repeat(5)
+                .flatMap(key -> {
+                    timeBandit.addUnixTimeMilliSeconds(100);
+                    return rateLimiter.overLimitReactive(key);
+                })
+                .toBlocking()
+                .subscribe(result -> assertThat(result).isFalse());
+
+        rateLimiter.overLimitReactive("ip:127.0.1.6").toBlocking().subscribe(result -> assertThat(result).isTrue());
     }
 
 }

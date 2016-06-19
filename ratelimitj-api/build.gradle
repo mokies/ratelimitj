@@ -3,7 +3,7 @@ description 'RateLimitJ API'
 dependencies {
 
     compile(
-            'io.reactivex:rxjava:1.1.5',
+            'io.reactivex:rxjava:1.1.6',
     )
 
 }
