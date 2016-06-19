@@ -3,7 +3,9 @@ RateLimitJ
 
 [![Build Status](https://travis-ci.org/mokies/ratelimitj.svg)](https://travis-ci.org/mokies/ratelimitj)
 
-A Java library for rate limiting assembled using extensible storage and application framework adaptors.
+A Java library for rate limiting assembled using extensible storage and application framework adaptors. The libraries interfaces support thread-safe sync, async, and reactive usage patterns.
+
+A Java library for rate limiting providing extensible storage and application framework adaptors. 
 
 #### Modules
 RateLimitJ is currently under active construction and provides the following plugable modules:
