@@ -8,7 +8,6 @@ import es.moki.ratelimitj.core.time.time.TimeSupplier;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rx.Observable;
 
 import java.util.Queue;
 import java.util.Set;
@@ -24,7 +23,7 @@ public abstract class AbstractAsyncRateLimiterTest {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private TimeBanditSupplier timeBandit = new TimeBanditSupplier();
+    private final TimeBanditSupplier timeBandit = new TimeBanditSupplier();
 
     protected abstract AsyncRateLimiter getAsyncRateLimiter(Set<LimitRule> rule, TimeSupplier timeSupplier);
 

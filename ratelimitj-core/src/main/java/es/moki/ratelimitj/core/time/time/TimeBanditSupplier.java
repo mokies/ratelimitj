@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class TimeBanditSupplier implements TimeSupplier {
 
-    private AtomicLong time = new AtomicLong(1000000000000L);
+    private final AtomicLong time = new AtomicLong(1000000000000L);
 
     public void setCurrentUnixTimeSeconds(long timeMilliSeconds) {
         time.set(timeMilliSeconds);

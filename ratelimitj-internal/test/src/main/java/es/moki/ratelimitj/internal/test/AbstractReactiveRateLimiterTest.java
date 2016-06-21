@@ -19,7 +19,7 @@ public abstract class AbstractReactiveRateLimiterTest {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private TimeBanditSupplier timeBandit = new TimeBanditSupplier();
+    private final TimeBanditSupplier timeBandit = new TimeBanditSupplier();
 
     protected abstract ReactiveRateLimiter getRateLimiter(Set<LimitRule> rules, TimeSupplier timeSupplier);
 

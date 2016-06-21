@@ -7,9 +7,9 @@ import es.moki.ratelimitj.api.LimitRule;
 
 import java.util.OptionalInt;
 
-public class LimitRuleJsonSerialiser {
+class LimitRuleJsonSerialiser {
 
-    public String encode(Iterable<LimitRule> rules) {
+    String encode(Iterable<LimitRule> rules) {
         JsonArray jsonArray = Json.array().asArray();
         rules.forEach(rule -> jsonArray.add(toJsonArray(rule)));
         return jsonArray.toString();

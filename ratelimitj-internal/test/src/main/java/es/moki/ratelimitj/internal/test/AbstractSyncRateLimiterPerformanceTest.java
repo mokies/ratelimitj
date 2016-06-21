@@ -20,7 +20,7 @@ public abstract class AbstractSyncRateLimiterPerformanceTest {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private TimeBanditSupplier timeBandit = new TimeBanditSupplier();
+    private final TimeBanditSupplier timeBandit = new TimeBanditSupplier();
 
     protected abstract RateLimiter getRateLimiter(Set<LimitRule> rules, TimeSupplier timeSupplier);
 

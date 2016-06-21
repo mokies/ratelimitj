@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class LimitRuleJsonSerialiserTest {
 
-    private LimitRuleJsonSerialiser serialiser = new LimitRuleJsonSerialiser();
+    private final LimitRuleJsonSerialiser serialiser = new LimitRuleJsonSerialiser();
 
     @Test
     public void shouldEncode() {

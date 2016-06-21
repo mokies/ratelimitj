@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
 public abstract class AbstractSyncRateLimiterTest {
 
-    private TimeBanditSupplier timeBandit = new TimeBanditSupplier();
+    private final TimeBanditSupplier timeBandit = new TimeBanditSupplier();
 
     protected abstract RateLimiter getRateLimiter(Set<LimitRule> rules, TimeSupplier timeSupplier);
 

@@ -23,7 +23,7 @@ public class HazelcastRateLimiterInternalTest {
 
     private static HazelcastInstance hz;
 
-    private TimeBanditSupplier timeBandit = new TimeBanditSupplier();
+    private final TimeBanditSupplier timeBandit = new TimeBanditSupplier();
 
     @BeforeClass
     public static void before() {
@@ -35,7 +35,7 @@ public class HazelcastRateLimiterInternalTest {
         hz.shutdown();
     }
 
-    protected RateLimiter getRateLimiter(Set<LimitRule> rules, TimeSupplier timeSupplier) {
+    private RateLimiter getRateLimiter(Set<LimitRule> rules, TimeSupplier timeSupplier) {
         return new HazelcastSlidingWindowRateLimiter(hz, rules, timeSupplier);
     }
 
