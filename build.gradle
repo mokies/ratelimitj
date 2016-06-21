@@ -11,7 +11,7 @@ buildscript {
 //}
 
 group 'es.moki'
-version '1.0-SNAPSHOT'
+version '0.1-SNAPSHOT'
 
 apply plugin: 'io.codearte.nexus-staging'
 
@@ -55,7 +55,7 @@ subprojects {
                 'junit:junit:4.12',
                 'ch.qos.logback:logback-classic:1.1.7',
                 'com.google.guava:guava:19.0',
-                'org.mockito:mockito-core:2.0.55-beta',
+                'org.mockito:mockito-core:2.0.62-beta',
         )
     }
 
