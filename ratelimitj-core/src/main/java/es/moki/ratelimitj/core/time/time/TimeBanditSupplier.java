@@ -5,6 +5,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * A time supplier suitable for testing.
+ */
 public class TimeBanditSupplier implements TimeSupplier {
 
     private final AtomicLong time = new AtomicLong(1000000000000L);
