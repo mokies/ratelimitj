@@ -26,21 +26,18 @@ RateLimitJ is currently under active construction and provides the following plu
 | ------------- |-------------| 
 | Redis sliding window rate limiter | beta  |
 | Dropwizard integration - bundle | beta |
-| Hazelcast sliding window rate limiter | alpha |
-| In memory sliding window rate limiter | under construction |
+| Hazelcast sliding window rate limiter | under construction |
+| In-memory sliding window rate limiter | under construction |
 | Whitelisting & blacklisting of keys | not started |
 | Redis fast bucket rate limiter | not started |
 | Spring integration | not started |
 | In memory fast bucket rate limiter | not started |
 
-#### Credis
+#### Credits
 This library was inspired by the following articles on sliding window rate limiting with Redis:
 
 * [Introduction to Rate Limiting with Redis Part 1](http://www.dr-josiah.com/2014/11/introduction-to-rate-limiting-with.html)
 * [Introduction to Rate Limiting with Redis Part 2](http://www.dr-josiah.com/2014/11/introduction-to-rate-limiting-with_26.html)
-
-#### Dependancies
-* RateLimitJ requires Java 8
 
 #### Authors
 

@@ -1,4 +1,4 @@
-package es.moki.ratelimitj.core.time.time;
+package es.moki.ratelimitj.core.time;
 
 
 import java.util.concurrent.CompletableFuture;

@@ -4,7 +4,7 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import es.moki.ratelimitj.api.LimitRule;
 import es.moki.ratelimitj.api.RateLimiter;
-import es.moki.ratelimitj.core.time.time.TimeSupplier;
+import es.moki.ratelimitj.core.time.TimeSupplier;
 import es.moki.ratelimitj.internal.test.AbstractSyncRateLimiterPerformanceTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

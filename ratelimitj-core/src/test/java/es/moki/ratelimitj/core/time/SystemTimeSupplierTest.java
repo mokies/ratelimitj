@@ -1,7 +1,6 @@
 package es.moki.ratelimitj.core.time;
 
 
-import es.moki.ratelimitj.core.time.time.SystemTimeSupplier;
 import org.assertj.core.data.Offset;
 import org.junit.Test;
 

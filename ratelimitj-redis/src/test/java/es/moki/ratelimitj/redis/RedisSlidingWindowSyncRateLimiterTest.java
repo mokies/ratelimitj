@@ -4,7 +4,7 @@ import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.api.StatefulRedisConnection;
 import es.moki.ratelimitj.api.LimitRule;
 import es.moki.ratelimitj.api.RateLimiter;
-import es.moki.ratelimitj.core.time.time.TimeSupplier;
+import es.moki.ratelimitj.core.time.TimeSupplier;
 import es.moki.ratelimitj.internal.test.AbstractSyncRateLimiterTest;
 import org.junit.After;
 import org.junit.AfterClass;

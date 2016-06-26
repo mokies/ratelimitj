@@ -2,9 +2,9 @@ package es.moki.ratelimitj.redis.time;
 
 
 import com.lambdaworks.redis.api.StatefulRedisConnection;
-import es.moki.ratelimitj.core.time.time.TimeSupplier;
-import net.jcip.annotations.ThreadSafe;
+import es.moki.ratelimitj.core.time.TimeSupplier;
 
+import javax.annotation.concurrent.ThreadSafe;
 import java.util.concurrent.CompletionStage;
 
 import static java.util.Objects.requireNonNull;

@@ -7,20 +7,20 @@ import es.moki.ratelimitj.api.AsyncRateLimiter;
 import es.moki.ratelimitj.api.LimitRule;
 import es.moki.ratelimitj.api.RateLimiter;
 import es.moki.ratelimitj.api.ReactiveRateLimiter;
-import es.moki.ratelimitj.core.time.time.SystemTimeSupplier;
-import es.moki.ratelimitj.core.time.time.TimeSupplier;
-import net.jcip.annotations.ThreadSafe;
+import es.moki.ratelimitj.core.time.SystemTimeSupplier;
+import es.moki.ratelimitj.core.time.TimeSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.Observable;
 
+import javax.annotation.concurrent.ThreadSafe;
 import java.util.Set;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
 
-import static net.javacrumbs.futureconverter.java8rx.FutureConverter.*;
 import static com.lambdaworks.redis.ScriptOutputType.VALUE;
 import static java.util.Objects.requireNonNull;
+import static net.javacrumbs.futureconverter.java8rx.FutureConverter.toObservable;
 
 @ThreadSafe
 public class RedisSlidingWindowRateLimiter implements RateLimiter, AsyncRateLimiter, ReactiveRateLimiter {

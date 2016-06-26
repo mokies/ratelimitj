@@ -3,8 +3,8 @@ package es.moki.ratelimitj.internal.test;
 import com.google.common.collect.ImmutableSet;
 import es.moki.ratelimitj.api.LimitRule;
 import es.moki.ratelimitj.api.RateLimiter;
-import es.moki.ratelimitj.core.time.time.TimeBanditSupplier;
-import es.moki.ratelimitj.core.time.time.TimeSupplier;
+import es.moki.ratelimitj.core.time.TimeBanditSupplier;
+import es.moki.ratelimitj.core.time.TimeSupplier;
 import org.junit.Test;
 
 import java.util.Set;

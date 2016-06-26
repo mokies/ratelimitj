@@ -5,11 +5,12 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 import es.moki.ratelimitj.api.LimitRule;
 import es.moki.ratelimitj.api.RateLimiter;
-import es.moki.ratelimitj.core.time.time.SystemTimeSupplier;
-import es.moki.ratelimitj.core.time.time.TimeSupplier;
+import es.moki.ratelimitj.core.time.SystemTimeSupplier;
+import es.moki.ratelimitj.core.time.TimeSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.concurrent.ThreadSafe;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +19,7 @@ import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
+@ThreadSafe
 public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
 
     private static final Logger LOG = LoggerFactory.getLogger(HazelcastSlidingWindowRateLimiter.class);
