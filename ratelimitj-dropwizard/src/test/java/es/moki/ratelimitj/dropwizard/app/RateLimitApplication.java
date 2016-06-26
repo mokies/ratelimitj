@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.api.StatefulRedisConnection;
 import es.moki.ratelimij.dropwizard.RateLimitBundle;
-import es.moki.ratelimitj.api.LimitRule;
+import es.moki.ratelimitj.core.api.LimitRule;
 import es.moki.ratelimitj.redis.RedisSlidingWindowRateLimiter;
 import io.dropwizard.Application;
 import io.dropwizard.lifecycle.Managed;

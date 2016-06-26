@@ -1,4 +1,4 @@
-package es.moki.ratelimitj.api;
+package es.moki.ratelimitj.core.api;
 
 
 import rx.Observable;

@@ -2,8 +2,8 @@ package es.moki.ratelimitj.hazelcast;
 
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
-import es.moki.ratelimitj.api.LimitRule;
-import es.moki.ratelimitj.api.RateLimiter;
+import es.moki.ratelimitj.core.api.LimitRule;
+import es.moki.ratelimitj.core.api.RateLimiter;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import es.moki.ratelimitj.internal.test.AbstractSyncRateLimiterTest;
 import org.junit.AfterClass;

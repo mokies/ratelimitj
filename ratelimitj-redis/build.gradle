@@ -5,17 +5,19 @@ project.ext.release = true
 dependencies {
 
     compile(
-            project(':ratelimitj-api'),
             project(':ratelimitj-core'),
             'biz.paluch.redis:lettuce:4.2.0.Final',
             'com.eclipsesource.minimal-json:minimal-json:0.9.4',
             'io.reactivex:rxjava:1.1.6',
             'net.javacrumbs.future-converter:future-converter-rxjava-java8:0.3.0'
     )
+
     testCompile(
             project(':ratelimitj-internal:test'),
             'org.assertj:assertj-core:3.4.1',
             'junit:junit:4.12',
+            'ch.qos.logback:logback-classic:1.1.7',
             'com.google.guava:guava:19.0',
+            'org.mockito:mockito-core:2.0.62-beta',
     )
 }

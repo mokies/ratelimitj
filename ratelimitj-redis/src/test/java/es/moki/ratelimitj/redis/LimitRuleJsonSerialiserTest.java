@@ -2,7 +2,7 @@ package es.moki.ratelimitj.redis;
 
 
 import com.google.common.collect.ImmutableList;
-import es.moki.ratelimitj.api.LimitRule;
+import es.moki.ratelimitj.core.api.LimitRule;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;

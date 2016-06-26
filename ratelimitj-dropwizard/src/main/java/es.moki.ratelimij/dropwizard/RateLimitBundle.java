@@ -2,7 +2,7 @@ package es.moki.ratelimij.dropwizard;
 
 
 import es.moki.ratelimij.dropwizard.filter.SimpleRateLimitFilter;
-import es.moki.ratelimitj.api.RateLimiter;
+import es.moki.ratelimitj.core.api.RateLimiter;
 import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
 import io.dropwizard.setup.Bootstrap;

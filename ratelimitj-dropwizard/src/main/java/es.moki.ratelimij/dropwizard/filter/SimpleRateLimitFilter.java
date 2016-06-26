@@ -1,7 +1,7 @@
 package es.moki.ratelimij.dropwizard.filter;
 
 
-import es.moki.ratelimitj.api.RateLimiter;
+import es.moki.ratelimitj.core.api.RateLimiter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;

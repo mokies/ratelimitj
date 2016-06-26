@@ -1,5 +1,6 @@
-package es.moki.ratelimitj.api;
+package es.moki.ratelimitj.core.time.api;
 
+import es.moki.ratelimitj.core.api.LimitRule;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;

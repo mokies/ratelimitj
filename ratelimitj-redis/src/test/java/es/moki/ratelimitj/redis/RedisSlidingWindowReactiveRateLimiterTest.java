@@ -2,8 +2,8 @@ package es.moki.ratelimitj.redis;
 
 import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.api.StatefulRedisConnection;
-import es.moki.ratelimitj.api.LimitRule;
-import es.moki.ratelimitj.api.ReactiveRateLimiter;
+import es.moki.ratelimitj.core.api.LimitRule;
+import es.moki.ratelimitj.core.api.ReactiveRateLimiter;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import es.moki.ratelimitj.internal.test.AbstractReactiveRateLimiterTest;
 import org.junit.After;

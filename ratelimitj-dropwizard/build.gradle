@@ -4,13 +4,19 @@ description 'RateLimitJ Dropwizard'
 dependencies {
 
     compile(
-            project(':ratelimitj-api'),
+            project(':ratelimitj-core'),
             'io.dropwizard:dropwizard-core:1.0.0-rc3',
             'io.dropwizard:dropwizard-jersey:1.0.0-rc3'
     )
     testCompile(
-            'io.dropwizard:dropwizard-testing:1.0.0-rc3',
             project(':ratelimitj-redis'),
+            project(':ratelimitj-internal:test'),
+            'io.dropwizard:dropwizard-testing:1.0.0-rc3',
+            'org.assertj:assertj-core:3.4.1',
+            'junit:junit:4.12',
+            'ch.qos.logback:logback-classic:1.1.7',
+            'com.google.guava:guava:19.0',
+            'org.mockito:mockito-core:2.0.62-beta',
     )
 }
 

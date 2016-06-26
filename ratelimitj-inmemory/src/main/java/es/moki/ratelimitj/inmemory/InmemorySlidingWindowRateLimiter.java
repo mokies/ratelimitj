@@ -1,6 +1,6 @@
 package es.moki.ratelimitj.inmemory;
 
-import es.moki.ratelimitj.api.RateLimiter;
+import es.moki.ratelimitj.core.api.RateLimiter;
 
 
 public class InmemorySlidingWindowRateLimiter implements RateLimiter {

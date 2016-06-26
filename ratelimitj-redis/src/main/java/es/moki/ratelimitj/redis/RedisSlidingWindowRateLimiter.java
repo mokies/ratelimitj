@@ -3,10 +3,10 @@ package es.moki.ratelimitj.redis;
 
 import com.lambdaworks.redis.api.StatefulRedisConnection;
 import com.lambdaworks.redis.api.async.RedisAsyncCommands;
-import es.moki.ratelimitj.api.AsyncRateLimiter;
-import es.moki.ratelimitj.api.LimitRule;
-import es.moki.ratelimitj.api.RateLimiter;
-import es.moki.ratelimitj.api.ReactiveRateLimiter;
+import es.moki.ratelimitj.core.api.AsyncRateLimiter;
+import es.moki.ratelimitj.core.api.LimitRule;
+import es.moki.ratelimitj.core.api.RateLimiter;
+import es.moki.ratelimitj.core.api.ReactiveRateLimiter;
 import es.moki.ratelimitj.core.time.SystemTimeSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import org.slf4j.Logger;

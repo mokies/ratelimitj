@@ -1,4 +1,4 @@
-package es.moki.ratelimitj.api;
+package es.moki.ratelimitj.core.api;
 
 /**
  * A synchronous rate limiter interface.

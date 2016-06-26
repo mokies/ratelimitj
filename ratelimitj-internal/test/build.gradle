@@ -3,7 +3,6 @@ description 'RateLimitJ Redis'
 dependencies {
 
     compile(
-            project(':ratelimitj-api'),
             project(':ratelimitj-core'),
             'org.assertj:assertj-core:3.4.1',
             'junit:junit:4.12',
