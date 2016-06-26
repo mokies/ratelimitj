@@ -1,5 +1,7 @@
 description 'RateLimitJ Redis'
 
+project.ext.release = true
+
 dependencies {
 
     compile(

@@ -1,5 +1,7 @@
 description 'RateLimitJ Core'
 
+project.ext.release = true
+
 dependencies {
 
     compile(

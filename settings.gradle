@@ -1,5 +1,10 @@
 rootProject.name = 'ratelimitj'
+<<<<<<< Updated upstream
 include 'ratelimitj-api'
+=======
+
+
+>>>>>>> Stashed changes
 include 'ratelimitj-core'
 include 'ratelimitj-redis'
 include 'ratelimitj-hazelcast'
