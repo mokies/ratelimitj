@@ -27,9 +27,9 @@ Example for Maven:
 
 ```xml
 <dependency>
-  <groupId>es.moki</groupId>
-  <artifactId>ratelimitj</artifactId>
-  <version>ratelimitj-redis</version>
+  <groupId>es.moki.ratelimitj</groupId>
+  <artifactId>>ratelimitj-redis</artifactId>
+  <version>0.1.1</version>
 </dependency>
 ```
 
