@@ -5,13 +5,13 @@ project.ext.release = true
 dependencies {
 
     compile(
-            'io.reactivex:rxjava:1.1.5',
+            'io.reactivex:rxjava:1.1.7',
             'org.slf4j:slf4j-api:1.7.21',
             'com.google.code.findbugs:jsr305:3.0.1'
     )
     testCompile(
-                'org.assertj:assertj-core:3.4.1',
-                'junit:junit:4.12',
+            'org.assertj:assertj-core:3.5.1',
+            'junit:junit:4.12',
     )
 
 }

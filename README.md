@@ -18,6 +18,21 @@ RateLimitJ is currently under active construction and provides the following plu
 * Uses an efficient sliding window algorithm for rate limiting
 * Multiple limit rules per instance
 
+Binaries/Download
+----------------
+
+Binaries and dependency information for Maven, Ivy, Gradle and others can be found at http://search.maven.org.
+
+Example for Maven:
+
+```xml
+<dependency>
+  <groupId>es.moki</groupId>
+  <artifactId>ratelimitj</artifactId>
+  <version>ratelimitj-redis</version>
+</dependency>
+```
+
 #### Prerequisite
 
 * RateLimitJ requires Java 8
