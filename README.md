@@ -21,15 +21,15 @@ RateLimitJ is currently under active construction and provides the following plu
 Binaries/Download
 ----------------
 
-Binaries and dependency information for Maven, Ivy, Gradle and others can be found at http://search.maven.org.
+Binaries and dependency information for Maven, Ivy, Gradle and others can be found at [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22es.moki.ratelimitj%22).
 
 Example for Maven:
 
 ```xml
 <dependency>
   <groupId>es.moki.ratelimitj</groupId>
-  <artifactId>>ratelimitj-redis</artifactId>
-  <version>0.1.1</version>
+  <artifactId>ratelimitj-redis</artifactId>
+  <version>x.x.x</version>
 </dependency>
 ```
 
@@ -41,14 +41,13 @@ Example for Maven:
 
 | Feature       | Status      |
 | ------------- |-------------| 
-| Redis sliding window rate limiter | beta  |
-| Dropwizard integration - bundle | beta |
+| Redis sliding window rate limiter | Release Candidate  |
+| Dropwizard integration - bundle | Beta |
 | Hazelcast sliding window rate limiter | under construction |
 | In-memory sliding window rate limiter | under construction |
 | Whitelisting & blacklisting of keys | not started |
 | Redis fast bucket rate limiter | not started |
 | Spring integration | not started |
-| In memory fast bucket rate limiter | not started |
 
 #### Credits
 This library was inspired by the following articles on sliding window rate limiting with Redis:

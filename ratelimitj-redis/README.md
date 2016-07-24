@@ -5,8 +5,18 @@ The RateLimitJ Redis module provides an implementation of a configurable sliding
 
 The Redis Module support (RateLimiter)[], (AsyncRateLimiter)[] and (ReactiveRateLimiter)[] interfaces.
  
-### Usage
 
+### Setup
+
+```xml
+<dependency>
+  <groupId>es.moki.ratelimitj</groupId>
+  <artifactId>ratelimitj-redis</artifactId>
+  <version>x.x.x</version>
+</dependency>
+```
+ 
+### Usage
 
 #### Basic Synchronous Example
 ```java
@@ -21,7 +31,7 @@ The Redis Module support (RateLimiter)[], (AsyncRateLimiter)[] and (ReactiveRate
 ```
 
 
-### Dependancies
+### Dependencies
 
 * Java 8
 * Redis
