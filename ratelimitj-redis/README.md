@@ -51,5 +51,5 @@ The Redis Module support (RateLimiter)[], (AsyncRateLimiter)[] and (ReactiveRate
 * Java 8
 * Redis
 
-### Perforamce 
+### Performance 
 
