@@ -14,13 +14,12 @@ import static java.util.Objects.requireNonNull;
  * <p>
  * It may be desirable to use a Redis based time supplier if the software is running on a group of servers with
  * different clocks or unreliable clocks. A disadvantage of the Redis based time supplier is that it introduces
- * an additional network round trip .
+ * an additional network round trip.
  */
 @ThreadSafe
 public class RedisTimeSupplier implements TimeSupplier {
 
     private final StatefulRedisConnection<String, String> connection;
-
 
     public RedisTimeSupplier(StatefulRedisConnection<String, String> connection) {
         this.connection = requireNonNull(connection);

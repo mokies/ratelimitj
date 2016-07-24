@@ -1,9 +1,6 @@
 package es.moki.ratelimitj.core.api;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.OptionalInt;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -25,14 +22,6 @@ public class LimitRule {
         this.durationSeconds = durationSeconds;
         this.limit = limit;
         this.precision = OptionalInt.of(precision);
-    }
-
-    public static Set<LimitRule> acceptableUseRuleSet() {
-        return Collections.unmodifiableSet(new HashSet<LimitRule>() {{
-            add(new LimitRule(1, 10));
-            add(new LimitRule(60, 120));
-            add(new LimitRule(3600, 240, 60));
-        }});
     }
 
     /**
