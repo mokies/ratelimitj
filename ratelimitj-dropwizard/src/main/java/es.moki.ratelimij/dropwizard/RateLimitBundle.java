@@ -23,7 +23,6 @@ public class RateLimitBundle<T extends Configuration> implements ConfiguredBundl
 
         SimpleRateLimitFilter rateLimitFilter = new SimpleRateLimitFilter(rateLimit);
         environment.jersey().register(rateLimitFilter);
-        //environment.jersey().register(DateRequiredFeature.class);
     }
 
     @Override
