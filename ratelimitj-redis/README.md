@@ -30,6 +30,21 @@ The Redis Module support (RateLimiter)[], (AsyncRateLimiter)[] and (ReactiveRate
     boolean overLimit = rateLimiter.overLimit("ip:127.0.0.2");
 ```
 
+#### Multi Rule Reactive Example
+```java
+    import com.lambdaworks.redis.RedisClient;
+    import es.moki.ratelimitj.core.LimitRule;
+
+    RedisClient client = RedisClient.create("redis://localhost");
+
+    Set<LimitRule> rules = new HashSet<>();
+    rules.add(LimitRule.of(1, TimeUnit.SECONDS, 10));
+    rules.add(LimitRule.of(3600, TimeUnit.SECONDS, 240).withPrecision(60));
+
+    RedisRateLimit rateLimiter = new RedisRateLimit(client, rules);
+    
+    Observable<Boolean> observable = rateLimiter.overLimitReactive("ip:127.0.1.6");
+```
 
 ### Dependencies
 
