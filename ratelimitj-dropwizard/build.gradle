@@ -5,13 +5,14 @@ dependencies {
 
     compile(
             project(':ratelimitj-core'),
-            'io.dropwizard:dropwizard-core:1.0.0-rc3',
-            'io.dropwizard:dropwizard-jersey:1.0.0-rc3'
+            'io.dropwizard:dropwizard-core:1.0.0',
+            'io.dropwizard:dropwizard-jersey:1.0.0'
     )
+
     testCompile(
             project(':ratelimitj-redis'),
             project(':ratelimitj-internal:test'),
-            'io.dropwizard:dropwizard-testing:1.0.0-rc3',
+            'io.dropwizard:dropwizard-testing:1.0.0',
             'org.assertj:assertj-core:3.4.1',
             'junit:junit:4.12',
             'ch.qos.logback:logback-classic:1.1.7',
