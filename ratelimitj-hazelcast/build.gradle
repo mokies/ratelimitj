@@ -8,7 +8,7 @@ dependencies {
     )
     testCompile(
             project(':ratelimitj-internal:test'),
-            'org.assertj:assertj-core:3.4.1',
+            'org.assertj:assertj-core:3.5.2',
             'junit:junit:4.12',
             'ch.qos.logback:logback-classic:1.1.7',
             'com.google.guava:guava:19.0',

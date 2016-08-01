@@ -10,7 +10,7 @@ dependencies {
             'com.google.code.findbugs:jsr305:3.0.1'
     )
     testCompile(
-            'org.assertj:assertj-core:3.5.1',
+            'org.assertj:assertj-core:3.5.2',
             'junit:junit:4.12',
     )
 
