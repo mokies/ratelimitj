@@ -14,4 +14,9 @@ public class InmemorySlidingWindowRateLimiter implements RateLimiter {
     public boolean overLimit(String key, int weight) {
         return false;
     }
+
+    @Override
+    public boolean resetLimit(String key) {
+        return false;
+    }
 }

@@ -122,6 +122,11 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
         return false;
     }
 
+    @Override
+    public boolean resetLimit(String key) {
+        throw new RuntimeException("Not implemented");
+    }
+
     private IMap<String, Long> getMap(String key, int longestDuration) {
 
         MapConfig mapConfig = hz.getConfig().getMapConfig(key);

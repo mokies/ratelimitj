@@ -19,4 +19,11 @@ public interface RateLimiter {
      * @return {@code true} if the key has exceeded the limit, otherwise {@code false} .
      */
     boolean overLimit(String key, int weight);
+
+    /**
+     * Resets the accumulated rate for the given key.
+     * @param key key.
+     * @return {@code true} if the key existed, otherwise {@code false} .
+     */
+    boolean resetLimit(String key);
 }

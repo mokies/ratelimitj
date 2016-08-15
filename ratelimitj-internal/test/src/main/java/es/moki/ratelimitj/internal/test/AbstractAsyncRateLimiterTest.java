@@ -73,4 +73,20 @@ public abstract class AbstractAsyncRateLimiterTest {
         assertThat(rateLimiter.overLimitAsync("ip:127.0.0.10").toCompletableFuture().get()).isFalse();
     }
 
+    @Test
+    public void shouldResetLimit() throws Exception {
+        ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(60, TimeUnit.SECONDS, 1));
+        AsyncRateLimiter rateLimiter = getAsyncRateLimiter(rules, timeBandit);
+
+        String key =  "ip:127.1.0.1";
+
+        assertThat(rateLimiter.overLimitAsync(key).toCompletableFuture().get()).isFalse();
+        assertThat(rateLimiter.overLimitAsync(key).toCompletableFuture().get()).isTrue();
+
+        assertThat(rateLimiter.resetLimitAsync(key).toCompletableFuture().get()).isTrue();
+        assertThat(rateLimiter.resetLimitAsync(key).toCompletableFuture().get()).isFalse();
+
+        assertThat(rateLimiter.overLimitAsync(key).toCompletableFuture().get()).isFalse();
+    }
+
 }

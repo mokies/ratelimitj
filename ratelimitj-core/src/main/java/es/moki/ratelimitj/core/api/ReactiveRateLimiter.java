@@ -11,4 +11,6 @@ public interface ReactiveRateLimiter {
     Observable<Boolean> overLimitReactive(String key);
 
     Observable<Boolean> overLimitReactive(String key, int weight);
+
+    Observable<Boolean> resetLimitReactive(String key);
 }

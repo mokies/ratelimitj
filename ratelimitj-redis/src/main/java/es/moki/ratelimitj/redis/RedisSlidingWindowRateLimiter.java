@@ -74,6 +74,11 @@ public class RedisSlidingWindowRateLimiter implements RateLimiter, AsyncRateLimi
     }
 
     @Override
+    public CompletionStage<Boolean> resetLimitAsync(String key) {
+        return async.del(key).thenApply(result -> 1 == result);
+    }
+
+    @Override
     public boolean overLimit(String key) {
         return overLimit(key, 1);
     }
@@ -88,6 +93,15 @@ public class RedisSlidingWindowRateLimiter implements RateLimiter, AsyncRateLimi
     }
 
     @Override
+    public boolean resetLimit(String key) {
+        try {
+            return resetLimitAsync(key).toCompletableFuture().get(10, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to resetLimit", e);
+        }
+    }
+
+    @Override
     public Observable<Boolean> overLimitReactive(String key) {
         return toObservable(overLimitAsync(key).toCompletableFuture());
     }
@@ -96,4 +110,11 @@ public class RedisSlidingWindowRateLimiter implements RateLimiter, AsyncRateLimi
     public Observable<Boolean> overLimitReactive(String key, int weight) {
         return toObservable(overLimitAsync(key, weight).toCompletableFuture());
     }
+
+    @Override
+    public Observable<Boolean> resetLimitReactive(String key) {
+        return toObservable(resetLimitAsync(key).toCompletableFuture());
+    }
+
+
 }

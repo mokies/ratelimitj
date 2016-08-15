@@ -44,4 +44,5 @@ public abstract class AbstractSyncRateLimiterPerformanceTest {
         log.info("total time " + watch.stop()
                 + " checks " + transactionsPerSecond + "/sec");
     }
+
 }

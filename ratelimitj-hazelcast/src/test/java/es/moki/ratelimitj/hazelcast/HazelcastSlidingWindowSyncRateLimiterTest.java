@@ -8,6 +8,8 @@ import es.moki.ratelimitj.core.time.TimeSupplier;
 import es.moki.ratelimitj.internal.test.AbstractSyncRateLimiterTest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.util.Set;
 
@@ -30,4 +32,10 @@ public class HazelcastSlidingWindowSyncRateLimiterTest extends AbstractSyncRateL
     protected RateLimiter getRateLimiter(Set<LimitRule> rules, TimeSupplier timeSupplier) {
         return new HazelcastSlidingWindowRateLimiter(hz, rules, timeSupplier);
     }
+
+    @Override @Test @Ignore
+    public void shouldResetLimit() {
+
+    }
+
 }

@@ -54,4 +54,19 @@ public abstract class AbstractSyncRateLimiterTest {
                 keySuffix -> assertThat(rateLimiter.overLimit("ip:127.0.0." + keySuffix)).isFalse());
     }
 
+    @Test
+    public void shouldResetLimit() {
+        ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(60, TimeUnit.SECONDS, 1));
+        RateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
+
+        String key =  "ip:127.1.0.1";
+        assertThat(rateLimiter.overLimit(key)).isFalse();
+        assertThat(rateLimiter.overLimit(key)).isTrue();
+
+        assertThat(rateLimiter.resetLimit(key)).isTrue();
+        assertThat(rateLimiter.resetLimit(key)).isFalse();
+
+        assertThat(rateLimiter.overLimit(key)).isFalse();
+    }
+
 }

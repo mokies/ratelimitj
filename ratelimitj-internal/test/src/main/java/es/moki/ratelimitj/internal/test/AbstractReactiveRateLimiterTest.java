@@ -73,4 +73,20 @@ public abstract class AbstractReactiveRateLimiterTest {
         rateLimiter.overLimitReactive("ip:127.0.1.6").toBlocking().subscribe(result -> assertThat(result).isTrue());
     }
 
+    @Test
+    public void shouldResetLimit() throws Exception {
+        ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(60, TimeUnit.SECONDS, 1));
+        ReactiveRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
+
+        String key =  "ip:127.1.0.1";
+
+        rateLimiter.overLimitReactive(key).toBlocking().subscribe(result -> assertThat(result).isFalse());
+        rateLimiter.overLimitReactive(key).toBlocking().subscribe(result -> assertThat(result).isTrue());
+
+        rateLimiter.resetLimitReactive(key).toBlocking().subscribe(result -> assertThat(result).isTrue());
+        rateLimiter.resetLimitReactive(key).toBlocking().subscribe(result -> assertThat(result).isFalse());
+
+        rateLimiter.overLimitReactive(key).toBlocking().subscribe(result -> assertThat(result).isFalse());
+    }
+
 }

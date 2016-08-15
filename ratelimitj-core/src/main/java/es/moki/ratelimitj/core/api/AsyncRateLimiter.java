@@ -11,4 +11,6 @@ public interface AsyncRateLimiter {
     CompletionStage<Boolean> overLimitAsync(String key);
 
     CompletionStage<Boolean> overLimitAsync(String key, int weight);
+
+    CompletionStage<Boolean> resetLimitAsync(String key);
 }
