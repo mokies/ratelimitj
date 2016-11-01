@@ -6,17 +6,17 @@ dependencies {
 
     compile(
             project(':ratelimitj-core'),
-            'biz.paluch.redis:lettuce:4.2.2.Final',
+            'biz.paluch.redis:lettuce:4.3.0.Final',
             'com.eclipsesource.minimal-json:minimal-json:0.9.4',
             'net.javacrumbs.future-converter:future-converter-rxjava-java8:0.3.0'
     )
 
     testCompile(
             project(':ratelimitj-internal:test'),
-            'org.assertj:assertj-core:3.5.2',
-            'junit:junit:4.12',
-            'ch.qos.logback:logback-classic:1.1.7',
-            'com.google.guava:guava:19.0',
-            'org.mockito:mockito-core:2.1.0',
+            libraries.assertj,
+            libraries.junit,
+            libraries.guava,
+            libraries.mockito,
+            libraries.logback,
     )
 }

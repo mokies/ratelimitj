@@ -8,10 +8,10 @@ dependencies {
     )
     testCompile(
             project(':ratelimitj-internal:test'),
-            'org.assertj:assertj-core:3.5.2',
-            'junit:junit:4.12',
-            'ch.qos.logback:logback-classic:1.1.7',
-            'com.google.guava:guava:19.0',
-            'org.mockito:mockito-core:2.1.0',
+            libraries.assertj,
+            libraries.junit,
+            libraries.guava,
+            libraries.mockito,
+            libraries.logback,
     )
 }
