@@ -5,7 +5,7 @@ project.ext.release = true
 dependencies {
 
     compile(
-            'io.reactivex:rxjava:1.2.1',
+            'io.projectreactor:reactor-core:3.0.3.RELEASE',
             'org.slf4j:slf4j-api:1.7.21',
             'com.google.code.findbugs:jsr305:3.0.1'
     )

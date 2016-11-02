@@ -6,9 +6,7 @@ import es.moki.ratelimitj.core.api.ReactiveRateLimiter;
 import es.moki.ratelimitj.core.time.TimeBanditSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import rx.Observable;
+import reactor.core.publisher.Flux;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -16,8 +14,6 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class AbstractReactiveRateLimiterTest {
-
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final TimeBanditSupplier timeBandit = new TimeBanditSupplier();
 
@@ -29,7 +25,7 @@ public abstract class AbstractReactiveRateLimiterTest {
         ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(10, TimeUnit.SECONDS, 5));
         ReactiveRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
 
-        Observable<Boolean> overLimitObservable = Observable
+        Flux<Boolean> overLimitFlux = Flux
                 .just("ip:127.0.1.5")
                 .repeat(5)
                 .flatMap(key -> {
@@ -37,9 +33,9 @@ public abstract class AbstractReactiveRateLimiterTest {
                     return rateLimiter.overLimitReactive(key);
                 });
 
-        overLimitObservable.toBlocking().subscribe(result -> assertThat(result).isFalse());
+        overLimitFlux.toStream().forEach(result -> assertThat(result).isFalse());
 
-        rateLimiter.overLimitReactive("ip:127.0.1.5").toBlocking().subscribe(result -> assertThat(result).isTrue());
+        assertThat(rateLimiter.overLimitReactive("ip:127.0.1.5").block()).isTrue();
     }
 
     @Test
@@ -48,29 +44,29 @@ public abstract class AbstractReactiveRateLimiterTest {
         ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(1, TimeUnit.SECONDS, 5), LimitRule.of(10, TimeUnit.SECONDS, 10));
         ReactiveRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
 
-        Observable
+        Flux
                 .just("ip:127.0.1.6")
                 .repeat(5)
                 .flatMap(key -> {
                     timeBandit.addUnixTimeMilliSeconds(100);
                     return rateLimiter.overLimitReactive(key);
                 })
-                .toBlocking()
-                .subscribe(result -> assertThat(result).isFalse());
+                .toStream()
+                .forEach(result -> assertThat(result).isFalse());
 
         timeBandit.addUnixTimeMilliSeconds(1000L);
 
-        Observable
+        Flux
                 .just("ip:127.0.1.6")
                 .repeat(5)
                 .flatMap(key -> {
                     timeBandit.addUnixTimeMilliSeconds(100);
                     return rateLimiter.overLimitReactive(key);
                 })
-                .toBlocking()
-                .subscribe(result -> assertThat(result).isFalse());
+                .toStream()
+                .forEach(result -> assertThat(result).isFalse());
 
-        rateLimiter.overLimitReactive("ip:127.0.1.6").toBlocking().subscribe(result -> assertThat(result).isTrue());
+        assertThat(rateLimiter.overLimitReactive("ip:127.0.1.6").block()).isTrue();
     }
 
     @Test
@@ -80,13 +76,13 @@ public abstract class AbstractReactiveRateLimiterTest {
 
         String key =  "ip:127.1.0.1";
 
-        rateLimiter.overLimitReactive(key).toBlocking().subscribe(result -> assertThat(result).isFalse());
-        rateLimiter.overLimitReactive(key).toBlocking().subscribe(result -> assertThat(result).isTrue());
+        assertThat(rateLimiter.overLimitReactive(key).block()).isFalse();
+        assertThat(rateLimiter.overLimitReactive(key).block()).isTrue();
 
-        rateLimiter.resetLimitReactive(key).toBlocking().subscribe(result -> assertThat(result).isTrue());
-        rateLimiter.resetLimitReactive(key).toBlocking().subscribe(result -> assertThat(result).isFalse());
+        assertThat(rateLimiter.resetLimitReactive(key).block()).isTrue();
+        assertThat(rateLimiter.resetLimitReactive(key).block()).isFalse();
 
-        rateLimiter.overLimitReactive(key).toBlocking().subscribe(result -> assertThat(result).isFalse());
+        assertThat(rateLimiter.overLimitReactive(key).block()).isFalse();
     }
 
 }

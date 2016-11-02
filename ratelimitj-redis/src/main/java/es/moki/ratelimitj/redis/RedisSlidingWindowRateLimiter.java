@@ -11,7 +11,7 @@ import es.moki.ratelimitj.core.time.SystemTimeSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rx.Observable;
+import reactor.core.publisher.Mono;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.Set;
@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 
 import static com.lambdaworks.redis.ScriptOutputType.VALUE;
 import static java.util.Objects.requireNonNull;
-import static net.javacrumbs.futureconverter.java8rx.FutureConverter.toObservable;
 
 @ThreadSafe
 public class RedisSlidingWindowRateLimiter implements RateLimiter, AsyncRateLimiter, ReactiveRateLimiter {
@@ -102,18 +101,18 @@ public class RedisSlidingWindowRateLimiter implements RateLimiter, AsyncRateLimi
     }
 
     @Override
-    public Observable<Boolean> overLimitReactive(String key) {
-        return toObservable(overLimitAsync(key).toCompletableFuture());
+    public Mono<Boolean> overLimitReactive(String key) {
+        return Mono.fromFuture(overLimitAsync(key).toCompletableFuture());
     }
 
     @Override
-    public Observable<Boolean> overLimitReactive(String key, int weight) {
-        return toObservable(overLimitAsync(key, weight).toCompletableFuture());
+    public Mono<Boolean> overLimitReactive(String key, int weight) {
+        return Mono.fromFuture(overLimitAsync(key, weight).toCompletableFuture());
     }
 
     @Override
-    public Observable<Boolean> resetLimitReactive(String key) {
-        return toObservable(resetLimitAsync(key).toCompletableFuture());
+    public Mono<Boolean> resetLimitReactive(String key) {
+        return Mono.fromFuture(resetLimitAsync(key).toCompletableFuture());
     }
 
 

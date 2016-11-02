@@ -59,7 +59,7 @@ public abstract class AbstractSyncRateLimiterTest {
         ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(60, TimeUnit.SECONDS, 1));
         RateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
 
-        String key =  "ip:127.1.0.1";
+        String key = "ip:127.1.0.1";
         assertThat(rateLimiter.overLimit(key)).isFalse();
         assertThat(rateLimiter.overLimit(key)).isTrue();
 

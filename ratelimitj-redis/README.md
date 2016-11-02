@@ -43,7 +43,7 @@ The Redis Module support (RateLimiter)[], (AsyncRateLimiter)[] and (ReactiveRate
 
     RedisRateLimit rateLimiter = new RedisRateLimit(client, rules);
     
-    Observable<Boolean> observable = rateLimiter.overLimitReactive("ip:127.0.1.6");
+    Mono<Boolean> observable = rateLimiter.overLimitReactive("ip:127.0.1.6");
 ```
 
 ### Dependencies

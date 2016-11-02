@@ -1,16 +1,16 @@
 package es.moki.ratelimitj.core.api;
 
 
-import rx.Observable;
+import reactor.core.publisher.Mono;
 
 /**
  * An reactive rate limiter interface.
  */
 public interface ReactiveRateLimiter {
 
-    Observable<Boolean> overLimitReactive(String key);
+    Mono<Boolean> overLimitReactive(String key);
 
-    Observable<Boolean> overLimitReactive(String key, int weight);
+    Mono<Boolean> overLimitReactive(String key, int weight);
 
-    Observable<Boolean> resetLimitReactive(String key);
+    Mono<Boolean> resetLimitReactive(String key);
 }
