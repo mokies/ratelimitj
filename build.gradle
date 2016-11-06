@@ -86,7 +86,7 @@ if (project.hasProperty('release')) {
         apply plugin: 'maven'
 
         project.group = 'es.moki.ratelimitj'
-        project.version = '0.2.0'
+        project.version = '0.3.0'
 
         // Signature of artifacts
         signing {
