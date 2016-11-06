@@ -6,10 +6,10 @@ import es.moki.ratelimitj.core.api.LimitRule;
 import es.moki.ratelimitj.core.api.RateLimiter;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import es.moki.ratelimitj.internal.test.AbstractSyncRateLimiterTest;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
@@ -18,12 +18,12 @@ public class HazelcastSlidingWindowSyncRateLimiterTest extends AbstractSyncRateL
 
     private static HazelcastInstance hz;
 
-    @BeforeClass
+    @BeforeAll
     public static void before() {
         hz = Hazelcast.newHazelcastInstance();
     }
 
-    @AfterClass
+    @AfterAll
     public static void after() {
         hz.shutdown();
     }
@@ -33,7 +33,7 @@ public class HazelcastSlidingWindowSyncRateLimiterTest extends AbstractSyncRateL
         return new HazelcastSlidingWindowRateLimiter(hz, rules, timeSupplier);
     }
 
-    @Override @Test @Ignore
+    @Override @Test @Disabled
     public void shouldResetLimit() {
 
     }

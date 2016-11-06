@@ -6,8 +6,8 @@ import es.moki.ratelimitj.core.api.LimitRule;
 import es.moki.ratelimitj.core.api.RateLimiter;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import es.moki.ratelimitj.internal.test.AbstractSyncRateLimiterPerformanceTest;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.Set;
 
@@ -17,13 +17,13 @@ public class HazelcastSlidingWindowSyncRateLimiterPerformanceTest extends Abstra
     private static HazelcastInstance hz;
 //    private static HazelcastInstance hz2;
 
-    @BeforeClass
+    @BeforeAll
     public static void before() {
         hz = Hazelcast.newHazelcastInstance();
 //        hz2 = Hazelcast.newHazelcastInstance();
     }
 
-    @AfterClass
+    @AfterAll
     public static void after() {
         hz.shutdown();
     }

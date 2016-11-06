@@ -2,9 +2,9 @@ package es.moki.ratelimitj.redis;
 
 
 import com.lambdaworks.redis.RedisClient;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
@@ -12,13 +12,13 @@ public class RedisScriptLoaderTest {
 
     private static RedisClient client;
 
-    @BeforeClass
-    public static void up() {
+    @BeforeAll
+    public static void beforeAll() {
         client = RedisClient.create("redis://localhost");
     }
 
-    @AfterClass
-    public static void down() {
+    @AfterAll
+    public static void afterAll() {
         client.shutdown();
     }
 

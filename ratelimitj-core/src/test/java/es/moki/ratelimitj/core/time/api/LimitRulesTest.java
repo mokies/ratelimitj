@@ -1,7 +1,7 @@
 package es.moki.ratelimitj.core.time.api;
 
 import es.moki.ratelimitj.core.api.LimitRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
@@ -34,7 +34,7 @@ public class LimitRulesTest {
     public void shouldHavePrecisionOf10() {
         LimitRule limitRule = LimitRule.of(1, TimeUnit.SECONDS, 5).withPrecision(10);
 
-        assertThat(limitRule.getPrecision().getAsInt()).isEqualTo(10);
+        assertThat(limitRule.getPrecision()).isPresent().hasValue(10);
     }
 
 }

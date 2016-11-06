@@ -6,7 +6,7 @@ dependencies {
 
     compile(
             'io.projectreactor:reactor-core:3.0.3.RELEASE',
-            'org.slf4j:slf4j-api:1.7.21',
+            libraries.slf4j,
             'com.google.code.findbugs:jsr305:3.0.1'
     )
     testCompile(

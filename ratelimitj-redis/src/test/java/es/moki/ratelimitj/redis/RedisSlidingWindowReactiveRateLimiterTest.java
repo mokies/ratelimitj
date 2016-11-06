@@ -6,9 +6,8 @@ import es.moki.ratelimitj.core.api.LimitRule;
 import es.moki.ratelimitj.core.api.ReactiveRateLimiter;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import es.moki.ratelimitj.internal.test.AbstractReactiveRateLimiterTest;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.Set;
 
@@ -18,19 +17,19 @@ public class RedisSlidingWindowReactiveRateLimiterTest extends AbstractReactiveR
     private static RedisClient client;
     private static StatefulRedisConnection<String, String> connect;
 
-    @BeforeClass
+    @BeforeAll
     public static void before() {
         client = RedisClient.create("redis://localhost");
         connect = client.connect();
     }
 
-    @AfterClass
+    @AfterAll
     public static void after() {
         connect.close();
         client.shutdown();
     }
 
-    @After
+    @AfterAll
     public void tearDown() {
         try (StatefulRedisConnection<String, String> connection = client.connect()) {
             connection.sync().flushdb();

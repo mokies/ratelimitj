@@ -2,9 +2,9 @@ package es.moki.ratelimitj.redis.time;
 
 import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.api.StatefulRedisConnection;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,14 +14,14 @@ public class RedisTimeSupplierTest {
     private static RedisClient client;
     private static StatefulRedisConnection<String, String> connect;
 
-    @BeforeClass
-    public static void before() {
+    @BeforeAll
+    public static void beforeAll() {
         client = RedisClient.create("redis://localhost");
         connect = client.connect();
     }
 
-    @AfterClass
-    public static void after() {
+    @AfterAll
+    public static void afterAll() {
         connect.close();
         client.shutdown();
     }

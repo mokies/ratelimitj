@@ -9,9 +9,9 @@ import es.moki.ratelimitj.core.api.LimitRule;
 import es.moki.ratelimitj.core.api.RateLimiter;
 import es.moki.ratelimitj.core.time.TimeBanditSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -25,12 +25,12 @@ public class HazelcastRateLimiterInternalTest {
 
     private final TimeBanditSupplier timeBandit = new TimeBanditSupplier();
 
-    @BeforeClass
+    @BeforeAll
     public static void before() {
         hz = Hazelcast.newHazelcastInstance();
     }
 
-    @AfterClass
+    @AfterAll
     public static void after() {
         hz.shutdown();
     }

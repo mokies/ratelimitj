@@ -5,14 +5,14 @@ dependencies {
 
     compile(
             project(':ratelimitj-core'),
-            'io.dropwizard:dropwizard-core:1.0.3',
-            'io.dropwizard:dropwizard-jersey:1.0.3'
+            'io.dropwizard:dropwizard-core:1.0.5',
+            'io.dropwizard:dropwizard-jersey:1.0.5'
     )
 
     testCompile(
             project(':ratelimitj-redis'),
             project(':ratelimitj-internal:test'),
-            'io.dropwizard:dropwizard-testing:1.0.3',
+            'io.dropwizard:dropwizard-testing:1.0.5',
             libraries.assertj,
             libraries.junit,
             libraries.guava,

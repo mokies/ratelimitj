@@ -46,7 +46,6 @@ Example for Maven:
 | Hazelcast sliding window rate limiter | under construction |
 | In-memory sliding window rate limiter | under construction |
 | Whitelisting & blacklisting of keys | not started |
-| Redis fast bucket rate limiter | not started |
 | Spring integration | not started |
 
 #### Credits

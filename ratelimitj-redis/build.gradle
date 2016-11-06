@@ -6,7 +6,6 @@ dependencies {
 
     compile(
             project(':ratelimitj-core'),
-            //'biz.paluch.redis:lettuce:4.3.0.Final',
             'biz.paluch.redis:lettuce:5.0.0.Beta1',
             'com.eclipsesource.minimal-json:minimal-json:0.9.4',
             libraries.guava
