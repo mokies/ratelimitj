@@ -13,7 +13,7 @@ import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 
-@RateLimited
+
 public class SimpleRateLimitFilter implements ContainerRequestFilter {
 
     private final RateLimiter rateLimit;
@@ -36,7 +36,7 @@ public class SimpleRateLimitFilter implements ContainerRequestFilter {
         return requestKey().map(rateLimit::overLimit).orElse(false);
     }
 
-    private Optional<String> requestKey() {
+    protected Optional<String> requestKey() {
         if (nonNull(request.getRemoteUser())) {
             return Optional.of("dwf:user:" + request.getRemoteUser());
         } else if (nonNull(request.getRemoteAddr())) {

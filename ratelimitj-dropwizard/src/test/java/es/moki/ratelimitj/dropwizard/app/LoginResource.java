@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response;
 @Consumes(MediaType.APPLICATION_JSON)
 public class LoginResource {
 
-    @RateLimited
+    @RateLimited(duration = 10, limit = 5)
     @POST
     public Response login(LoginRequest login) {
 

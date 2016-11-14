@@ -39,7 +39,6 @@ public class RedisSlidingWindowRateLimiter implements RateLimiter, AsyncRateLimi
 
     public RedisSlidingWindowRateLimiter(StatefulRedisConnection<String, String> connection, Set<LimitRule> rules, TimeSupplier timeSupplier) {
         async = connection.async();
-        connection.reactive();
         scriptLoader = new RedisScriptLoader(connection, "sliding-window-ratelimit.lua");
         rulesJson = serialiserLimitRules(rules);
         this.timeSupplier = timeSupplier;
