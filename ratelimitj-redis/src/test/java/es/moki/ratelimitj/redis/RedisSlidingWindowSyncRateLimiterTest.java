@@ -9,10 +9,13 @@ import es.moki.ratelimitj.internal.test.AbstractSyncRateLimiterTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.runner.RunWith;
 
 import java.util.Set;
 
 
+@RunWith(JUnitPlatform.class)
 public class RedisSlidingWindowSyncRateLimiterTest extends AbstractSyncRateLimiterTest {
 
     private static RedisClient client;

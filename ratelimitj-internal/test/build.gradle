@@ -5,8 +5,11 @@ dependencies {
     compile(
             project(':ratelimitj-core'),
             libraries.assertj,
-            libraries.junit,
             libraries.guava,
     )
+
+    compile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+    compile "org.junit.platform:junit-platform-runner:${junitPlatformVersion}"
+    runtime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
 
 }

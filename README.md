@@ -41,10 +41,10 @@ Example for Maven:
 
 | Feature       | Status      |
 | ------------- |-------------| 
-| Redis sliding window rate limiter | Production  |
-| Dropwizard integration - bundle | Beta |
-| Hazelcast sliding window rate limiter | under construction |
-| In-memory sliding window rate limiter | under construction |
+| Redis sliding window rate limiter | Release |
+| Dropwizard integration - bundle | Release |
+| Hazelcast sliding window rate limiter | Development |
+| In-memory sliding window rate limiter | Development |
 | Whitelisting & blacklisting of keys | not started |
 | Spring integration | not started |
 

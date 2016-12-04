@@ -10,8 +10,11 @@ dependencies {
             'com.google.code.findbugs:jsr305:3.0.1'
     )
     testCompile(
-            libraries.assertj,
-            libraries.junit,
+            libraries.assertj
     )
+
+    testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+    testCompile "org.junit.platform:junit-platform-runner:${junitPlatformVersion}"
+    testRuntime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
 
 }

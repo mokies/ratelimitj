@@ -1,20 +1,27 @@
 group 'moki.es'
 description 'RateLimitJ Dropwizard'
 
+
+ext.dropWizardVersion = '1.0.5'
+
 dependencies {
 
     compile(
             project(':ratelimitj-core'),
-            'io.dropwizard:dropwizard-core:1.0.5',
-            'io.dropwizard:dropwizard-jersey:1.0.5'
+            "io.dropwizard:dropwizard-core:${dropWizardVersion}",
+            "io.dropwizard:dropwizard-jersey:${dropWizardVersion}"
     )
+
+   	testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+    testCompile "org.junit.platform:junit-platform-runner:${junitPlatformVersion}"
+    testRuntime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
 
     testCompile(
             project(':ratelimitj-redis'),
             project(':ratelimitj-internal:test'),
             'io.dropwizard:dropwizard-testing:1.0.5',
+            'org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:2.24.1',
             libraries.assertj,
-            libraries.junit,
             libraries.guava,
             libraries.mockito,
             libraries.logback,

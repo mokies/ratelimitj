@@ -4,6 +4,7 @@ package es.moki.ratelimitj.redis;
 import com.lambdaworks.redis.RedisClient;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -23,6 +24,7 @@ public class RedisScriptLoaderTest {
     }
 
     @Test
+    @DisplayName("should load rate limit lua script into Redis")
     public void shouldLoadScript() throws Exception {
         RedisScriptLoader scriptLoader = new RedisScriptLoader(client.connect(), "sliding-window-ratelimit.lua");
 
