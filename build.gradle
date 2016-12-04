@@ -48,8 +48,7 @@ subprojects {
     ext.libraries = [
             assertj : 'org.assertj:assertj-core:3.6.1',
             junit  : 'junit:junit:4.12',
-            guava  : 'com.google.guava:guava:19.0',
-            mockito: 'org.mockito:mockito-core:2.2.9',
+            mockito: 'org.mockito:mockito-core:2.2.28',
             guava  : 'com.google.guava:guava:20.0',
             logback: 'ch.qos.logback:logback-classic:1.1.7'
     ]
