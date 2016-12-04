@@ -1,5 +1,7 @@
 package com.touch.esp.common.dropwizard.ratelimit;
 
+import com.lambdaworks.redis.RedisClient;
+import com.lambdaworks.redis.api.StatefulRedisConnection;
 import com.touch.esp.common.dropwizard.ratelimit.app.RateLimitApplication;
 import com.touch.esp.common.dropwizard.ratelimit.app.config.RateLimitApplicationConfiguration;
 import com.touch.esp.common.dropwizard.ratelimit.app.model.LoginRequest;
@@ -7,6 +9,9 @@ import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -22,15 +27,28 @@ public class DropwizardRateLimitComponentTest {
     public static final DropwizardAppRule<RateLimitApplicationConfiguration> RULE =
             new DropwizardAppRule<>(RateLimitApplication.class, ResourceHelpers.resourceFilePath("ratelimit-app.yml"));
 
-//    @Rule
-//    public RedisRule redisRule = new RedisRule(newRemoteRedisConfiguration()
-//                                                           .host(RULE.getConfiguration().getRateLimitConfiguration().getHost())
-//                                                           .port(RULE.getConfiguration().getRateLimitConfiguration().getPort()).build());
-//
-//    @Before
-//    public void setUp() {
-//        redisRule.getDatabaseOperation().deleteAll();
-//    }
+
+    private static RedisClient client;
+    private static StatefulRedisConnection<String, String> connect;
+
+    @BeforeAll
+    public static void beforeAll() {
+        client = RedisClient.create("redis://localhost");
+        connect = client.connect();
+    }
+
+    @AfterAll
+    public static void afterAll() {
+        connect.close();
+        client.shutdown();
+    }
+
+    @AfterEach
+    public void afterEach() {
+        try (StatefulRedisConnection<String, String> connection = client.connect()) {
+            connection.sync().flushdb();
+        }
+    }
 
     @Test
     public void loginHandlerRedirectsAfterPost() {
@@ -48,21 +66,20 @@ public class DropwizardRateLimitComponentTest {
                  .forEach(i -> assertThat(client.get().getStatus()).isEqualTo(200));
 
         assertThat(client.get().getStatus()).isEqualTo(429);
-
     }
 
     private static class RestClient {
 
         private final Client client = ClientBuilder.newBuilder().build();
 
-        public Response login() {
+        Response login() {
             return client.target(
                     String.format("http://localhost:%d/application/login", RULE.getLocalPort()))
                          .request()
                          .post(Entity.json(loginForm()));
         }
 
-        public Response get() {
+        Response get() {
             return client.target(
                     String.format("http://localhost:%d/application/user/{id}", RULE.getLocalPort()))
                          .resolveTemplate("id", 1)
