@@ -1,44 +1,28 @@
 package es.moki.ratelimij.dropwizard;
 
 
-import es.moki.ratelimij.dropwizard.filter.RateLimitFeature;
-import es.moki.ratelimitj.core.api.RateLimiterFactory;
+import es.moki.ratelimij.dropwizard.filter.SimpleRateLimitFilter;
+import es.moki.ratelimitj.core.api.RateLimiter;
 import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
-import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
 public class RateLimitBundle<T extends Configuration> implements ConfiguredBundle<T> {
 
-    public static final String PROPERTY_FACTORY = "rateLimiterFactory";
+    private final RateLimiter rateLimit;
 
-    private final RateLimiterFactory rateLimiterFactory;
-
-    public RateLimitBundle(RateLimiterFactory rateLimiterFactory) {
-        this.rateLimiterFactory = rateLimiterFactory;
+    public RateLimitBundle(RateLimiter rateLimit) {
+        this.rateLimit = rateLimit;
     }
 
     @Override
     public void run(T configuration, Environment environment) throws Exception {
 
-//        SimpleRateLimitFilter rateLimitFilter = new SimpleRateLimitFilter(rateLimit);
+        // TODO provide decoupled mechanism to bind Ratelimiter implementation to dropwizard
 
-
-        environment.jersey().property(PROPERTY_FACTORY, rateLimiterFactory);
-        environment.jersey().register(RateLimitFeature.class);
-
-        environment.lifecycle().manage(new Managed() {
-            @Override
-            public void start() throws Exception {
-
-            }
-
-            @Override
-            public void stop() throws Exception {
-                rateLimiterFactory.close();
-            }
-        });
+        SimpleRateLimitFilter rateLimitFilter = new SimpleRateLimitFilter(rateLimit);
+        environment.jersey().register(rateLimitFilter);
     }
 
     @Override
