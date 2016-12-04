@@ -1,9 +1,8 @@
-
 server:
   type: simple
   connector:
     type: http
-    port: 8080
+    port: 18080
 
 logging:
 
@@ -12,5 +11,9 @@ logging:
   appenders:
     - type: console
 
-
-
+rateLimit:
+  host: redis
+  port: 6379
+  limits:
+    activate : { duration: 1 days, limit: 10000 }
+    login    : { duration: 1 days, limit: 10000 }

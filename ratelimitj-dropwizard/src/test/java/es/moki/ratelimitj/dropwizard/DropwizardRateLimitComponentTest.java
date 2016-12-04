@@ -37,7 +37,7 @@ public class DropwizardRateLimitComponentTest {
 
         private final Client client = ClientBuilder.newBuilder().build();
 
-        public Response login() {
+        Response login() {
             return client.target(
                     String.format("http://localhost:%d/application/login", RULE.getLocalPort()))
                     .request()
