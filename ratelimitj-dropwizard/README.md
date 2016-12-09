@@ -9,7 +9,12 @@ The RateLimitJ Dropwizard module provides RateLimitJ integration with Dropwizard
  <dependency>
    <groupId>es.moki.ratelimitj</groupId>
    <artifactId>ratelimitj-dropwizard</artifactId>
-   <version>x.x.x</version>
+   <version>${ratelimitj-dropwizard.version}</version>
+ </dependency>
+ <dependency>
+   <groupId>es.moki.ratelimitj</groupId>
+   <artifactId>ratelimitj-redis</artifactId>
+   <version>${ratelimitj-redis.version}</version>
  </dependency>
  ```
  

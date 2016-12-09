@@ -30,7 +30,7 @@ Example for Maven:
 <dependency>
   <groupId>es.moki.ratelimitj</groupId>
   <artifactId>ratelimitj-redis</artifactId>
-  <version>x.x.x</version>
+  <version>${ratelimitj-redis.version}</version>
 </dependency>
 ```
 
