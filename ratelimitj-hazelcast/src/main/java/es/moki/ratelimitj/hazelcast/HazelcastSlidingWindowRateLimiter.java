@@ -94,7 +94,7 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
             Long cur;
             if (!dele.isEmpty()) {
 //                dele.stream().map(hcKeyMap::removeAsync).collect(Collectors.toList());
-                dele.stream().forEach(hcKeyMap::remove);
+                dele.forEach(hcKeyMap::remove);
                 final long decrement = decr;
                 cur = hcKeyMap.compute(savedKey.countKey, (k, v) -> v - decrement);
             } else {
@@ -143,7 +143,7 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
         final String countKey;
         final String tsKey;
 
-        public SavedKey(long now, int duration, OptionalInt precisionOpt) {
+        SavedKey(long now, int duration, OptionalInt precisionOpt) {
 
             int precision = precisionOpt.orElse(duration);
             precision = Math.min(precision, duration);
