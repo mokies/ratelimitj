@@ -1,8 +1,8 @@
 package es.moki.ratelimij.dropwizard.component;
 
 import es.moki.ratelimij.dropwizard.component.app.RateLimitApplication;
-import es.moki.ratelimij.dropwizard.component.app.config.RateLimitApplicationConfiguration;
 import es.moki.ratelimij.dropwizard.component.app.model.LoginRequest;
+import io.dropwizard.Configuration;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.junit.ClassRule;
@@ -22,7 +22,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 public class DropwizardRateLimitComponentTest {
 
     @ClassRule
-    public static final DropwizardAppRule<RateLimitApplicationConfiguration> RULE =
+    public static final DropwizardAppRule<Configuration> RULE =
             new DropwizardAppRule<>(RateLimitApplication.class, ResourceHelpers.resourceFilePath("ratelimit-app.yml"));
 
 

@@ -1,8 +1,8 @@
 package es.moki.ratelimij.dropwizard;
 
-import es.moki.ratelimij.dropwizard.config.RateLimitBundleConfiguration;
 import es.moki.ratelimij.dropwizard.filter.RateLimitFeature;
 import es.moki.ratelimitj.core.api.RateLimiterFactory;
+import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
 import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.setup.Bootstrap;
@@ -24,7 +24,7 @@ import javax.inject.Singleton;
 
 import static java.util.Objects.requireNonNull;
 
-public class RateLimitBundle implements ConfiguredBundle<RateLimitBundleConfiguration> {
+public class RateLimitBundle implements ConfiguredBundle<Configuration> {
 
     private final RateLimiterFactory rateLimiterFactory;
 
@@ -37,7 +37,7 @@ public class RateLimitBundle implements ConfiguredBundle<RateLimitBundleConfigur
     }
 
     @Override
-    public void run(final RateLimitBundleConfiguration configuration,
+    public void run(final Configuration configuration,
                     final Environment environment) throws Exception {
 
         environment.jersey().register(new RateLimitingFactoryProvider.Binder(rateLimiterFactory));
