@@ -21,9 +21,9 @@ Usage
 ```
 
 
-### Dependancies
+### Dependencies
 
 * Java 8
 
 
-### Perforamce 
+### Performance 
