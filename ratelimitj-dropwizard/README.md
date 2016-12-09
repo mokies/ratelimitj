@@ -1,7 +1,7 @@
 RateLimitJ - Dropwizard
 ======================
 
-The RateLimitJ Dropwizard module provides RateLimitJ integration with Dropwizard
+The RateLimitJ Dropwizard module provides integration with Dropwizard and annotation based configuration
  
 ### Setup
  
