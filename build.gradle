@@ -69,7 +69,7 @@ subprojects {
             slf4j  : 'org.slf4j:slf4j-api:1.7.21',
             assertj: 'org.assertj:assertj-core:3.6.1',
             junit  : 'org.junit.jupiter:junit-jupiter-api:5.0.0-M3',
-            mockito: 'org.mockito:mockito-core:2.2.28',
+            mockito: 'org.mockito:mockito-core:2.5.4',
             guava  : 'com.google.guava:guava:20.0',
             logback: 'ch.qos.logback:logback-classic:1.1.7'
     ]
