@@ -33,7 +33,9 @@ public class HazelcastSlidingWindowSyncRateLimiterTest extends AbstractSyncRateL
         return new HazelcastSlidingWindowRateLimiter(hz, rules, timeSupplier);
     }
 
-    @Override @Test @Disabled
+    @Override
+    @Test
+    @Disabled
     public void shouldResetLimit() {
 
     }

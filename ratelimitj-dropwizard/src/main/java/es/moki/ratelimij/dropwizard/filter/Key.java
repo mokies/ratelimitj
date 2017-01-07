@@ -12,7 +12,6 @@ import static java.util.Objects.isNull;
 public enum Key implements KeyProvider {
 
     DEFAULT {
-
         @Override
         public String create(final HttpServletRequest request,
                              final ResourceInfo resource) {
@@ -31,8 +30,8 @@ public enum Key implements KeyProvider {
     private static final String X_FORWARDED_FOR = "X-Forwarded-For";
 
     private static String resourceKey(final ResourceInfo resource) {
-        return resource.getResourceClass().getTypeName() +
-                "#" + resource.getResourceMethod().getName();
+        return resource.getResourceClass().getTypeName()
+                + "#" + resource.getResourceMethod().getName();
     }
 
 //    private static Optional<String> requestKey(final HttpServletRequest request) {
