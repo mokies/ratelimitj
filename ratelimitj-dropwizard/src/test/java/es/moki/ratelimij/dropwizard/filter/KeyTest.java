@@ -26,7 +26,6 @@ public class KeyTest {
 
     @Before
     public void beforeEach() throws Exception {
-
         doReturn(Object.class).when(resource).getResourceClass();
         when(resource.getResourceMethod()).thenReturn(Object.class.getMethod("wait", null)) ;
     }
@@ -45,7 +44,6 @@ public class KeyTest {
     @DisplayName("default key should include Class and Method names in key")
     @Test
     public void shouldEndWithResourceInKey() {
-
         String keyName = Key.DEFAULT.create(request, resource);
 
         System.out.println(keyName);
@@ -67,7 +65,6 @@ public class KeyTest {
     @DisplayName("default key should include user id if available")
     @Test
     public void shouldIncludeXForwardedForIfUserNull() {
-//        when(request.getRemoteUser()).thenReturn("elliot");
         when(request.getHeader("X-Forwarded-For")).thenReturn("203.0.113.7,  211.1.16.2");
 
         String keyName = Key.DEFAULT.create(request, resource);
