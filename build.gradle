@@ -74,12 +74,10 @@ subprojects {
             logback: 'ch.qos.logback:logback-classic:1.1.7'
     ]
 
-//    ext.junit4Version        = '4.12'
     ext.junitVintageVersion = '4.12.0-M3'
     ext.junitPlatformVersion = '1.0.0-M3'
     ext.junitJupiterVersion = '5.0.0-M3'
     ext.log4jVersion = '2.6.2'
-
 }
 
 subprojects {
@@ -103,8 +101,10 @@ subprojects {
 ext {
     // Credentials for publication repositories (needed only for publishing)
     // Should be set in ${HOME}/.gradle/gradle.properties
+    println project.hasProperty('ossrhUser')
+    println project.hasProperty('ossrhPassword')
     ossrhUser = project.hasProperty('ossrhUser') ? project.property('ossrhUser') : ""
-    osshrPassword = project.hasProperty('osshrPassword') ? project.property('osshrPassword') : ""
+    osshrPassword = project.hasProperty('ossrhPassword') ? project.property('ossrhPassword') : ""
 }
 
 allprojects {
