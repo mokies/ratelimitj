@@ -19,7 +19,7 @@ apply plugin: 'io.codearte.nexus-staging'
 //apply plugin: 'org.junit.platform.gradle.plugin'
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.2.1'
+    gradleVersion = '3.3'
 }
 
 buildScan {
@@ -101,8 +101,6 @@ subprojects {
 ext {
     // Credentials for publication repositories (needed only for publishing)
     // Should be set in ${HOME}/.gradle/gradle.properties
-    println project.hasProperty('ossrhUser')
-    println project.hasProperty('ossrhPassword')
     ossrhUser = project.hasProperty('ossrhUser') ? project.property('ossrhUser') : ""
     osshrPassword = project.hasProperty('ossrhPassword') ? project.property('ossrhPassword') : ""
 }
