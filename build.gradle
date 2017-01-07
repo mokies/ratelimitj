@@ -66,7 +66,7 @@ subprojects {
     sourceCompatibility = 1.8
 
     ext.libraries = [
-            slf4j: 'org.slf4j:slf4j-api:1.7.21',
+            slf4j  : 'org.slf4j:slf4j-api:1.7.21',
             assertj: 'org.assertj:assertj-core:3.6.1',
             junit  : 'org.junit.jupiter:junit-jupiter-api:5.0.0-M3',
             mockito: 'org.mockito:mockito-core:2.2.28',
@@ -75,17 +75,11 @@ subprojects {
     ]
 
 //    ext.junit4Version        = '4.12'
-    ext.junitVintageVersion  = '4.12.0-M3'
+    ext.junitVintageVersion = '4.12.0-M3'
     ext.junitPlatformVersion = '1.0.0-M3'
-    ext.junitJupiterVersion  = '5.0.0-M3'
-    ext.log4jVersion         = '2.6.2'
+    ext.junitJupiterVersion = '5.0.0-M3'
+    ext.log4jVersion = '2.6.2'
 
-}
-
-//    if (project.hasProperty('release')) {
-nexusStaging {
-    username = ossrhUser
-    password = ossrhPassword
 }
 
 subprojects {
@@ -106,20 +100,27 @@ subprojects {
 }
 
 
-if (project.hasProperty('release')) {
-    allprojects {
-        apply plugin: 'signing'
-        apply plugin: 'maven'
+ext {
+    // Credentials for publication repositories (needed only for publishing)
+    // Should be set in ${HOME}/.gradle/gradle.properties
+    ossrhUser = project.hasProperty('ossrhUser') ? project.property('ossrhUser') : ""
+    osshrPassword = project.hasProperty('osshrPassword') ? project.property('osshrPassword') : ""
+}
 
-        project.group = 'es.moki.ratelimitj'
-        project.version = '0.3.0'
+allprojects {
+    apply plugin: 'signing'
+    apply plugin: 'maven'
 
-        // Signature of artifacts
-        signing {
-            sign configurations.archives
-        }
+    project.group = 'es.moki.ratelimitj'
+    project.version = '0.3.0'
 
-        // OSSRH publication
+    // Signature of artifacts
+    signing {
+        sign configurations.archives
+    }
+
+    // OSSRH publication
+    if (ossrhUser != "") {
         uploadArchives {
             repositories {
                 mavenDeployer {
@@ -127,10 +128,10 @@ if (project.hasProperty('release')) {
                     beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
                     // Target repository
                     repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                        authentication(userName: ossrhUser, password: ossrhPassword)
+                        authentication(userName: ossrhUser, password: osshrPassword)
                     }
                     snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                        authentication(userName: ossrhUser, password: ossrhPassword)
+                        authentication(userName: ossrhUser, password: osshrPassword)
                     }
 
                     pom.project {
@@ -165,22 +166,28 @@ if (project.hasProperty('release')) {
         }
         uploadArchives.dependsOn build
     }
-// ./gradlew -Prelease uploadArchives closeAndPromoteRepository
 
-//    coveralls {
-//        sourceDirs = publishedProjects.sourceSets.main.allSource.srcDirs.flatten()
-//        jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
-//    }
-//
-//    tasks.coveralls {
-//        group = 'Coverage reports'
-//        description = 'Uploads the aggregated coverage report to Coveralls'
-//
-//        dependsOn jacocoRootReport
-//        onlyIf { System.env.'CI' }
-//    }
+    //    coveralls {
+    //        sourceDirs = publishedProjects.sourceSets.main.allSource.srcDirs.flatten()
+    //        jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+    //    }
+    //
+    //    tasks.coveralls {
+    //        group = 'Coverage reports'
+    //        description = 'Uploads the aggregated coverage report to Coveralls'
+    //
+    //        dependsOn jacocoRootReport
+    //        onlyIf { System.env.'CI' }
+    //    }
+
 
 }
+// http://nemerosa.ghost.io/2015/07/01/publishing-to-the-maven-central-using-gradle/
+// ./gradlew uploadArchives closeAndPromoteRepository
+
+
+
+
 
 
 
