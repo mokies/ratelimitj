@@ -2,7 +2,7 @@ group 'moki.es'
 description 'RateLimitJ Dropwizard'
 
 
-ext.dropWizardVersion = '1.0.5'
+ext.dropWizardVersion = '1.1.0'
 
 dependencies {
 
