@@ -19,7 +19,7 @@ dependencies {
     testCompile(
             project(':ratelimitj-redis'),
             project(':ratelimitj-internal:test'),
-            'io.dropwizard:dropwizard-testing:1.0.5',
+            "io.dropwizard:dropwizard-testing:${dropWizardVersion}",
             'org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:2.24.1',
             libraries.assertj,
             libraries.guava,

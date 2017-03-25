@@ -29,7 +29,7 @@ buildScan {
 
 subprojects {
 
-    apply plugin: 'java'
+    apply plugin: 'java-library'
     apply plugin: 'pmd'
     apply plugin: 'findbugs'
     apply plugin: 'checkstyle'
