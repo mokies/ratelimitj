@@ -70,7 +70,7 @@ subprojects {
             assertj: 'org.assertj:assertj-core:3.6.1',
             junit  : 'org.junit.jupiter:junit-jupiter-api:5.0.0-M3',
             mockito: 'org.mockito:mockito-core:2.5.4',
-            guava  : 'com.google.guava:guava:20.0',
+            guava  : 'com.google.guava:guava:21.0',
             logback: 'ch.qos.logback:logback-classic:1.1.7',
             findbugs: 'com.google.code.findbugs:jsr305:3.0.1'
     ]
