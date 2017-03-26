@@ -55,7 +55,7 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
 
         final long now = timeSupplier.get();
         // TODO implement cleanup
-        final int longestDuration = rules.stream().map(LimitRule::getDurationSeconds).reduce(Integer::max).get();
+        final int longestDuration = rules.stream().map(LimitRule::getDurationSeconds).reduce(Integer::max).orElse(0);
         List<SavedKey> savedKeys = new ArrayList<>(rules.size());
 
         IMap<String, Long> hcKeyMap = getMap(key, longestDuration);

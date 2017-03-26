@@ -19,10 +19,10 @@ import static org.mockito.Mockito.when;
 public class KeyTest {
 
     @Mock
-    HttpServletRequest request;
+    private HttpServletRequest request;
 
     @Mock
-    ResourceInfo resource;
+    private ResourceInfo resource;
 
     @Before
     public void beforeEach() throws Exception {
@@ -36,8 +36,6 @@ public class KeyTest {
     public void shouldStartWithPrefix() {
         String keyName = Key.DEFAULT.create(request, resource);
 
-        System.out.println(keyName);
-
         assertThat(keyName).startsWith("dw-ratelimit:");
     }
 
@@ -45,8 +43,6 @@ public class KeyTest {
     @Test
     public void shouldEndWithResourceInKey() {
         String keyName = Key.DEFAULT.create(request, resource);
-
-        System.out.println(keyName);
 
         assertThat(keyName).endsWith("java.lang.Object#wait");
     }
