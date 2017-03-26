@@ -2,11 +2,11 @@ description 'RateLimitJ Hazelcast'
 
 dependencies {
 
-    compile(
+    implementation(
             project(':ratelimitj-core'),
     )
 
-    testCompile(
+    testImplementation(
             project(':ratelimitj-internal:test'),
             libraries.assertj,
             libraries.guava,

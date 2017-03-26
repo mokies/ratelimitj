@@ -4,12 +4,16 @@ project.ext.release = true
 
 dependencies {
 
-    compile(
+    api(
             'io.projectreactor:reactor-core:3.0.3.RELEASE',
-            libraries.slf4j,
-            'com.google.code.findbugs:jsr305:3.0.1'
     )
-    testCompile(
+
+    implementation(
+            libraries.slf4j,
+            libraries.findbugs
+    )
+
+    testImplementation(
             libraries.assertj
     )
 

@@ -4,11 +4,16 @@ project.ext.release = true
 
 dependencies {
 
-    compile(
+    implementation(
             project(':ratelimitj-core'),
-            'biz.paluch.redis:lettuce:5.0.0.Beta1',
             'com.eclipsesource.minimal-json:minimal-json:0.9.4',
-            libraries.guava
+            libraries.findbugs,
+            libraries.guava,
+            libraries.slf4j
+    )
+
+    api(
+            'biz.paluch.redis:lettuce:5.0.0.Beta1',
     )
 
     testCompile(
@@ -19,8 +24,8 @@ dependencies {
             libraries.logback,
     )
 
-        testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+    testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
 //    testCompile "org.junit.platform:junit-platform-runner:${junitPlatformVersion}"
-   	testRuntime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
+    testRuntime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
     //testRuntime "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
 }

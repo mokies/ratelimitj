@@ -16,7 +16,7 @@ dependencies {
     testCompile "org.junit.platform:junit-platform-runner:${junitPlatformVersion}"
     testRuntime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
 
-    testCompile(
+    testImplementation(
             project(':ratelimitj-redis'),
             project(':ratelimitj-internal:test'),
             "io.dropwizard:dropwizard-testing:${dropWizardVersion}",
