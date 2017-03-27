@@ -41,8 +41,7 @@ public abstract class AbstractSyncRateLimiterPerformanceTest {
         });
 
         double transactionsPerSecond = Math.ceil((double) total / watch.elapsed(TimeUnit.MILLISECONDS) * 1000);
-        log.info("total time " + watch.stop()
-                + " checks " + transactionsPerSecond + "/sec");
+        log.info("total time {} checks {}/sec", watch.stop(), transactionsPerSecond);
     }
 
 }

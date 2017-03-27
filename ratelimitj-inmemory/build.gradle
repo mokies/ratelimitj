@@ -4,6 +4,9 @@ dependencies {
 
     implementation(
             project(':ratelimitj-core'),
+            libraries.slf4j,
+            'net.jodah:expiringmap:0.5.8',
+            libraries.findbugs
     )
 
     testImplementation(
