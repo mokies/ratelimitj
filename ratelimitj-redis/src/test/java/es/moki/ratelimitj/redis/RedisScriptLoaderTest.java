@@ -26,7 +26,7 @@ public class RedisScriptLoaderTest {
     @Test
     @DisplayName("should load rate limit lua script into Redis")
     public void shouldLoadScript() throws Exception {
-        RedisScriptLoader scriptLoader = new RedisScriptLoader(client.connect(), "sliding-window-ratelimit.lua");
+        RedisScriptLoader scriptLoader = new RedisScriptLoader(client.connect(), "token-bucket-ratelimit.lua");
 
         assertThat(scriptLoader.scriptSha()).isNotEmpty();
     }

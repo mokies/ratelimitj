@@ -1,47 +1,39 @@
-package es.moki.ratelimitj.inmemory;
+package es.moki.ratelimitj.hazelcast;
 
+import com.hazelcast.config.MapConfig;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IMap;
 import es.moki.ratelimitj.core.api.LimitRule;
 import es.moki.ratelimitj.core.api.RateLimiter;
 import es.moki.ratelimitj.core.time.SystemTimeSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
-import net.jodah.expiringmap.ExpirationPolicy;
-import net.jodah.expiringmap.ExpiringMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
-import static es.moki.ratelimitj.core.RateLimitUtils.coalesce;
 import static java.util.Objects.requireNonNull;
 
 @ThreadSafe
-public class InMemorySlidingWindowRateLimiter implements RateLimiter {
+public class HazelcastTokenBucketRateLimiter implements RateLimiter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(InMemorySlidingWindowRateLimiter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HazelcastTokenBucketRateLimiter.class);
 
+    private final HazelcastInstance hz;
     private final Set<LimitRule> rules;
     private final TimeSupplier timeSupplier;
-    private final ExpiringMap<String, Map<String, Long>> expiryingKeyMap;
 
-    public InMemorySlidingWindowRateLimiter(Set<LimitRule> rules) {
-        this(rules, new SystemTimeSupplier());
+    public HazelcastTokenBucketRateLimiter(HazelcastInstance hz, Set<LimitRule> rules) {
+        this(hz, rules, new SystemTimeSupplier());
     }
 
-    public InMemorySlidingWindowRateLimiter(Set<LimitRule> rules, TimeSupplier timeSupplier) {
-        this.rules = rules;
-        this.timeSupplier = timeSupplier;
-        this.expiryingKeyMap = ExpiringMap.builder().variableExpiration().build();
-    }
-
-    InMemorySlidingWindowRateLimiter(ExpiringMap<String, Map<String, Long>> expiryingKeyMap, Set<LimitRule> rules, TimeSupplier timeSupplier) {
-        this.expiryingKeyMap = expiryingKeyMap;
+    public HazelcastTokenBucketRateLimiter(HazelcastInstance hz, Set<LimitRule> rules, TimeSupplier timeSupplier) {
+        this.hz = hz;
         this.rules = rules;
         this.timeSupplier = timeSupplier;
     }
@@ -63,10 +55,10 @@ public class InMemorySlidingWindowRateLimiter implements RateLimiter {
 
         final long now = timeSupplier.get();
         // TODO implement cleanup
-        final int longestDurationSeconds = rules.stream().map(LimitRule::getDurationSeconds).reduce(Integer::max).orElse(0);
+        final int longestDuration = rules.stream().map(LimitRule::getDurationSeconds).reduce(Integer::max).orElse(0);
         List<SavedKey> savedKeys = new ArrayList<>(rules.size());
 
-        Map<String, Long> keyMap = getMap(key, longestDurationSeconds);
+        IMap<String, Long> hcKeyMap = getMap(key, longestDuration);
 
         // TODO perform each rule calculation in parallel
         for (LimitRule rule : rules) {
@@ -74,7 +66,7 @@ public class InMemorySlidingWindowRateLimiter implements RateLimiter {
             SavedKey savedKey = new SavedKey(now, rule.getDurationSeconds(), rule.getPrecision());
             savedKeys.add(savedKey);
 
-            Long oldTs = keyMap.get(savedKey.tsKey);
+            Long oldTs = hcKeyMap.get(savedKey.tsKey);
 
             //oldTs = Optional.ofNullable(oldTs).orElse(saved.trimBefore);
             oldTs = oldTs != null ? oldTs : savedKey.trimBefore;
@@ -91,7 +83,7 @@ public class InMemorySlidingWindowRateLimiter implements RateLimiter {
 
             for (long oldBlock = oldTs; oldBlock == trim - 1; oldBlock++) {
                 String bkey = savedKey.countKey + oldBlock;
-                Long bcount = keyMap.get(bkey);
+                Long bcount = hcKeyMap.get(bkey);
                 if (bcount != null) {
                     decr = decr + bcount;
                     dele.add(bkey);
@@ -101,16 +93,16 @@ public class InMemorySlidingWindowRateLimiter implements RateLimiter {
             // handle cleanup
             Long cur;
             if (!dele.isEmpty()) {
-//                dele.stream().map(keyMap::removeAsync).collect(Collectors.toList());
-                dele.forEach(keyMap::remove);
+//                dele.stream().map(hcKeyMap::removeAsync).collect(Collectors.toList());
+                dele.forEach(hcKeyMap::remove);
                 final long decrement = decr;
-                cur = keyMap.compute(savedKey.countKey, (k, v) -> v - decrement);
+                cur = hcKeyMap.compute(savedKey.countKey, (k, v) -> v - decrement);
             } else {
-                cur = keyMap.get(savedKey.countKey);
+                cur = hcKeyMap.get(savedKey.countKey);
             }
 
             // check our limits
-            if (coalesce(cur, 0L) + weight > rule.getLimit()) {
+            if (Optional.ofNullable(cur).orElse(0L) + weight > rule.getLimit()) {
                 return true;
             }
         }
@@ -118,15 +110,13 @@ public class InMemorySlidingWindowRateLimiter implements RateLimiter {
         // there is enough resources, update the counts
         for (SavedKey savedKey : savedKeys) {
             //update the current timestamp, count, and bucket count
-            keyMap.put(savedKey.tsKey, savedKey.trimBefore);
+            hcKeyMap.set(savedKey.tsKey, savedKey.trimBefore);
             // TODO should this ben just compute
-            Long computedCountKeyValue = keyMap.compute(savedKey.countKey, (k, v) -> coalesce(v, 0L) + weight);
-            Long computedCountKeyBlockIdValue = keyMap.compute(savedKey.countKey + savedKey.blockId, (k, v) -> coalesce(v, 0L)+ weight);
+            Long computedCountKeyValue = hcKeyMap.compute(savedKey.countKey, (k, v) -> Optional.ofNullable(v).orElse(0L) + weight);
+            LOG.debug("{} {}={}", key, savedKey.countKey, computedCountKeyValue);
+            Long computedCountKeyBlockIdValue = hcKeyMap.compute(savedKey.countKey + savedKey.blockId, (k, v) -> Optional.ofNullable(v).orElse(0L) + weight);
+            LOG.debug("{} {}={}", key, savedKey.countKey + savedKey.blockId, computedCountKeyBlockIdValue);
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("{} {}={}", key, savedKey.countKey, computedCountKeyValue);
-                LOG.debug("{} {}={}", key, savedKey.countKey + savedKey.blockId, computedCountKeyBlockIdValue);
-            }
         }
 
         return false;
@@ -137,14 +127,13 @@ public class InMemorySlidingWindowRateLimiter implements RateLimiter {
         throw new RuntimeException("Not implemented");
     }
 
-    private Map<String, Long> getMap(String key, int longestDuration) {
-        Map<String, Long> keyMap = expiryingKeyMap.get(key);
-        // FIXME we have some threading issues to deal with
-        if (keyMap == null) {
-            keyMap = new HashMap<>();
-            expiryingKeyMap.put(key, keyMap, ExpirationPolicy.CREATED, longestDuration, TimeUnit.SECONDS);
-        }
-        return keyMap;
+    private IMap<String, Long> getMap(String key, int longestDuration) {
+
+        MapConfig mapConfig = hz.getConfig().getMapConfig(key);
+        mapConfig.setTimeToLiveSeconds(longestDuration);
+        mapConfig.setAsyncBackupCount(1);
+        mapConfig.setBackupCount(0);
+        return hz.getMap(key);
     }
 
     private static class SavedKey {

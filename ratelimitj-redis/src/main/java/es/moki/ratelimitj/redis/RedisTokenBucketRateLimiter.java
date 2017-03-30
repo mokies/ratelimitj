@@ -22,9 +22,9 @@ import static com.lambdaworks.redis.ScriptOutputType.VALUE;
 import static java.util.Objects.requireNonNull;
 
 @ThreadSafe
-public class RedisSlidingWindowRateLimiter implements RateLimiter, AsyncRateLimiter, ReactiveRateLimiter {
+public class RedisTokenBucketRateLimiter implements RateLimiter, AsyncRateLimiter, ReactiveRateLimiter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RedisSlidingWindowRateLimiter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RedisTokenBucketRateLimiter.class);
 
     private final LimitRuleJsonSerialiser serialiser = new LimitRuleJsonSerialiser();
 
@@ -33,14 +33,14 @@ public class RedisSlidingWindowRateLimiter implements RateLimiter, AsyncRateLimi
     private final String rulesJson;
     private final TimeSupplier timeSupplier;
 
-    public RedisSlidingWindowRateLimiter(StatefulRedisConnection<String, String> connection, Set<LimitRule> rules) {
+    public RedisTokenBucketRateLimiter(StatefulRedisConnection<String, String> connection, Set<LimitRule> rules) {
         this(connection, rules, new SystemTimeSupplier());
     }
 
-    public RedisSlidingWindowRateLimiter(StatefulRedisConnection<String, String> connection, Set<LimitRule> rules, TimeSupplier timeSupplier) {
+    public RedisTokenBucketRateLimiter(StatefulRedisConnection<String, String> connection, Set<LimitRule> rules, TimeSupplier timeSupplier) {
         async = connection.async();
         connection.reactive();
-        scriptLoader = new RedisScriptLoader(connection, "sliding-window-ratelimit.lua");
+        scriptLoader = new RedisScriptLoader(connection, "token-bucket-ratelimit.lua");
         rulesJson = serialiserLimitRules(rules);
         this.timeSupplier = timeSupplier;
     }

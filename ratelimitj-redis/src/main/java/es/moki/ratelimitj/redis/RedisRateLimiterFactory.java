@@ -25,17 +25,17 @@ public class RedisRateLimiterFactory implements RateLimiterFactory {
 
     @Override
     public RateLimiter getInstance(Set<LimitRule> rules) {
-        return new RedisSlidingWindowRateLimiter(connection, rules);
+        return new RedisTokenBucketRateLimiter(connection, rules);
     }
 
     @Override
     public AsyncRateLimiter getInstanceAsync(Set<LimitRule> rules) {
-        return new RedisSlidingWindowRateLimiter(connection, rules);
+        return new RedisTokenBucketRateLimiter(connection, rules);
     }
 
     @Override
     public ReactiveRateLimiter getInstanceReactive(Set<LimitRule> rules) {
-        return new RedisSlidingWindowRateLimiter(connection, rules);
+        return new RedisTokenBucketRateLimiter(connection, rules);
     }
 
     @Override

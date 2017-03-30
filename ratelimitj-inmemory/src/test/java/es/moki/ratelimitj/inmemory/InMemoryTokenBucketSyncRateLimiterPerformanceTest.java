@@ -3,17 +3,14 @@ package es.moki.ratelimitj.inmemory;
 import es.moki.ratelimitj.core.api.LimitRule;
 import es.moki.ratelimitj.core.api.RateLimiter;
 import es.moki.ratelimitj.core.time.TimeSupplier;
-import es.moki.ratelimitj.inmemory.InMemorySlidingWindowRateLimiter;
-import es.moki.ratelimitj.internal.test.AbstractSyncRateLimiterTest;
+import es.moki.ratelimitj.internal.test.AbstractSyncRateLimiterPerformanceTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
 
-public class InMemorySlidingWindowSyncRateLimiterTest extends AbstractSyncRateLimiterTest {
+public class InMemoryTokenBucketSyncRateLimiterPerformanceTest extends AbstractSyncRateLimiterPerformanceTest {
 
 
     @BeforeAll
@@ -28,14 +25,6 @@ public class InMemorySlidingWindowSyncRateLimiterTest extends AbstractSyncRateLi
 
     @Override
     protected RateLimiter getRateLimiter(Set<LimitRule> rules, TimeSupplier timeSupplier) {
-        return new InMemorySlidingWindowRateLimiter(rules, timeSupplier);
+        return new InMemoryTokenBucketRateLimiter(rules, timeSupplier);
     }
-
-    @Override
-    @Test
-    @Disabled
-    public void shouldResetLimit() {
-
-    }
-
 }
