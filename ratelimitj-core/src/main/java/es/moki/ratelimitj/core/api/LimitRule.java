@@ -4,24 +4,24 @@ import java.util.OptionalInt;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Defines a limit rule that can support regular and sliding window rate limits.
+ * Defines a limit rule that can support regular and token bucket rate limits.
  */
 public class LimitRule {
 
     private final int durationSeconds;
     private final long limit;
     private final OptionalInt precision;
+    private final String name;
 
     private LimitRule(int durationSeconds, long limit) {
-        this.durationSeconds = durationSeconds;
-        this.limit = limit;
-        this.precision = OptionalInt.empty();
+        this(durationSeconds, limit, OptionalInt.empty(), null) ;
     }
 
-    private LimitRule(int durationSeconds, long limit, int precision) {
+    private LimitRule(int durationSeconds, long limit, OptionalInt precision, String name) {
         this.durationSeconds = durationSeconds;
         this.limit = limit;
-        this.precision = OptionalInt.of(precision);
+        this.precision = precision;
+        this.name = name;
     }
 
     /**
@@ -43,8 +43,17 @@ public class LimitRule {
      * @return a limit rule
      */
     public LimitRule withPrecision(int precision) {
-        return new LimitRule(this.durationSeconds, this.limit, precision);
+        return new LimitRule(this.durationSeconds, this.limit, OptionalInt.of(precision), this.name);
     }
+
+    /**
+     * Applies a name to the rate limit that is useful for analysis of limits.
+     * @param name Defines a descriptive name for the rule limit.
+     * @return a limit rule
+     */
+    public LimitRule withName(String name) {
+            return new LimitRule(this.durationSeconds, this.limit, this.precision, name);
+        }
 
     /**
      * @return The limits duration in seconds.
@@ -58,6 +67,13 @@ public class LimitRule {
      */
     public OptionalInt getPrecision() {
         return precision;
+    }
+
+    /**
+     * @return The name.
+     */
+    public String getName() {
+        return name;
     }
 
     /**

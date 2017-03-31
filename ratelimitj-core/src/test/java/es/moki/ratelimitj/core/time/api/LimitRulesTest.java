@@ -37,4 +37,11 @@ public class LimitRulesTest {
         assertThat(limitRule.getPrecision()).isPresent().hasValue(10);
     }
 
+    @Test
+    public void shouldHaveNameOfBoom() {
+        LimitRule limitRule = LimitRule.of(1, TimeUnit.SECONDS, 5).withName("boom");
+
+        assertThat(limitRule.getName()).isEqualTo("boom");
+    }
+
 }
