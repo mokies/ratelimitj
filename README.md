@@ -16,7 +16,7 @@ RateLimitJ is currently provides the following plugable modules:
 
 
 #### Features
-* Uses an efficient sliding window algorithm for rate limiting
+* Uses an efficient token bucket algorithm for rate limiting
 * Multiple limit rules per instance
 
 Binaries/Download
@@ -42,11 +42,14 @@ Example for Maven:
 
 | Feature       | Status      |
 | ------------- |-------------| 
-| Redis sliding window rate limiter | Release |
-| Dropwizard integration - Bundle | Release |
+| Redis sliding window rate limiter | Stable |
+| Dropwizard integration - Bundle | Stable |
 | Hazelcast sliding window rate limiter | Development |
 | In-memory sliding window rate limiter | Development |
+| Better metrics logging | not started |
+| Rate limiting Toggles (dark launch) for framework integration | not started |
 | Whitelisting & blacklisting of keys | not started |
+| Rate limit HTTP header responses | not started |
 | Spring integration | not started |
 
 #### Credits
@@ -54,6 +57,10 @@ This library was inspired by the following articles on sliding window rate limit
 
 * [Introduction to Rate Limiting with Redis Part 1](http://www.dr-josiah.com/2014/11/introduction-to-rate-limiting-with.html)
 * [Introduction to Rate Limiting with Redis Part 2](http://www.dr-josiah.com/2014/11/introduction-to-rate-limiting-with_26.html)
+
+#### Background Reading
+
+* [Stripe Blog - Scaling your API with rate limiters](https://stripe.com/blog/rate-limiters)
 
 #### Authors
 
