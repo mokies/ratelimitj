@@ -50,7 +50,7 @@ public enum Key implements KeyProvider {
         if (isNull(remoteUser)) {
             return Optional.empty();
         }
-        return Optional.of("user#" + remoteUser);
+        return Optional.of("rlj#usr#" + remoteUser);
     }
 
     static Optional<String> xForwardedForRequestKey(HttpServletRequest request) {
@@ -61,7 +61,7 @@ public enum Key implements KeyProvider {
         }
 
         Optional<String> originatingClientIp = Stream.of(header.split(",")).findFirst();
-        return originatingClientIp.map(ip -> "xfwd4#" + ip);
+        return originatingClientIp.map(ip -> "rlj#xfwd4#" + ip);
     }
 
     static Optional<String> ipRequestKey(HttpServletRequest request) {
@@ -69,7 +69,7 @@ public enum Key implements KeyProvider {
         if (isNull(remoteAddr)) {
             return Optional.empty();
         }
-        return Optional.of("ip#" + remoteAddr);
+        return Optional.of("rlj#ip#" + remoteAddr);
     }
 
     @SafeVarargs
