@@ -15,7 +15,7 @@ public enum Key implements KeyProvider {
         @Override
         public String create(final HttpServletRequest request,
                              final ResourceInfo resource) {
-            return "dw-ratelimit:" + requestKey(request) + ":" + resourceKey(resource);
+            return "rlj:" + requestKey(request) + ":" + resourceKey(resource);
         }
 
         private String requestKey(final HttpServletRequest request) {
@@ -50,7 +50,7 @@ public enum Key implements KeyProvider {
         if (isNull(remoteUser)) {
             return Optional.empty();
         }
-        return Optional.of("rlj#usr#" + remoteUser);
+        return Optional.of("usr#" + remoteUser);
     }
 
     static Optional<String> xForwardedForRequestKey(HttpServletRequest request) {
@@ -61,7 +61,7 @@ public enum Key implements KeyProvider {
         }
 
         Optional<String> originatingClientIp = Stream.of(header.split(",")).findFirst();
-        return originatingClientIp.map(ip -> "rlj#xfwd4#" + ip);
+        return originatingClientIp.map(ip -> "xfwd4#" + ip);
     }
 
     static Optional<String> ipRequestKey(HttpServletRequest request) {
@@ -69,7 +69,7 @@ public enum Key implements KeyProvider {
         if (isNull(remoteAddr)) {
             return Optional.empty();
         }
-        return Optional.of("rlj#ip#" + remoteAddr);
+        return Optional.of("ip#" + remoteAddr);
     }
 
     @SafeVarargs

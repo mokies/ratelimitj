@@ -30,13 +30,12 @@ public class KeyTest {
         when(resource.getResourceMethod()).thenReturn(Object.class.getMethod("wait", null)) ;
     }
 
-
     @DisplayName("default key should start with 'dw-ratelimit' prefix")
     @Test
     public void shouldStartWithPrefix() {
         String keyName = Key.DEFAULT.create(request, resource);
 
-        assertThat(keyName).startsWith("dw-ratelimit:");
+        assertThat(keyName).startsWith("rlj:");
     }
 
     @DisplayName("default key should include Class and Method names in key")
@@ -55,7 +54,7 @@ public class KeyTest {
 
         String keyName = Key.DEFAULT.create(request, resource);
 
-        assertThat(keyName).contains("user#elliot");
+        assertThat(keyName).contains("usr#elliot");
     }
 
     @DisplayName("default key should include user id if available")
