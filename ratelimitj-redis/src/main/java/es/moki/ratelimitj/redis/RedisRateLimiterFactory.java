@@ -16,30 +16,37 @@ import static java.util.Objects.requireNonNull;
 public class RedisRateLimiterFactory implements RateLimiterFactory {
 
     private final RedisClient client;
-    private final StatefulRedisConnection<String, String> connection;
+    private StatefulRedisConnection<String, String> connection;
 
     public RedisRateLimiterFactory(RedisClient client) {
         this.client = requireNonNull(client);
-        this.connection = client.connect();
     }
 
     @Override
     public RateLimiter getInstance(Set<LimitRule> rules) {
-        return new RedisTokenBucketRateLimiter(connection, rules);
+        return new RedisTokenBucketRateLimiter(getConnection(), rules);
     }
 
     @Override
     public AsyncRateLimiter getInstanceAsync(Set<LimitRule> rules) {
-        return new RedisTokenBucketRateLimiter(connection, rules);
+        return new RedisTokenBucketRateLimiter(getConnection(), rules);
     }
 
     @Override
     public ReactiveRateLimiter getInstanceReactive(Set<LimitRule> rules) {
-        return new RedisTokenBucketRateLimiter(connection, rules);
+        return new RedisTokenBucketRateLimiter(getConnection(), rules);
     }
 
     @Override
     public void close() throws IOException {
         client.shutdown();
+    }
+
+    private StatefulRedisConnection<String, String> getConnection() {
+        // going to ignore race conditions at the cost of having multiple connections
+        if (connection == null) {
+            connection = client.connect();
+        }
+        return connection;
     }
 }

@@ -25,7 +25,6 @@ public class DropwizardRateLimitComponentTest {
     public static final DropwizardAppRule<Configuration> RULE =
             new DropwizardAppRule<>(RateLimitApplication.class, ResourceHelpers.resourceFilePath("ratelimit-app.yml"));
 
-
 //    @BeforeAll
 //    public static void beforeAll() {
 //        client = RedisClient.create("redis://localhost");

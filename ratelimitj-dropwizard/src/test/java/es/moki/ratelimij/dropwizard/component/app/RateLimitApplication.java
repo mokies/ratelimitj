@@ -30,7 +30,6 @@ public class RateLimitApplication extends Application<Configuration> {
         environment.jersey().register(new LoginResource());
         environment.jersey().register(new UserResource());
 
-
         //TODO move this cleanup into the tests
         environment.lifecycle().manage(new Managed() {
             @Override

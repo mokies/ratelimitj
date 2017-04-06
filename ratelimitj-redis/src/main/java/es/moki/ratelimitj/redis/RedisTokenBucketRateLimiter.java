@@ -2,7 +2,6 @@ package es.moki.ratelimitj.redis;
 
 
 import com.lambdaworks.redis.api.StatefulRedisConnection;
-import com.lambdaworks.redis.api.async.RedisAsyncCommands;
 import es.moki.ratelimitj.core.api.AsyncRateLimiter;
 import es.moki.ratelimitj.core.api.LimitRule;
 import es.moki.ratelimitj.core.api.RateLimiter;
@@ -28,7 +27,7 @@ public class RedisTokenBucketRateLimiter implements RateLimiter, AsyncRateLimite
 
     private final LimitRuleJsonSerialiser serialiser = new LimitRuleJsonSerialiser();
 
-    private final RedisAsyncCommands<String, String> async;
+    private final StatefulRedisConnection<String, String> connection;
     private final RedisScriptLoader scriptLoader;
     private final String rulesJson;
     private final TimeSupplier timeSupplier;
@@ -38,8 +37,7 @@ public class RedisTokenBucketRateLimiter implements RateLimiter, AsyncRateLimite
     }
 
     public RedisTokenBucketRateLimiter(StatefulRedisConnection<String, String> connection, Set<LimitRule> rules, TimeSupplier timeSupplier) {
-        async = connection.async();
-        connection.reactive();
+        this.connection = connection;
         scriptLoader = new RedisScriptLoader(connection, "token-bucket-ratelimit.lua");
         rulesJson = serialiserLimitRules(rules);
         this.timeSupplier = timeSupplier;
@@ -57,12 +55,12 @@ public class RedisTokenBucketRateLimiter implements RateLimiter, AsyncRateLimite
     public CompletionStage<Boolean> overLimitAsync(String key, int weight) {
         requireNonNull(key);
 
-        LOG.debug("overLimitAsync for key '{}' of weight {}", key, weight);
+        LOG.debug("overLimit for key '{}' of weight {}", key, weight);
 
         String sha = scriptLoader.scriptSha();
 
         return timeSupplier.getAsync().thenCompose(time ->
-                async.evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight))
+                connection.async().evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight))
         ).thenApply(result -> {
             boolean overLimit = "1".equals(result);
             LOG.debug("over limit {}", overLimit);
@@ -74,7 +72,7 @@ public class RedisTokenBucketRateLimiter implements RateLimiter, AsyncRateLimite
 
     @Override
     public CompletionStage<Boolean> resetLimitAsync(String key) {
-        return async.del(key).thenApply(result -> 1 == result);
+        return connection.async().del(key).thenApply(result -> 1 == result);
     }
 
     @Override
