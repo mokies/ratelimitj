@@ -18,6 +18,8 @@ plugins {
 apply plugin: 'io.codearte.nexus-staging'
 //apply plugin: 'org.junit.platform.gradle.plugin'
 
+defaultTasks 'check'
+
 task wrapper(type: Wrapper) {
     gradleVersion = '3.4.1'
 }
@@ -64,21 +66,20 @@ subprojects {
     }
 
     sourceCompatibility = 1.8
+    
+    ext.junitVintageVersion = '4.12.0-M4'
+    ext.junitPlatformVersion = '1.0.0-M4'
+    ext.junitJupiterVersion = '5.0.0-M4'
 
     ext.libraries = [
             slf4j  : 'org.slf4j:slf4j-api:1.7.21',
             assertj: 'org.assertj:assertj-core:3.6.2',
-            junit  : 'org.junit.jupiter:junit-jupiter-api:5.0.0-M3',
+            junit  : "org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion",
             mockito: 'org.mockito:mockito-core:2.7.19',
             guava  : 'com.google.guava:guava:21.0',
             logback: 'ch.qos.logback:logback-classic:1.2.2',
             findbugs: 'com.google.code.findbugs:jsr305:3.0.1'
     ]
-
-    ext.junitVintageVersion = '4.12.0-M3'
-    ext.junitPlatformVersion = '1.0.0-M3'
-    ext.junitJupiterVersion = '5.0.0-M3'
-    ext.log4jVersion = '2.6.2'
 }
 
 subprojects {
