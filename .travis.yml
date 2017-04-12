@@ -13,7 +13,12 @@ services:
 before_install:
  - cp gradle.properties.ci gradle.properties
 
-script: ./gradlew clean build
+before_script:
+  - chmod +x gradlew
+  
+script:
+  - ./gradlew check
+  - ./gradlew codeCoverageReport
 
 notifications:
   email:
@@ -21,7 +26,7 @@ notifications:
     on_failure: always
 
 after_success:
-  - ./gradlew jacocoTestReport coveralls
+ - bash <(curl -s https://codecov.io/bash)
 
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
