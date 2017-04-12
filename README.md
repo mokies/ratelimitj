@@ -61,6 +61,7 @@ This library was inspired by the following articles on sliding window rate limit
 #### Background Reading
 
 * [Stripe Blog - Scaling your API with rate limiters](https://stripe.com/blog/rate-limiters)
+* [An alternative approach to rate limiting](https://medium.com/figma-design/an-alternative-approach-to-rate-limiting-f8a06cf7c94c)
 
 #### Authors
 
