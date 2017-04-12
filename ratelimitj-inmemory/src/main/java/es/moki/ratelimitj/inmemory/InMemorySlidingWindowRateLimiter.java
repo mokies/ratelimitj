@@ -1,39 +1,47 @@
-package es.moki.ratelimitj.hazelcast;
+package es.moki.ratelimitj.inmemory;
 
-import com.hazelcast.config.MapConfig;
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
 import es.moki.ratelimitj.core.api.LimitRule;
 import es.moki.ratelimitj.core.api.RateLimiter;
 import es.moki.ratelimitj.core.time.SystemTimeSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
+import net.jodah.expiringmap.ExpirationPolicy;
+import net.jodah.expiringmap.ExpiringMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
+import static es.moki.ratelimitj.core.RateLimitUtils.coalesce;
 import static java.util.Objects.requireNonNull;
 
 @ThreadSafe
-public class HazelcastTokenBucketRateLimiter implements RateLimiter {
+public class InMemorySlidingWindowRateLimiter implements RateLimiter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(HazelcastTokenBucketRateLimiter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(InMemorySlidingWindowRateLimiter.class);
 
-    private final HazelcastInstance hz;
     private final Set<LimitRule> rules;
     private final TimeSupplier timeSupplier;
+    private final ExpiringMap<String, Map<String, Long>> expiryingKeyMap;
 
-    public HazelcastTokenBucketRateLimiter(HazelcastInstance hz, Set<LimitRule> rules) {
-        this(hz, rules, new SystemTimeSupplier());
+    public InMemorySlidingWindowRateLimiter(Set<LimitRule> rules) {
+        this(rules, new SystemTimeSupplier());
     }
 
-    public HazelcastTokenBucketRateLimiter(HazelcastInstance hz, Set<LimitRule> rules, TimeSupplier timeSupplier) {
-        this.hz = hz;
+    public InMemorySlidingWindowRateLimiter(Set<LimitRule> rules, TimeSupplier timeSupplier) {
+        this.rules = rules;
+        this.timeSupplier = timeSupplier;
+        this.expiryingKeyMap = ExpiringMap.builder().variableExpiration().build();
+    }
+
+    InMemorySlidingWindowRateLimiter(ExpiringMap<String, Map<String, Long>> expiryingKeyMap, Set<LimitRule> rules, TimeSupplier timeSupplier) {
+        this.expiryingKeyMap = expiryingKeyMap;
         this.rules = rules;
         this.timeSupplier = timeSupplier;
     }
@@ -55,10 +63,10 @@ public class HazelcastTokenBucketRateLimiter implements RateLimiter {
 
         final long now = timeSupplier.get();
         // TODO implement cleanup
-        final int longestDuration = rules.stream().map(LimitRule::getDurationSeconds).reduce(Integer::max).orElse(0);
+        final int longestDurationSeconds = rules.stream().map(LimitRule::getDurationSeconds).reduce(Integer::max).orElse(0);
         List<SavedKey> savedKeys = new ArrayList<>(rules.size());
 
-        IMap<String, Long> hcKeyMap = getMap(key, longestDuration);
+        Map<String, Long> keyMap = getMap(key, longestDurationSeconds);
 
         // TODO perform each rule calculation in parallel
         for (LimitRule rule : rules) {
@@ -66,7 +74,7 @@ public class HazelcastTokenBucketRateLimiter implements RateLimiter {
             SavedKey savedKey = new SavedKey(now, rule.getDurationSeconds(), rule.getPrecision());
             savedKeys.add(savedKey);
 
-            Long oldTs = hcKeyMap.get(savedKey.tsKey);
+            Long oldTs = keyMap.get(savedKey.tsKey);
 
             //oldTs = Optional.ofNullable(oldTs).orElse(saved.trimBefore);
             oldTs = oldTs != null ? oldTs : savedKey.trimBefore;
@@ -83,7 +91,7 @@ public class HazelcastTokenBucketRateLimiter implements RateLimiter {
 
             for (long oldBlock = oldTs; oldBlock == trim - 1; oldBlock++) {
                 String bkey = savedKey.countKey + oldBlock;
-                Long bcount = hcKeyMap.get(bkey);
+                Long bcount = keyMap.get(bkey);
                 if (bcount != null) {
                     decr = decr + bcount;
                     dele.add(bkey);
@@ -93,16 +101,16 @@ public class HazelcastTokenBucketRateLimiter implements RateLimiter {
             // handle cleanup
             Long cur;
             if (!dele.isEmpty()) {
-//                dele.stream().map(hcKeyMap::removeAsync).collect(Collectors.toList());
-                dele.forEach(hcKeyMap::remove);
+//                dele.stream().map(keyMap::removeAsync).collect(Collectors.toList());
+                dele.forEach(keyMap::remove);
                 final long decrement = decr;
-                cur = hcKeyMap.compute(savedKey.countKey, (k, v) -> v - decrement);
+                cur = keyMap.compute(savedKey.countKey, (k, v) -> v - decrement);
             } else {
-                cur = hcKeyMap.get(savedKey.countKey);
+                cur = keyMap.get(savedKey.countKey);
             }
 
             // check our limits
-            if (Optional.ofNullable(cur).orElse(0L) + weight > rule.getLimit()) {
+            if (coalesce(cur, 0L) + weight > rule.getLimit()) {
                 return true;
             }
         }
@@ -110,13 +118,15 @@ public class HazelcastTokenBucketRateLimiter implements RateLimiter {
         // there is enough resources, update the counts
         for (SavedKey savedKey : savedKeys) {
             //update the current timestamp, count, and bucket count
-            hcKeyMap.set(savedKey.tsKey, savedKey.trimBefore);
+            keyMap.put(savedKey.tsKey, savedKey.trimBefore);
             // TODO should this ben just compute
-            Long computedCountKeyValue = hcKeyMap.compute(savedKey.countKey, (k, v) -> Optional.ofNullable(v).orElse(0L) + weight);
-            LOG.debug("{} {}={}", key, savedKey.countKey, computedCountKeyValue);
-            Long computedCountKeyBlockIdValue = hcKeyMap.compute(savedKey.countKey + savedKey.blockId, (k, v) -> Optional.ofNullable(v).orElse(0L) + weight);
-            LOG.debug("{} {}={}", key, savedKey.countKey + savedKey.blockId, computedCountKeyBlockIdValue);
+            Long computedCountKeyValue = keyMap.compute(savedKey.countKey, (k, v) -> coalesce(v, 0L) + weight);
+            Long computedCountKeyBlockIdValue = keyMap.compute(savedKey.countKey + savedKey.blockId, (k, v) -> coalesce(v, 0L)+ weight);
 
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("{} {}={}", key, savedKey.countKey, computedCountKeyValue);
+                LOG.debug("{} {}={}", key, savedKey.countKey + savedKey.blockId, computedCountKeyBlockIdValue);
+            }
         }
 
         return false;
@@ -127,13 +137,14 @@ public class HazelcastTokenBucketRateLimiter implements RateLimiter {
         throw new RuntimeException("Not implemented");
     }
 
-    private IMap<String, Long> getMap(String key, int longestDuration) {
-
-        MapConfig mapConfig = hz.getConfig().getMapConfig(key);
-        mapConfig.setTimeToLiveSeconds(longestDuration);
-        mapConfig.setAsyncBackupCount(1);
-        mapConfig.setBackupCount(0);
-        return hz.getMap(key);
+    private Map<String, Long> getMap(String key, int longestDuration) {
+        Map<String, Long> keyMap = expiryingKeyMap.get(key);
+        // FIXME we have some threading issues to deal with
+        if (keyMap == null) {
+            keyMap = new HashMap<>();
+            expiryingKeyMap.put(key, keyMap, ExpirationPolicy.CREATED, longestDuration, TimeUnit.SECONDS);
+        }
+        return keyMap;
     }
 
     private static class SavedKey {

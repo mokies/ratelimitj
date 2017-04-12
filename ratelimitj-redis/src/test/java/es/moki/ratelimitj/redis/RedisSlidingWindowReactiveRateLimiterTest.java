@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeAll;
 import java.util.Set;
 
 
-public class RedisTokenBucketReactiveRateLimiterTest extends AbstractReactiveRateLimiterTest {
+public class RedisSlidingWindowReactiveRateLimiterTest extends AbstractReactiveRateLimiterTest {
 
     private static RedisClient client;
     private static StatefulRedisConnection<String, String> connect;
@@ -39,6 +39,6 @@ public class RedisTokenBucketReactiveRateLimiterTest extends AbstractReactiveRat
 
     @Override
     protected ReactiveRateLimiter getRateLimiter(Set<LimitRule> rules, TimeSupplier timeSupplier) {
-        return new RedisTokenBucketRateLimiter(connect, rules, timeSupplier);
+        return new RedisSlidingWindowRateLimiter(connect, rules, timeSupplier);
     }
 }

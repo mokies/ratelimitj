@@ -36,7 +36,7 @@ public class InMemoryRateLimiterInternalTest {
     }
 
     private RateLimiter getRateLimiter(Set<LimitRule> rules, TimeSupplier timeSupplier) {
-        return new InMemoryTokenBucketRateLimiter(expiryingKeyMap, rules, timeSupplier);
+        return new InMemorySlidingWindowRateLimiter(expiryingKeyMap, rules, timeSupplier);
     }
 
     @Test @Ignore

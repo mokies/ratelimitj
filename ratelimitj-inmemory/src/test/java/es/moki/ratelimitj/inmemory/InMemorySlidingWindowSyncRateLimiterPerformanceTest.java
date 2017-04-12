@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeAll;
 import java.util.Set;
 
 
-public class InMemoryTokenBucketSyncRateLimiterPerformanceTest extends AbstractSyncRateLimiterPerformanceTest {
+public class InMemorySlidingWindowSyncRateLimiterPerformanceTest extends AbstractSyncRateLimiterPerformanceTest {
 
 
     @BeforeAll
@@ -25,6 +25,6 @@ public class InMemoryTokenBucketSyncRateLimiterPerformanceTest extends AbstractS
 
     @Override
     protected RateLimiter getRateLimiter(Set<LimitRule> rules, TimeSupplier timeSupplier) {
-        return new InMemoryTokenBucketRateLimiter(rules, timeSupplier);
+        return new InMemorySlidingWindowRateLimiter(rules, timeSupplier);
     }
 }

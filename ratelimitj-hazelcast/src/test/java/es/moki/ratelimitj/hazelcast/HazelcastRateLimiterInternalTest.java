@@ -36,7 +36,7 @@ public class HazelcastRateLimiterInternalTest {
     }
 
     private RateLimiter getRateLimiter(Set<LimitRule> rules, TimeSupplier timeSupplier) {
-        return new HazelcastTokenBucketRateLimiter(hz, rules, timeSupplier);
+        return new HazelcastSlidingWindowRateLimiter(hz, rules, timeSupplier);
     }
 
     @Test
