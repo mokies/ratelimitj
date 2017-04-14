@@ -15,7 +15,7 @@ RateLimitJ provides the following stable plugable modules:
 
 
 #### Features
-* Uses an efficient token bucket algorithm for rate limiting
+* Uses an efficient approximated sliding window algorithm for rate limiting
 * Multiple limit rules per instance
 
 Binaries/Download
