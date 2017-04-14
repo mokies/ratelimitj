@@ -54,11 +54,11 @@ public enum Key implements KeyProvider {
     }
 
     static Optional<String> ipRequestKey(HttpServletRequest request) {
-        String remoteAddr = request.getRemoteAddr();
-        if (isNull(remoteAddr)) {
+        String remoteAddress = request.getRemoteAddr();
+        if (isNull(remoteAddress)) {
             return Optional.empty();
         }
-        return Optional.of("ip#" + remoteAddr);
+        return Optional.of("ip#" + remoteAddress);
     }
 
     @SafeVarargs

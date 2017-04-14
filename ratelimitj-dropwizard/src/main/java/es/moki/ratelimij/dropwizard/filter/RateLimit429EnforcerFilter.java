@@ -5,6 +5,8 @@ import es.moki.ratelimitj.core.api.LimitRule;
 import es.moki.ratelimitj.core.api.RateLimiter;
 import es.moki.ratelimitj.core.api.RateLimiterFactory;
 import org.glassfish.jersey.server.model.AnnotatedMethod;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -17,9 +19,11 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class RateLimitFilter implements ContainerRequestFilter {
+public class RateLimit429EnforcerFilter implements ContainerRequestFilter {
 
-    private static final int HTTP_STATUS = 429;
+    private static final int HTTP_STATUS_TOO_MANY_REQUESTS = 429;
+
+    private static final Logger LOG = LoggerFactory.getLogger(RateLimit429EnforcerFilter.class);
 
     @RateLimiting
     private RateLimiterFactory factory;
@@ -39,8 +43,16 @@ public class RateLimitFilter implements ContainerRequestFilter {
         RateLimiter rateLimit = factory.getInstance(toLimitRules(rateLimited));
         KeyProvider keyProvider = rateLimited.key();
 
-        if (rateLimit.overLimit(keyProvider.create(request, resource))) {
-            requestContext.abortWith(Response.status(HTTP_STATUS).build());
+        String key = keyProvider.create(request, resource);
+        boolean overLimit = rateLimit.overLimit(key);
+        if (overLimit) {
+            if (!rateLimited.reportOnly()) {
+                LOG.info("rate-limit key '{}' over limit. HTTP Status 429 returned.", key);
+                requestContext.abortWith(Response.status(HTTP_STATUS_TOO_MANY_REQUESTS).build());
+            } else {
+                LOG.info("rate-limit key '{}' over limit. ReportOnly is true, no action taken.", key);
+            }
+            LOG.debug("rate-limit key '{}' under limit.", key);
         }
     }
 

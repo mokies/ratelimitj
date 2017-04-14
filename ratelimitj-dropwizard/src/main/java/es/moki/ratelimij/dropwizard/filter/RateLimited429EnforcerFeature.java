@@ -8,7 +8,7 @@ import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.ext.Provider;
 
 @Provider
-public class RateLimitFeature implements DynamicFeature {
+public class RateLimited429EnforcerFeature implements DynamicFeature {
 
     @Override
     public void configure(final ResourceInfo resourceInfo,
@@ -18,7 +18,7 @@ public class RateLimitFeature implements DynamicFeature {
         final RateLimited rateLimited = method.getAnnotation(RateLimited.class);
 
         if (null != rateLimited) {
-            context.register(RateLimitFilter.class);
+            context.register(RateLimit429EnforcerFilter.class);
         }
     }
 }

@@ -15,4 +15,10 @@ public @interface RateLimited {
 
     Rate[] rates();
 
+    /**
+     * If true the rate limiter won't enforce over limit. ReportOnly can be used to evaluate rate limits in production environments.
+     * @return should not enforce limit.
+     */
+    boolean reportOnly() default false;
+
 }

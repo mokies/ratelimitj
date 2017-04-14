@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith(MockitoJUnitRunner.class)
-public class RateLimitFilterTest {
+public class RateLimit429EnforcerFilterTest {
 
     @Mock
     private static RateLimiterFactory rateLimiterFactory;
@@ -48,18 +48,47 @@ public class RateLimitFilterTest {
             .builder()
             .setTestContainerFactory(new GrizzlyWebTestContainerFactory())
             .addProvider(new TestRateLimitingFactoryProvider.Binder())
-            .addProvider(new RateLimitFeature())
+            .addProvider(new RateLimited429EnforcerFeature())
             .addResource(new TestResource())
             .build();
 
     @Test
-    @DisplayName("should configure rate limiter")
-    public void shouldAdd() {
+    @DisplayName("should not limit request")
+    public void shouldNotLimit() {
 
         when(rateLimiterFactory.getInstance(anySet())).thenReturn(rateLimiter);
         when(rateLimiter.overLimit(anyString())).thenReturn(false);
 
         Response response = rule.getJerseyTest().target("/test/{id}").resolveTemplate("id", 1)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+
+        assertThat(response.getStatus()).isEqualTo(200);
+    }
+
+    @Test
+    @DisplayName("should limit request returning a 429")
+    public void shouldLimit() {
+
+        when(rateLimiterFactory.getInstance(anySet())).thenReturn(rateLimiter);
+        when(rateLimiter.overLimit(anyString())).thenReturn(true);
+
+        Response response = rule.getJerseyTest().target("/test/{id}").resolveTemplate("id", 1)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+
+        assertThat(response.getStatus()).isEqualTo(429);
+    }
+
+    @Test
+    @DisplayName("should configure rate limiter")
+    public void shouldReportOnly() {
+
+        when(rateLimiterFactory.getInstance(anySet())).thenReturn(rateLimiter);
+        when(rateLimiter.overLimit(anyString())).thenReturn(true);
+
+
+        Response response = rule.getJerseyTest().target("/test/reportOnly/{id}").resolveTemplate("id", 1)
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .get();
 

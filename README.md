@@ -47,7 +47,7 @@ Example for Maven:
 | Hazelcast sliding window rate limiter | Development |
 | In-memory sliding window rate limiter | Development |
 | Better metrics logging | not started |
-| Rate limiting Toggles (dark launch) for framework integration | not started |
+| Rate limiting toggles (dark launch) for framework integration | not started |
 | Whitelisting & blacklisting of keys | not started |
 | Rate limit HTTP header responses | not started |
 | Spring integration | not started |
