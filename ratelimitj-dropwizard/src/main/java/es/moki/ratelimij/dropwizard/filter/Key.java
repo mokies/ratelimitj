@@ -34,17 +34,6 @@ public enum Key implements KeyProvider {
                 + "#" + resource.getResourceMethod().getName();
     }
 
-//    private static Optional<String> requestKey(final HttpServletRequest request) {
-//        if (nonNull(request.getRemoteUser())) {
-//            return Optional.of("user#" + request.getRemoteUser());
-//        } else if (nonNull(request.getHeader(HEADER))) {
-//            return Optional.of("xfwd4#" + request.getHeader(HEADER));
-//        } else if (nonNull(request.getRemoteAddr())) {
-//            return Optional.of("ip#" + request.getRemoteAddr());
-//        }
-//        return Optional.empty();
-//    }
-
     static Optional<String> userRequestKey(HttpServletRequest request) {
         String remoteUser = request.getRemoteUser();
         if (isNull(remoteUser)) {
