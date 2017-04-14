@@ -102,7 +102,7 @@ ext {
     osshrPassword = project.hasProperty('ossrhPassword') ? project.property('ossrhPassword') : ""
 }
 
-allprojects {
+configure([project(':ratelimitj-redis'), project(':ratelimitj-core'), project(':ratelimitj-dropwizard')]) {
 
     // OSSRH publication
     if (ossrhUser != "") {
@@ -111,7 +111,7 @@ allprojects {
         apply plugin: 'maven'
 
         project.group = 'es.moki.ratelimitj'
-        project.version = '0.3.0'
+        project.version = '0.3.1'
 
         // Signature of artifacts
         signing {
