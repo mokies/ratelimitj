@@ -8,11 +8,10 @@ RateLimitJ
 A Java library for rate limiting, assembled using extensible storage and application framework adaptors. The library's interfaces support thread-safe sync, async, and reactive usage patterns.
 
 #### Modules
-RateLimitJ is currently provides the following plugable modules:
+RateLimitJ provides the following stable plugable modules:
 
 * [Redis sliding window rate limiter](ratelimitj-redis)
 * [Dropwizard integration](ratelimitj-dropwizard)
-* [Hazelcast sliding window rate limiter](ratelimitj-hazelcast) (in development)
 
 
 #### Features
@@ -47,7 +46,7 @@ Example for Maven:
 | Hazelcast sliding window rate limiter | Development |
 | In-memory sliding window rate limiter | Development |
 | Better metrics logging | not started |
-| Rate limiting toggles (dark launch) for framework integration | not started |
+| Rate limiting toggles (dark launch) for framework integration | Beta |
 | Whitelisting & blacklisting of keys | not started |
 | Rate limit HTTP header responses | not started |
 | Spring integration | not started |
