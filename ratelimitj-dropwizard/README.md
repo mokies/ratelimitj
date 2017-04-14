@@ -46,14 +46,26 @@ public class RateLimitApplication extends Application<Configuration> {
 public class LoginResource {
 
     @POST
-    @RateLimited(key = Key.DEFAULT, rates = {
-            @Rate(duration = 10, timeUnit = TimeUnit.HOURS, limit = 5)
-    })
+    @RateLimited(
+            key = Key.DEFAULT, 
+            rates = { @Rate(duration = 10, timeUnit = TimeUnit.HOURS, limit = 5) })
     public Response login(final LoginRequest login) {
 
         return Response.ok().build();
     }
 }
+```
+
+#### Dark Launch
+When introducing rate limits to a production environment it can be helpful to first evaluate request patterns to avoid over limiting.
+To disable enforcement include the 'reportOnly = true' on the @RateLimit annotation.
+
+```java
+    @POST
+    @RateLimited(
+            reportOnly = true,
+            key = Key.DEFAULT, 
+            rates = { @Rate(duration = 10, timeUnit = TimeUnit.HOURS, limit = 5) })
 ```
 
 
