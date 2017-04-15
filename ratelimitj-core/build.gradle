@@ -14,7 +14,8 @@ dependencies {
     )
 
     testImplementation(
-            libraries.assertj
+            libraries.assertj,
+            libraries.guava
     )
 
     testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"

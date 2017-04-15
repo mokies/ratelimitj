@@ -1,9 +1,9 @@
-package es.moki.ratelimitj.internal.test;
+package es.moki.ratelimitj.test;
 
 import com.google.common.collect.ImmutableSet;
 import es.moki.ratelimitj.core.api.AsyncRateLimiter;
 import es.moki.ratelimitj.core.api.LimitRule;
-import es.moki.ratelimitj.core.time.TimeBanditSupplier;
+import es.moki.ratelimitj.test.time.TimeBanditSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;

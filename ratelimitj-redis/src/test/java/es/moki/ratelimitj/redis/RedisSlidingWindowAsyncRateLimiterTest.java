@@ -5,7 +5,7 @@ import com.lambdaworks.redis.api.StatefulRedisConnection;
 import es.moki.ratelimitj.core.api.AsyncRateLimiter;
 import es.moki.ratelimitj.core.api.LimitRule;
 import es.moki.ratelimitj.core.time.TimeSupplier;
-import es.moki.ratelimitj.internal.test.AbstractAsyncRateLimiterTest;
+import es.moki.ratelimitj.test.AbstractAsyncRateLimiterTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;

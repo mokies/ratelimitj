@@ -1,5 +1,7 @@
-package es.moki.ratelimitj.core.time;
+package es.moki.ratelimitj.test.time;
 
+
+import es.moki.ratelimitj.core.time.TimeSupplier;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;

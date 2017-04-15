@@ -5,7 +5,7 @@ import com.hazelcast.core.HazelcastInstance;
 import es.moki.ratelimitj.core.api.LimitRule;
 import es.moki.ratelimitj.core.api.RateLimiter;
 import es.moki.ratelimitj.core.time.TimeSupplier;
-import es.moki.ratelimitj.internal.test.AbstractSyncRateLimiterTest;
+import es.moki.ratelimitj.test.AbstractSyncRateLimiterTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;

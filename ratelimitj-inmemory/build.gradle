@@ -10,7 +10,7 @@ dependencies {
     )
 
     testImplementation(
-            project(':ratelimitj-internal:test'),
+            project(':ratelimitj-test'),
             libraries.assertj,
             libraries.guava,
             libraries.mockito,

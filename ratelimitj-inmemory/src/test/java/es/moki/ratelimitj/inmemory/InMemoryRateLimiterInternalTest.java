@@ -4,7 +4,7 @@ package es.moki.ratelimitj.inmemory;
 import com.google.common.collect.ImmutableSet;
 import es.moki.ratelimitj.core.api.LimitRule;
 import es.moki.ratelimitj.core.api.RateLimiter;
-import es.moki.ratelimitj.core.time.TimeBanditSupplier;
+import es.moki.ratelimitj.test.time.TimeBanditSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import net.jodah.expiringmap.ExpiringMap;
 import org.junit.Ignore;
