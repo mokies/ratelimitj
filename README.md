@@ -3,7 +3,7 @@ RateLimitJ
 
 [![Build Status](https://travis-ci.org/mokies/ratelimitj.svg)](https://travis-ci.org/mokies/ratelimitj)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/es.moki.ratelimitj/ratelimitj-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/es.moki.ratelimitj/ratelimitj-core)
-[![Codecov](https://codecov.io/github/mokies/ratelimitj/coverage.svg?branch=master)](https://codecov.io/github/mokies/ratelimitj/coverage.svg?branch=master)
+[![Codecov](https://codecov.io/github/mokies/ratelimitj/coverage.svg?branch=master)](https://codecov.io/github/mokies/ratelimitj?branch=master)
 [![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 A Java library for rate limiting, assembled using extensible storage and application framework adaptors. The library's interfaces support thread-safe sync, async, and reactive usage patterns.
