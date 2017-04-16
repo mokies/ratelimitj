@@ -75,8 +75,6 @@ public class InMemorySlidingWindowRateLimiter implements RateLimiter {
             savedKeys.add(savedKey);
 
             Long oldTs = keyMap.get(savedKey.tsKey);
-
-            //oldTs = Optional.ofNullable(oldTs).orElse(saved.trimBefore);
             oldTs = oldTs != null ? oldTs : savedKey.trimBefore;
 
             if (oldTs > now) {
@@ -101,7 +99,6 @@ public class InMemorySlidingWindowRateLimiter implements RateLimiter {
             // handle cleanup
             Long cur;
             if (!dele.isEmpty()) {
-//                dele.stream().map(keyMap::removeAsync).collect(Collectors.toList());
                 dele.forEach(keyMap::remove);
                 final long decrement = decr;
                 cur = keyMap.compute(savedKey.countKey, (k, v) -> v - decrement);
@@ -121,7 +118,6 @@ public class InMemorySlidingWindowRateLimiter implements RateLimiter {
             keyMap.put(savedKey.tsKey, savedKey.trimBefore);
 
             Long computedCountKeyValue = keyMap.compute(savedKey.countKey, (k, v) -> coalesce(v, 0L) + weight);
-
             Long computedCountKeyBlockIdValue = keyMap.compute(savedKey.countKey + savedKey.blockId, (k, v) -> coalesce(v, 0L)+ weight);
 
             if (LOG.isDebugEnabled()) {
