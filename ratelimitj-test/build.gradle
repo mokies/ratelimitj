@@ -18,7 +18,7 @@ dependencies {
 //        sourceDirectories = files(sourceSets.main.allSource.srcDirs)
         afterEvaluate {
             classDirectories = files(classDirectories.files.collect {
-                fileTree(dir: it, exclude: 'es/mokie/ratelimitj/test')
+                fileTree(dir: it, exclude: 'es/moki/ratelimitj/test')
             })
         }
     }
