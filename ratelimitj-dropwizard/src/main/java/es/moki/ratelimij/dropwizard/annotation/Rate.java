@@ -1,4 +1,4 @@
-package es.moki.ratelimij.dropwizard.filter;
+package es.moki.ratelimij.dropwizard.annotation;
 
 import javax.ws.rs.NameBinding;
 import java.lang.annotation.ElementType;

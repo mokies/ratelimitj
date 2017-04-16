@@ -11,6 +11,9 @@ import static java.util.Objects.isNull;
 
 public enum Key implements KeyProvider {
 
+    /**
+     * TODO require docos
+     */
     DEFAULT {
         @Override
         public String create(final HttpServletRequest request,

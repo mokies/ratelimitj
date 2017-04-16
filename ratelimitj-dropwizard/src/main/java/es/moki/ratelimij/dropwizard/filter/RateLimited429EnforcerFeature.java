@@ -1,5 +1,6 @@
 package es.moki.ratelimij.dropwizard.filter;
 
+import es.moki.ratelimij.dropwizard.annotation.RateLimited;
 import org.glassfish.jersey.server.model.AnnotatedMethod;
 
 import javax.ws.rs.container.DynamicFeature;

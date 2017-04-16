@@ -1,5 +1,8 @@
 package es.moki.ratelimij.dropwizard.filter;
 
+import es.moki.ratelimij.dropwizard.annotation.Rate;
+import es.moki.ratelimij.dropwizard.annotation.RateLimited;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

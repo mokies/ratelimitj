@@ -1,6 +1,8 @@
 package es.moki.ratelimij.dropwizard.filter;
 
 import es.moki.ratelimij.dropwizard.RateLimiting;
+import es.moki.ratelimij.dropwizard.annotation.Rate;
+import es.moki.ratelimij.dropwizard.annotation.RateLimited;
 import es.moki.ratelimitj.core.api.LimitRule;
 import es.moki.ratelimitj.core.api.RateLimiter;
 import es.moki.ratelimitj.core.api.RateLimiterFactory;
