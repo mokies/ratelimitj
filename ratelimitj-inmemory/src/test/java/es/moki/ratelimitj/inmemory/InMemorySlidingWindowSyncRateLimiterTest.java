@@ -14,7 +14,6 @@ import java.util.Set;
 
 public class InMemorySlidingWindowSyncRateLimiterTest extends AbstractSyncRateLimiterTest {
 
-
     @BeforeAll
     public static void before() {
 

@@ -7,6 +7,7 @@ import es.moki.ratelimitj.core.api.LimitRule;
 import es.moki.ratelimitj.core.api.RateLimiter;
 import es.moki.ratelimitj.core.time.SystemTimeSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
+import es.moki.ratelimitj.inmemory.SavedKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +15,6 @@ import javax.annotation.concurrent.ThreadSafe;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
@@ -136,23 +136,4 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
         return hz.getMap(key);
     }
 
-    private static class SavedKey {
-        final long blockId;
-        final long blocks;
-        final long trimBefore;
-        final String countKey;
-        final String tsKey;
-
-        SavedKey(long now, int duration, OptionalInt precisionOpt) {
-
-            int precision = precisionOpt.orElse(duration);
-            precision = Math.min(precision, duration);
-
-            this.blocks = (long) Math.ceil(duration / (double) precision);
-            this.blockId = (long) Math.floor(now / (double) precision);
-            this.trimBefore = blockId - blocks + 1;
-            this.countKey = "" + duration + ':' + precision + ':';
-            this.tsKey = countKey + 'o';
-        }
-    }
 }

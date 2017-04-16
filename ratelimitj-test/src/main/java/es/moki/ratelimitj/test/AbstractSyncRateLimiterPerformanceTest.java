@@ -4,12 +4,14 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
 import es.moki.ratelimitj.core.api.LimitRule;
 import es.moki.ratelimitj.core.api.RateLimiter;
-import es.moki.ratelimitj.test.time.TimeBanditSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
+import es.moki.ratelimitj.test.time.TimeBanditSupplier;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -41,7 +43,8 @@ public abstract class AbstractSyncRateLimiterPerformanceTest {
         });
 
         double transactionsPerSecond = Math.ceil((double) total / watch.elapsed(TimeUnit.MILLISECONDS) * 1000);
-        log.info("total time {} checks {}/sec", watch.stop(), transactionsPerSecond);
+
+        log.info("total time {} checks {}/sec", watch.stop(), NumberFormat.getNumberInstance(Locale.US).format(transactionsPerSecond));
     }
 
 }

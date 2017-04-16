@@ -4,6 +4,7 @@ dependencies {
 
     implementation(
             project(':ratelimitj-core'),
+            project(':ratelimitj-inmemory'),
             'com.hazelcast:hazelcast:3.6.3',
             libraries.slf4j,
             libraries.findbugs

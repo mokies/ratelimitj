@@ -11,11 +11,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.OptionalInt;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import static es.moki.ratelimitj.core.RateLimitUtils.coalesce;
@@ -28,7 +28,7 @@ public class InMemorySlidingWindowRateLimiter implements RateLimiter {
 
     private final Set<LimitRule> rules;
     private final TimeSupplier timeSupplier;
-    private final ExpiringMap<String, Map<String, Long>> expiryingKeyMap;
+    private final ExpiringMap<String, ConcurrentMap<String, Long>> expiryingKeyMap;
 
     public InMemorySlidingWindowRateLimiter(Set<LimitRule> rules) {
         this(rules, new SystemTimeSupplier());
@@ -40,7 +40,7 @@ public class InMemorySlidingWindowRateLimiter implements RateLimiter {
         this.expiryingKeyMap = ExpiringMap.builder().variableExpiration().build();
     }
 
-    InMemorySlidingWindowRateLimiter(ExpiringMap<String, Map<String, Long>> expiryingKeyMap, Set<LimitRule> rules, TimeSupplier timeSupplier) {
+    InMemorySlidingWindowRateLimiter(ExpiringMap<String, ConcurrentMap<String, Long>> expiryingKeyMap, Set<LimitRule> rules, TimeSupplier timeSupplier) {
         this.expiryingKeyMap = expiryingKeyMap;
         this.rules = rules;
         this.timeSupplier = timeSupplier;
@@ -119,8 +119,9 @@ public class InMemorySlidingWindowRateLimiter implements RateLimiter {
         for (SavedKey savedKey : savedKeys) {
             //update the current timestamp, count, and bucket count
             keyMap.put(savedKey.tsKey, savedKey.trimBefore);
-            // TODO should this ben just compute
+
             Long computedCountKeyValue = keyMap.compute(savedKey.countKey, (k, v) -> coalesce(v, 0L) + weight);
+
             Long computedCountKeyBlockIdValue = keyMap.compute(savedKey.countKey + savedKey.blockId, (k, v) -> coalesce(v, 0L)+ weight);
 
             if (LOG.isDebugEnabled()) {
@@ -137,33 +138,15 @@ public class InMemorySlidingWindowRateLimiter implements RateLimiter {
         throw new RuntimeException("Not implemented");
     }
 
-    private Map<String, Long> getMap(String key, int longestDuration) {
-        Map<String, Long> keyMap = expiryingKeyMap.get(key);
-        // FIXME we have some threading issues to deal with
-        if (keyMap == null) {
-            keyMap = new HashMap<>();
-            expiryingKeyMap.put(key, keyMap, ExpirationPolicy.CREATED, longestDuration, TimeUnit.SECONDS);
-        }
-        return keyMap;
-    }
-
-    private static class SavedKey {
-        final long blockId;
-        final long blocks;
-        final long trimBefore;
-        final String countKey;
-        final String tsKey;
-
-        SavedKey(long now, int duration, OptionalInt precisionOpt) {
-
-            int precision = precisionOpt.orElse(duration);
-            precision = Math.min(precision, duration);
-
-            this.blocks = (long) Math.ceil(duration / (double) precision);
-            this.blockId = (long) Math.floor(now / (double) precision);
-            this.trimBefore = blockId - blocks + 1;
-            this.countKey = "" + duration + ':' + precision + ':';
-            this.tsKey = countKey + 'o';
+    private ConcurrentMap<String, Long> getMap(String key, int longestDuration) {
+        synchronized (key) {
+            ConcurrentMap<String, Long> keyMap = expiryingKeyMap.get(key);
+            if (keyMap == null) {
+                keyMap = new ConcurrentHashMap<>();
+                expiryingKeyMap.put(key, keyMap, ExpirationPolicy.CREATED, longestDuration, TimeUnit.SECONDS);
+            }
+            return keyMap;
         }
     }
+
 }
