@@ -40,10 +40,10 @@ public class KeyTest {
 
     @DisplayName("default key should include Class and Method names in key")
     @Test
-    public void shouldEndWithResourceInKey() {
+    public void shouldIncludeResourceInKey() {
         String keyName = Key.DEFAULT.create(request, resource);
 
-        assertThat(keyName).endsWith("java.lang.Object#wait");
+        assertThat(keyName).contains("java.lang.Object#wait");
     }
 
 

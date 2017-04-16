@@ -15,7 +15,7 @@ public enum Key implements KeyProvider {
         @Override
         public String create(final HttpServletRequest request,
                              final ResourceInfo resource) {
-            return "rlj:" + requestKey(request) + ":" + resourceKey(resource);
+            return "rlj:" + resourceKey(resource) + ":" + requestKey(request);
         }
 
         private String requestKey(final HttpServletRequest request) {
