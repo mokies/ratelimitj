@@ -13,14 +13,4 @@ dependencies {
     compile "org.junit.platform:junit-platform-runner:${junitPlatformVersion}"
     runtime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
 
-    jacocoTestReport {
-//        additionalSourceDirs = files(sourceSets.main.allSource.srcDirs)
-//        sourceDirectories = files(sourceSets.main.allSource.srcDirs)
-        afterEvaluate {
-            classDirectories = files(classDirectories.files.collect {
-                fileTree(dir: it, exclude: 'es/moki/ratelimitj/test')
-            })
-        }
-    }
-
 }

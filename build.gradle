@@ -173,7 +173,7 @@ task codeCoverageReport(type: JacocoReport) {
 
     afterEvaluate {
         classDirectories = files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: 'es/moki/ratelimitj/test')
+            fileTree(dir: it, exclude: ['es/moki/ratelimitj/test', 'es/moki/ratelimitj/inmemory', 'es/moki/ratelimitj/hazelcast'])
         })
     }
 }
