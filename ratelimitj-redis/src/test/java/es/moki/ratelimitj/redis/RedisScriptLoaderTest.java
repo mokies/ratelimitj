@@ -8,7 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.expectThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class RedisScriptLoaderTest {
 
@@ -27,7 +27,7 @@ public class RedisScriptLoaderTest {
     @Test
     @DisplayName("should load rate limit lua script into Redis")
     public void shouldLoadScript() {
-        RedisScriptLoader scriptLoader = new RedisScriptLoader(client.connect(), "token-bucket-ratelimit.lua");
+        RedisScriptLoader scriptLoader = new RedisScriptLoader(client.connect(), "sliding-window-ratelimit.lua");
 
         assertThat(scriptLoader.scriptSha()).isNotEmpty();
     }
@@ -35,7 +35,7 @@ public class RedisScriptLoaderTest {
     @Test
     @DisplayName("should eagerly load rate limit lua script into Redis")
     public void shouldEagerlyLoadScript() {
-        RedisScriptLoader scriptLoader = new RedisScriptLoader(client.connect(), "token-bucket-ratelimit.lua", true);
+        RedisScriptLoader scriptLoader = new RedisScriptLoader(client.connect(), "sliding-window-ratelimit.lua", true);
 
         assertThat(scriptLoader.scriptSha()).isNotEmpty();
     }
@@ -44,7 +44,7 @@ public class RedisScriptLoaderTest {
     @DisplayName("should fail if script not found")
     public void shouldFailedIfScriptNotFound() {
 
-        Throwable exception = expectThrows(IllegalArgumentException.class, () -> {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> {
             new RedisScriptLoader(client.connect(), "not-found-script.lua", true);
         });
         assertThat(exception.getMessage()).contains("not found");

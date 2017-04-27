@@ -1,4 +1,4 @@
--- Credit: http://www.dr-josiah.com/2014/11/introduction-to-rate-limiting-with_26.html
+ -- Credit: http://www.dr-josiah.com/2014/11/introduction-to-rate-limiting-with_26.html
 
 local limits = cjson.decode(ARGV[1])
 local now = tonumber(ARGV[2])
