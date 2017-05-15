@@ -131,7 +131,7 @@ public class InMemorySlidingWindowRateLimiter implements RateLimiter {
 
     @Override
     public boolean resetLimit(String key) {
-        throw new RuntimeException("Not implemented");
+        return expiryingKeyMap.remove(key) != null;
     }
 
     private ConcurrentMap<String, Long> getMap(String key, int longestDuration) {
