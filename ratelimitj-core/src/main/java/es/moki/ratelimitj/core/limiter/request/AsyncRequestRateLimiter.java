@@ -1,4 +1,4 @@
-package es.moki.ratelimitj.core.api;
+package es.moki.ratelimitj.core.limiter.request;
 
 
 import java.util.concurrent.CompletionStage;
@@ -6,7 +6,7 @@ import java.util.concurrent.CompletionStage;
 /**
  * An asynchronous rate limiter interface supporting Java 8's {@link java.util.concurrent.CompletionStage}.
  */
-public interface AsyncRateLimiter {
+public interface AsyncRequestRateLimiter {
 
     CompletionStage<Boolean> overLimitAsync(String key);
 

@@ -2,7 +2,7 @@ package es.moki.ratelimitj.redis;
 
 
 import com.google.common.collect.ImmutableList;
-import es.moki.ratelimitj.core.api.LimitRule;
+import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class LimitRuleJsonSerialiserTest {
+public class RequestLimitRuleJsonSerialiserTest {
 
     private final LimitRuleJsonSerialiser serialiser = new LimitRuleJsonSerialiser();
 
@@ -18,7 +18,7 @@ public class LimitRuleJsonSerialiserTest {
     @DisplayName("should encode limit rule in JSON array")
     public void shouldEncode() {
 
-        ImmutableList<LimitRule> rules = ImmutableList.of(LimitRule.of(10, TimeUnit.SECONDS, 10L), LimitRule.of(1, TimeUnit.MINUTES, 20L));
+        ImmutableList<RequestLimitRule> rules = ImmutableList.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 10L), RequestLimitRule.of(1, TimeUnit.MINUTES, 20L));
 
         assertThat(serialiser.encode(rules)).isEqualTo("[[10,10],[60,20]]");
     }
@@ -27,7 +27,7 @@ public class LimitRuleJsonSerialiserTest {
     @DisplayName("should encode limit rule with precision in JSON array")
     public void shouldEncodeWithPrecisions() {
 
-        ImmutableList<LimitRule> rules = ImmutableList.of(LimitRule.of(10, TimeUnit.SECONDS, 10L).withPrecision(4), LimitRule.of(1, TimeUnit.MINUTES, 20L).withPrecision(8));
+        ImmutableList<RequestLimitRule> rules = ImmutableList.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 10L).withPrecision(4), RequestLimitRule.of(1, TimeUnit.MINUTES, 20L).withPrecision(8));
 
         assertThat(serialiser.encode(rules)).isEqualTo("[[10,10,4],[60,20,8]]");
     }

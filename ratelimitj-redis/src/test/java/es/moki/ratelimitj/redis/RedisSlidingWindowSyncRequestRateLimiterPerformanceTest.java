@@ -2,10 +2,10 @@ package es.moki.ratelimitj.redis;
 
 import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.api.StatefulRedisConnection;
-import es.moki.ratelimitj.core.api.LimitRule;
-import es.moki.ratelimitj.core.api.ReactiveRateLimiter;
+import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
+import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.core.time.TimeSupplier;
-import es.moki.ratelimitj.test.AbstractReactiveRateLimiterTest;
+import es.moki.ratelimitj.test.AbstractSyncRateLimiterPerformanceTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeAll;
 import java.util.Set;
 
 
-public class RedisSlidingWindowReactiveRateLimiterTest extends AbstractReactiveRateLimiterTest {
+public class RedisSlidingWindowSyncRequestRateLimiterPerformanceTest extends AbstractSyncRateLimiterPerformanceTest {
 
     private static RedisClient client;
     private static StatefulRedisConnection<String, String> connect;
@@ -38,7 +38,7 @@ public class RedisSlidingWindowReactiveRateLimiterTest extends AbstractReactiveR
     }
 
     @Override
-    protected ReactiveRateLimiter getRateLimiter(Set<LimitRule> rules, TimeSupplier timeSupplier) {
-        return new RedisSlidingWindowRateLimiter(connect, rules, timeSupplier);
+    protected RequestRateLimiter getRateLimiter(Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
+        return new RedisSlidingWindowRequestRequestRequestRateLimiter(connect, rules, timeSupplier);
     }
 }

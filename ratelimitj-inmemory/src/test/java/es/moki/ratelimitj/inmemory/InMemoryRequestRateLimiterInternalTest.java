@@ -2,8 +2,8 @@ package es.moki.ratelimitj.inmemory;
 
 
 import com.google.common.collect.ImmutableSet;
-import es.moki.ratelimitj.core.api.LimitRule;
-import es.moki.ratelimitj.core.api.RateLimiter;
+import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
+import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.test.time.TimeBanditSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import net.jodah.expiringmap.ExpiringMap;
@@ -18,7 +18,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class InMemoryRateLimiterInternalTest {
+public class InMemoryRequestRateLimiterInternalTest {
 
 
     private final TimeBanditSupplier timeBandit = new TimeBanditSupplier();
@@ -35,20 +35,20 @@ public class InMemoryRateLimiterInternalTest {
 
     }
 
-    private RateLimiter getRateLimiter(Set<LimitRule> rules, TimeSupplier timeSupplier) {
-        return new InMemorySlidingWindowRateLimiter(expiryingKeyMap, rules, timeSupplier);
+    private RequestRateLimiter getRateLimiter(Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
+        return new InMemorySlidingWindowRequestRateLimiter(expiryingKeyMap, rules, timeSupplier);
     }
 
     @Test @Ignore
     public void shouldEventuallyCleanUpExpiredKeys() throws Exception {
-        ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(1, TimeUnit.SECONDS, 5));
-        RateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(1, TimeUnit.SECONDS, 5));
+        RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
 
         String key = "ip:127.0.0.5";
 
         IntStream.rangeClosed(1, 5).forEach(value -> {
             timeBandit.addUnixTimeMilliSeconds(100L);
-            assertThat(rateLimiter.overLimit(key)).isFalse();
+            assertThat(requestRateLimiter.overLimit(key)).isFalse();
         });
 
         while (expiryingKeyMap.size() != 0) {

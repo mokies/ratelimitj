@@ -1,7 +1,7 @@
 package es.moki.ratelimitj.inmemory;
 
-import es.moki.ratelimitj.core.api.LimitRule;
-import es.moki.ratelimitj.core.api.RateLimiter;
+import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
+import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.core.time.SystemTimeSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import net.jodah.expiringmap.ExpirationPolicy;
@@ -22,25 +22,25 @@ import static es.moki.ratelimitj.core.RateLimitUtils.coalesce;
 import static java.util.Objects.requireNonNull;
 
 @ThreadSafe
-public class InMemorySlidingWindowRateLimiter implements RateLimiter {
+public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimiter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(InMemorySlidingWindowRateLimiter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(InMemorySlidingWindowRequestRateLimiter.class);
 
-    private final Set<LimitRule> rules;
+    private final Set<RequestLimitRule> rules;
     private final TimeSupplier timeSupplier;
     private final ExpiringMap<String, ConcurrentMap<String, Long>> expiryingKeyMap;
 
-    public InMemorySlidingWindowRateLimiter(Set<LimitRule> rules) {
+    public InMemorySlidingWindowRequestRateLimiter(Set<RequestLimitRule> rules) {
         this(rules, new SystemTimeSupplier());
     }
 
-    public InMemorySlidingWindowRateLimiter(Set<LimitRule> rules, TimeSupplier timeSupplier) {
+    public InMemorySlidingWindowRequestRateLimiter(Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
         this.rules = rules;
         this.timeSupplier = timeSupplier;
         this.expiryingKeyMap = ExpiringMap.builder().variableExpiration().build();
     }
 
-    InMemorySlidingWindowRateLimiter(ExpiringMap<String, ConcurrentMap<String, Long>> expiryingKeyMap, Set<LimitRule> rules, TimeSupplier timeSupplier) {
+    InMemorySlidingWindowRequestRateLimiter(ExpiringMap<String, ConcurrentMap<String, Long>> expiryingKeyMap, Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
         this.expiryingKeyMap = expiryingKeyMap;
         this.rules = rules;
         this.timeSupplier = timeSupplier;
@@ -63,13 +63,13 @@ public class InMemorySlidingWindowRateLimiter implements RateLimiter {
 
         final long now = timeSupplier.get();
         // TODO implement cleanup
-        final int longestDurationSeconds = rules.stream().map(LimitRule::getDurationSeconds).reduce(Integer::max).orElse(0);
+        final int longestDurationSeconds = rules.stream().map(RequestLimitRule::getDurationSeconds).reduce(Integer::max).orElse(0);
         List<SavedKey> savedKeys = new ArrayList<>(rules.size());
 
         Map<String, Long> keyMap = getMap(key, longestDurationSeconds);
 
         // TODO perform each rule calculation in parallel
-        for (LimitRule rule : rules) {
+        for (RequestLimitRule rule : rules) {
 
             SavedKey savedKey = new SavedKey(now, rule.getDurationSeconds(), rule.getPrecision());
             savedKeys.add(savedKey);

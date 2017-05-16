@@ -1,7 +1,7 @@
 package es.moki.ratelimij.dropwizard;
 
 import es.moki.ratelimij.dropwizard.filter.RateLimited429EnforcerFeature;
-import es.moki.ratelimitj.core.api.RateLimiterFactory;
+import es.moki.ratelimitj.core.limiter.request.RequestRateLimiterFactory;
 import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
 import io.dropwizard.lifecycle.Managed;
@@ -26,10 +26,10 @@ import static java.util.Objects.requireNonNull;
 
 public class RateLimitBundle implements ConfiguredBundle<Configuration> {
 
-    private final RateLimiterFactory rateLimiterFactory;
+    private final RequestRateLimiterFactory requestRateLimiterFactory;
 
-    public RateLimitBundle(RateLimiterFactory rateLimiterFactory) {
-        this.rateLimiterFactory = requireNonNull(rateLimiterFactory);
+    public RateLimitBundle(RequestRateLimiterFactory requestRateLimiterFactory) {
+        this.requestRateLimiterFactory = requireNonNull(requestRateLimiterFactory);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class RateLimitBundle implements ConfiguredBundle<Configuration> {
     public void run(final Configuration configuration,
                     final Environment environment) throws Exception {
 
-        environment.jersey().register(new RateLimitingFactoryProvider.Binder(rateLimiterFactory));
+        environment.jersey().register(new RateLimitingFactoryProvider.Binder(requestRateLimiterFactory));
         environment.jersey().register(new RateLimited429EnforcerFeature());
 
         environment.lifecycle().manage(new Managed() {
@@ -50,7 +50,7 @@ public class RateLimitBundle implements ConfiguredBundle<Configuration> {
 
             @Override
             public void stop() throws Exception {
-                rateLimiterFactory.close();
+                requestRateLimiterFactory.close();
             }
         });
     }
@@ -58,25 +58,25 @@ public class RateLimitBundle implements ConfiguredBundle<Configuration> {
     @Singleton
     public static class RateLimitingFactoryProvider extends AbstractValueFactoryProvider {
 
-        private RateLimiterFactory rateLimiterFactory;
+        private RequestRateLimiterFactory requestRateLimiterFactory;
 
         @Inject
         public RateLimitingFactoryProvider(final MultivaluedParameterExtractorProvider extractorProvider,
                                            final ServiceLocator injector,
                                            final RateLimiterFactoryProvider rateLimiterFactoryProvider) {
             super(extractorProvider, injector, Parameter.Source.UNKNOWN);
-            this.rateLimiterFactory = rateLimiterFactoryProvider.factory;
+            this.requestRateLimiterFactory = rateLimiterFactoryProvider.factory;
         }
 
         @Override
-        protected Factory<RateLimiterFactory> createValueFactory(final Parameter parameter) {
+        protected Factory<RequestRateLimiterFactory> createValueFactory(final Parameter parameter) {
             final RateLimiting annotation = parameter.getAnnotation(RateLimiting.class);
             if (null == annotation) {
                 return null;
             } else {
-                return new AbstractContainerRequestValueFactory<RateLimiterFactory>() {
-                    public RateLimiterFactory provide() {
-                        return rateLimiterFactory;
+                return new AbstractContainerRequestValueFactory<RequestRateLimiterFactory>() {
+                    public RequestRateLimiterFactory provide() {
+                        return requestRateLimiterFactory;
                     }
                 };
             }
@@ -91,24 +91,24 @@ public class RateLimitBundle implements ConfiguredBundle<Configuration> {
         @Singleton
         public static class RateLimiterFactoryProvider {
 
-            private final RateLimiterFactory factory;
+            private final RequestRateLimiterFactory factory;
 
-            RateLimiterFactoryProvider(final RateLimiterFactory factory) {
+            RateLimiterFactoryProvider(final RequestRateLimiterFactory factory) {
                 this.factory = factory;
             }
         }
 
         public static class Binder extends AbstractBinder {
 
-            private final RateLimiterFactory rateLimiterFactory;
+            private final RequestRateLimiterFactory requestRateLimiterFactory;
 
-            public Binder(final RateLimiterFactory rateLimiterFactory) {
-                this.rateLimiterFactory = rateLimiterFactory;
+            public Binder(final RequestRateLimiterFactory requestRateLimiterFactory) {
+                this.requestRateLimiterFactory = requestRateLimiterFactory;
             }
 
             @Override
             protected void configure() {
-                bind(new RateLimiterFactoryProvider(rateLimiterFactory)).to(RateLimiterFactoryProvider.class);
+                bind(new RateLimiterFactoryProvider(requestRateLimiterFactory)).to(RateLimiterFactoryProvider.class);
                 bind(RateLimitingFactoryProvider.class).to(ValueFactoryProvider.class).in(Singleton.class);
                 bind(RateLimitingFactoryProvider.RateLimitingInjectionResolver.class)
                         .to(new TypeLiteral<InjectionResolver<RateLimiting>>() {}).in(Singleton.class);

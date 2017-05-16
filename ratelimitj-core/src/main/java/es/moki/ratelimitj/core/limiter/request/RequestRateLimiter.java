@@ -1,9 +1,9 @@
-package es.moki.ratelimitj.core.api;
+package es.moki.ratelimitj.core.limiter.request;
 
 /**
- * A synchronous rate limiter interface.
+ * A synchronous request rate limiter interface.
  */
-public interface RateLimiter {
+public interface RequestRateLimiter {
 
     /**
      * Determine if the given key, after incrementing by 1, has exceeded the configured rate limit.

@@ -1,8 +1,8 @@
 package es.moki.ratelimitj.test;
 
 import com.google.common.collect.ImmutableSet;
-import es.moki.ratelimitj.core.api.LimitRule;
-import es.moki.ratelimitj.core.api.ReactiveRateLimiter;
+import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
+import es.moki.ratelimitj.core.limiter.request.ReactiveRequestRateLimiter;
 import es.moki.ratelimitj.test.time.TimeBanditSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import org.junit.jupiter.api.Test;
@@ -17,13 +17,13 @@ public abstract class AbstractReactiveRateLimiterTest {
 
     private final TimeBanditSupplier timeBandit = new TimeBanditSupplier();
 
-    protected abstract ReactiveRateLimiter getRateLimiter(Set<LimitRule> rules, TimeSupplier timeSupplier);
+    protected abstract ReactiveRequestRateLimiter getRateLimiter(Set<RequestLimitRule> rules, TimeSupplier timeSupplier);
 
     @Test
     public void shouldLimitSingleWindowSync() throws Exception {
 
-        ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(10, TimeUnit.SECONDS, 5));
-        ReactiveRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 5));
+        ReactiveRequestRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
 
         Flux<Boolean> overLimitFlux = Flux
                 .just("ip:127.0.1.5")
@@ -41,8 +41,8 @@ public abstract class AbstractReactiveRateLimiterTest {
     @Test
     public void shouldLimitDualWindowAsync() throws Exception {
 
-        ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(1, TimeUnit.SECONDS, 5), LimitRule.of(10, TimeUnit.SECONDS, 10));
-        ReactiveRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(1, TimeUnit.SECONDS, 5), RequestLimitRule.of(10, TimeUnit.SECONDS, 10));
+        ReactiveRequestRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
 
         Flux
                 .just("ip:127.0.1.6")
@@ -71,8 +71,8 @@ public abstract class AbstractReactiveRateLimiterTest {
 
     @Test
     public void shouldResetLimit() throws Exception {
-        ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(60, TimeUnit.SECONDS, 1));
-        ReactiveRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(60, TimeUnit.SECONDS, 1));
+        ReactiveRequestRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
 
         String key =  "ip:127.1.0.1";
 

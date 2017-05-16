@@ -3,8 +3,8 @@ package es.moki.ratelimitj.hazelcast;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
-import es.moki.ratelimitj.core.api.LimitRule;
-import es.moki.ratelimitj.core.api.RateLimiter;
+import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
+import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.core.time.SystemTimeSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import es.moki.ratelimitj.inmemory.SavedKey;
@@ -20,19 +20,19 @@ import java.util.Set;
 import static java.util.Objects.requireNonNull;
 
 @ThreadSafe
-public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
+public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimiter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(HazelcastSlidingWindowRateLimiter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HazelcastSlidingWindowRequestRateLimiter.class);
 
     private final HazelcastInstance hz;
-    private final Set<LimitRule> rules;
+    private final Set<RequestLimitRule> rules;
     private final TimeSupplier timeSupplier;
 
-    public HazelcastSlidingWindowRateLimiter(HazelcastInstance hz, Set<LimitRule> rules) {
+    public HazelcastSlidingWindowRequestRateLimiter(HazelcastInstance hz, Set<RequestLimitRule> rules) {
         this(hz, rules, new SystemTimeSupplier());
     }
 
-    public HazelcastSlidingWindowRateLimiter(HazelcastInstance hz, Set<LimitRule> rules, TimeSupplier timeSupplier) {
+    public HazelcastSlidingWindowRequestRateLimiter(HazelcastInstance hz, Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
         this.hz = hz;
         this.rules = rules;
         this.timeSupplier = timeSupplier;
@@ -55,13 +55,13 @@ public class HazelcastSlidingWindowRateLimiter implements RateLimiter {
 
         final long now = timeSupplier.get();
         // TODO implement cleanup
-        final int longestDuration = rules.stream().map(LimitRule::getDurationSeconds).reduce(Integer::max).orElse(0);
+        final int longestDuration = rules.stream().map(RequestLimitRule::getDurationSeconds).reduce(Integer::max).orElse(0);
         List<SavedKey> savedKeys = new ArrayList<>(rules.size());
 
         IMap<String, Long> hcKeyMap = getMap(key, longestDuration);
 
         // TODO perform each rule calculation in parallel
-        for (LimitRule rule : rules) {
+        for (RequestLimitRule rule : rules) {
 
             SavedKey savedKey = new SavedKey(now, rule.getDurationSeconds(), rule.getPrecision());
             savedKeys.add(savedKey);

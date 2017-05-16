@@ -1,8 +1,8 @@
 package es.moki.ratelimij.dropwizard.filter;
 
 import es.moki.ratelimij.dropwizard.RateLimiting;
-import es.moki.ratelimitj.core.api.RateLimiter;
-import es.moki.ratelimitj.core.api.RateLimiterFactory;
+import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
+import es.moki.ratelimitj.core.limiter.request.RequestRateLimiterFactory;
 import io.dropwizard.testing.junit.ResourceTestRule;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.api.InjectionResolver;
@@ -38,10 +38,10 @@ import static org.mockito.Mockito.when;
 public class RateLimit429EnforcerFilterTest {
 
     @Mock
-    private static RateLimiterFactory rateLimiterFactory;
+    private static RequestRateLimiterFactory requestRateLimiterFactory;
 
     @Mock
-    private RateLimiter rateLimiter;
+    private RequestRateLimiter requestRateLimiter;
 
     @Rule
     public ResourceTestRule rule = ResourceTestRule
@@ -56,8 +56,8 @@ public class RateLimit429EnforcerFilterTest {
     @DisplayName("should not limit request")
     public void shouldNotLimit() {
 
-        when(rateLimiterFactory.getInstance(anySet())).thenReturn(rateLimiter);
-        when(rateLimiter.overLimit(anyString())).thenReturn(false);
+        when(requestRateLimiterFactory.getInstance(anySet())).thenReturn(requestRateLimiter);
+        when(requestRateLimiter.overLimit(anyString())).thenReturn(false);
 
         Response response = rule.getJerseyTest().target("/test/{id}").resolveTemplate("id", 1)
                 .request(MediaType.APPLICATION_JSON_TYPE)
@@ -70,8 +70,8 @@ public class RateLimit429EnforcerFilterTest {
     @DisplayName("should limit request returning a 429")
     public void shouldLimit() {
 
-        when(rateLimiterFactory.getInstance(anySet())).thenReturn(rateLimiter);
-        when(rateLimiter.overLimit(anyString())).thenReturn(true);
+        when(requestRateLimiterFactory.getInstance(anySet())).thenReturn(requestRateLimiter);
+        when(requestRateLimiter.overLimit(anyString())).thenReturn(true);
 
         Response response = rule.getJerseyTest().target("/test/{id}").resolveTemplate("id", 1)
                 .request(MediaType.APPLICATION_JSON_TYPE)
@@ -84,8 +84,8 @@ public class RateLimit429EnforcerFilterTest {
     @DisplayName("should configure rate limiter")
     public void shouldReportOnly() {
 
-        when(rateLimiterFactory.getInstance(anySet())).thenReturn(rateLimiter);
-        when(rateLimiter.overLimit(anyString())).thenReturn(true);
+        when(requestRateLimiterFactory.getInstance(anySet())).thenReturn(requestRateLimiter);
+        when(requestRateLimiter.overLimit(anyString())).thenReturn(true);
 
 
         Response response = rule.getJerseyTest().target("/test/reportOnly/{id}").resolveTemplate("id", 1)
@@ -110,9 +110,9 @@ public class RateLimit429EnforcerFilterTest {
             if (null == annotation) {
                 return null;
             } else {
-                return new AbstractContainerRequestValueFactory<RateLimiterFactory>() {
-                    public RateLimiterFactory provide() {
-                        return rateLimiterFactory;
+                return new AbstractContainerRequestValueFactory<RequestRateLimiterFactory>() {
+                    public RequestRateLimiterFactory provide() {
+                        return requestRateLimiterFactory;
                     }
                 };
             }

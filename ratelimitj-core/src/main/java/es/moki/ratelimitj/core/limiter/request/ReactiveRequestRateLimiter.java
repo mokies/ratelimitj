@@ -1,12 +1,12 @@
-package es.moki.ratelimitj.core.api;
+package es.moki.ratelimitj.core.limiter.request;
 
 
 import reactor.core.publisher.Mono;
 
 /**
- * An reactive rate limiter interface.
+ * An reactive request rate limiter interface.
  */
-public interface ReactiveRateLimiter {
+public interface ReactiveRequestRateLimiter {
 
     Mono<Boolean> overLimitReactive(String key);
 

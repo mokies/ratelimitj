@@ -5,8 +5,8 @@ import com.lambdaworks.redis.api.StatefulRedisConnection;
 import es.moki.ratelimij.dropwizard.RateLimitBundle;
 import es.moki.ratelimij.dropwizard.component.app.api.LoginResource;
 import es.moki.ratelimij.dropwizard.component.app.api.UserResource;
-import es.moki.ratelimitj.core.api.RateLimiterFactory;
-import es.moki.ratelimitj.redis.RedisRateLimiterFactory;
+import es.moki.ratelimitj.core.limiter.request.RequestRateLimiterFactory;
+import es.moki.ratelimitj.redis.RedisRequestRateLimiterFactory;
 import io.dropwizard.Application;
 import io.dropwizard.Configuration;
 import io.dropwizard.lifecycle.Managed;
@@ -19,7 +19,7 @@ public class RateLimitApplication extends Application<Configuration> {
 
     public void initialize(Bootstrap<Configuration> bootstrap) {
         redisClient = RedisClient.create("redis://localhost");
-        RateLimiterFactory factory = new RedisRateLimiterFactory(redisClient);
+        RequestRateLimiterFactory factory = new RedisRequestRateLimiterFactory(redisClient);
 
         bootstrap.addBundle(new RateLimitBundle(factory));
     }

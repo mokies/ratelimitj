@@ -1,8 +1,8 @@
 package es.moki.ratelimitj.test;
 
 import com.google.common.collect.ImmutableSet;
-import es.moki.ratelimitj.core.api.AsyncRateLimiter;
-import es.moki.ratelimitj.core.api.LimitRule;
+import es.moki.ratelimitj.core.limiter.request.AsyncRequestRateLimiter;
+import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.test.time.TimeBanditSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import org.junit.jupiter.api.Test;
@@ -25,13 +25,13 @@ public abstract class AbstractAsyncRateLimiterTest {
 
     private final TimeBanditSupplier timeBandit = new TimeBanditSupplier();
 
-    protected abstract AsyncRateLimiter getAsyncRateLimiter(Set<LimitRule> rule, TimeSupplier timeSupplier);
+    protected abstract AsyncRequestRateLimiter getAsyncRateLimiter(Set<RequestLimitRule> rule, TimeSupplier timeSupplier);
 
     @Test
     public void shouldLimitSingleWindowAsync() throws Exception {
 
-        ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(10, TimeUnit.SECONDS, 5));
-        AsyncRateLimiter rateLimiter = getAsyncRateLimiter(rules, timeBandit);
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 5));
+        AsyncRequestRateLimiter rateLimiter = getAsyncRateLimiter(rules, timeBandit);
 
         Queue<CompletionStage> stageAsserts = new ConcurrentLinkedQueue<>();
 
@@ -52,8 +52,8 @@ public abstract class AbstractAsyncRateLimiterTest {
     @Test
     public void shouldLimitDualWindowAsync() throws Exception {
 
-        ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(2, TimeUnit.SECONDS, 5), LimitRule.of(10, TimeUnit.SECONDS, 20));
-        AsyncRateLimiter rateLimiter = getAsyncRateLimiter(rules, timeBandit);
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(2, TimeUnit.SECONDS, 5), RequestLimitRule.of(10, TimeUnit.SECONDS, 20));
+        AsyncRequestRateLimiter rateLimiter = getAsyncRateLimiter(rules, timeBandit);
 
         Queue<CompletionStage> stageAsserts = new ConcurrentLinkedQueue<>();
 
@@ -75,8 +75,8 @@ public abstract class AbstractAsyncRateLimiterTest {
 
     @Test
     public void shouldResetLimit() throws Exception {
-        ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(60, TimeUnit.SECONDS, 1));
-        AsyncRateLimiter rateLimiter = getAsyncRateLimiter(rules, timeBandit);
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(60, TimeUnit.SECONDS, 1));
+        AsyncRequestRateLimiter rateLimiter = getAsyncRateLimiter(rules, timeBandit);
 
         String key =  "ip:127.1.0.1";
 

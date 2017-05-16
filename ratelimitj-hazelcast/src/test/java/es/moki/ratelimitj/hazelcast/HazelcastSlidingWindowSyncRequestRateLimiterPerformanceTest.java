@@ -2,8 +2,8 @@ package es.moki.ratelimitj.hazelcast;
 
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
-import es.moki.ratelimitj.core.api.LimitRule;
-import es.moki.ratelimitj.core.api.RateLimiter;
+import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
+import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import es.moki.ratelimitj.test.AbstractSyncRateLimiterPerformanceTest;
 import org.junit.jupiter.api.AfterAll;
@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeAll;
 import java.util.Set;
 
 
-public class HazelcastSlidingWindowSyncRateLimiterPerformanceTest extends AbstractSyncRateLimiterPerformanceTest {
+public class HazelcastSlidingWindowSyncRequestRateLimiterPerformanceTest extends AbstractSyncRateLimiterPerformanceTest {
 
     private static HazelcastInstance hz;
 
@@ -27,7 +27,7 @@ public class HazelcastSlidingWindowSyncRateLimiterPerformanceTest extends Abstra
     }
 
     @Override
-    protected RateLimiter getRateLimiter(Set<LimitRule> rules, TimeSupplier timeSupplier) {
-        return new HazelcastSlidingWindowRateLimiter(hz, rules, timeSupplier);
+    protected RequestRateLimiter getRateLimiter(Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
+        return new HazelcastSlidingWindowRequestRateLimiter(hz, rules, timeSupplier);
     }
 }

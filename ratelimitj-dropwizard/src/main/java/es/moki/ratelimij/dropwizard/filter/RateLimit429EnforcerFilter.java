@@ -3,9 +3,9 @@ package es.moki.ratelimij.dropwizard.filter;
 import es.moki.ratelimij.dropwizard.RateLimiting;
 import es.moki.ratelimij.dropwizard.annotation.Rate;
 import es.moki.ratelimij.dropwizard.annotation.RateLimited;
-import es.moki.ratelimitj.core.api.LimitRule;
-import es.moki.ratelimitj.core.api.RateLimiter;
-import es.moki.ratelimitj.core.api.RateLimiterFactory;
+import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
+import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
+import es.moki.ratelimitj.core.limiter.request.RequestRateLimiterFactory;
 import org.glassfish.jersey.server.model.AnnotatedMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ public class RateLimit429EnforcerFilter implements ContainerRequestFilter {
     private static final Logger LOG = LoggerFactory.getLogger(RateLimit429EnforcerFilter.class);
 
     @RateLimiting
-    private RateLimiterFactory factory;
+    private RequestRateLimiterFactory factory;
 
     @Context
     private HttpServletRequest request;
@@ -42,7 +42,7 @@ public class RateLimit429EnforcerFilter implements ContainerRequestFilter {
         AnnotatedMethod method = new AnnotatedMethod(resource.getResourceMethod());
         RateLimited rateLimited = method.getAnnotation(RateLimited.class);
 
-        RateLimiter rateLimit = factory.getInstance(toLimitRules(rateLimited));
+        RequestRateLimiter rateLimit = factory.getInstance(toLimitRules(rateLimited));
         KeyProvider keyProvider = rateLimited.key();
 
         String key = keyProvider.create(request, resource);
@@ -58,11 +58,11 @@ public class RateLimit429EnforcerFilter implements ContainerRequestFilter {
         }
     }
 
-    private Set<LimitRule> toLimitRules(RateLimited rateLimited) {
+    private Set<RequestLimitRule> toLimitRules(RateLimited rateLimited) {
         return Arrays.stream(rateLimited.rates()).map(this::toLimitRule).collect(Collectors.toSet());
     }
 
-    private LimitRule toLimitRule(Rate rate) {
-        return LimitRule.of(rate.duration(), rate.timeUnit(), rate.limit());
+    private RequestLimitRule toLimitRule(Rate rate) {
+        return RequestLimitRule.of(rate.duration(), rate.timeUnit(), rate.limit());
     }
 }

@@ -5,8 +5,8 @@ import com.google.common.collect.ImmutableSet;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
-import es.moki.ratelimitj.core.api.LimitRule;
-import es.moki.ratelimitj.core.api.RateLimiter;
+import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
+import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.test.time.TimeBanditSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import org.junit.jupiter.api.AfterAll;
@@ -19,7 +19,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class HazelcastRateLimiterInternalTest {
+public class HazelcastRequestRateLimiterInternalTest {
 
     private static HazelcastInstance hz;
 
@@ -35,20 +35,20 @@ public class HazelcastRateLimiterInternalTest {
         hz.shutdown();
     }
 
-    private RateLimiter getRateLimiter(Set<LimitRule> rules, TimeSupplier timeSupplier) {
-        return new HazelcastSlidingWindowRateLimiter(hz, rules, timeSupplier);
+    private RequestRateLimiter getRateLimiter(Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
+        return new HazelcastSlidingWindowRequestRateLimiter(hz, rules, timeSupplier);
     }
 
     @Test
     public void shouldEventuallyCleanUpExpiredKeys() throws Exception {
-        ImmutableSet<LimitRule> rules = ImmutableSet.of(LimitRule.of(2, TimeUnit.SECONDS, 5));
-        RateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(2, TimeUnit.SECONDS, 5));
+        RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
 
         String key = "ip:127.0.0.5";
 
         IntStream.rangeClosed(1, 5).forEach(value -> {
             timeBandit.addUnixTimeMilliSeconds(100L);
-            assertThat(rateLimiter.overLimit(key)).isFalse();
+            assertThat(requestRateLimiter.overLimit(key)).isFalse();
         });
 
         IMap<Object, Object> map = hz.getMap(key);

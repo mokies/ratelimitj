@@ -1,4 +1,4 @@
-package es.moki.ratelimitj.core.api;
+package es.moki.ratelimitj.core.limiter.request;
 
 import java.util.OptionalInt;
 import java.util.concurrent.TimeUnit;
@@ -6,18 +6,18 @@ import java.util.concurrent.TimeUnit;
 /**
  * Defines a limit rule that can support regular and token bucket rate limits.
  */
-public class LimitRule {
+public class RequestLimitRule {
 
     private final int durationSeconds;
     private final long limit;
     private final OptionalInt precision;
     private final String name;
 
-    private LimitRule(int durationSeconds, long limit) {
+    private RequestLimitRule(int durationSeconds, long limit) {
         this(durationSeconds, limit, OptionalInt.empty(), null);
     }
 
-    private LimitRule(int durationSeconds, long limit, OptionalInt precision, String name) {
+    private RequestLimitRule(int durationSeconds, long limit, OptionalInt precision, String name) {
         this.durationSeconds = durationSeconds;
         this.limit = limit;
         this.precision = precision;
@@ -33,8 +33,8 @@ public class LimitRule {
      * @return A limit rule.
      */
 
-    public static LimitRule of(int duration, TimeUnit timeUnit, long limit) {
-        return new LimitRule((int) timeUnit.toSeconds(duration), limit);
+    public static RequestLimitRule of(int duration, TimeUnit timeUnit, long limit) {
+        return new RequestLimitRule((int) timeUnit.toSeconds(duration), limit);
     }
 
     /**
@@ -44,8 +44,8 @@ public class LimitRule {
      * @param precision Defines the number of buckets that will be used to approximate the sliding window.
      * @return a limit rule
      */
-    public LimitRule withPrecision(int precision) {
-        return new LimitRule(this.durationSeconds, this.limit, OptionalInt.of(precision), this.name);
+    public RequestLimitRule withPrecision(int precision) {
+        return new RequestLimitRule(this.durationSeconds, this.limit, OptionalInt.of(precision), this.name);
     }
 
     /**
@@ -54,8 +54,8 @@ public class LimitRule {
      * @param name Defines a descriptive name for the rule limit.
      * @return a limit rule
      */
-    public LimitRule withName(String name) {
-        return new LimitRule(this.durationSeconds, this.limit, this.precision, name);
+    public RequestLimitRule withName(String name) {
+        return new RequestLimitRule(this.durationSeconds, this.limit, this.precision, name);
     }
 
     /**
