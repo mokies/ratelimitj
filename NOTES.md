@@ -4,3 +4,7 @@ https://github.com/nlap/dropwizard-ratelimit/blob/master/bundle/src/main/java/ca
 https://github.com/juju/ratelimit
 https://github.com/touhonoob/RateLimit
 https://stripe.com/blog/rate-limiters
+
+
+Enhancements 
+- Toggle silent failures

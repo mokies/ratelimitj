@@ -1,4 +1,4 @@
-package es.moki.ratelimitj.inmemory;
+package es.moki.ratelimitj.inmemory.request;
 
 import de.jkeylockmanager.manager.KeyLockManager;
 import de.jkeylockmanager.manager.KeyLockManagers;

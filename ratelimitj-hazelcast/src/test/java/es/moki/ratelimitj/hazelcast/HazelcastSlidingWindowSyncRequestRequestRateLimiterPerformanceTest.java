@@ -5,14 +5,14 @@ import com.hazelcast.core.HazelcastInstance;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.core.time.TimeSupplier;
-import es.moki.ratelimitj.test.AbstractSyncRateLimiterPerformanceTest;
+import es.moki.ratelimitj.test.limiter.request.AbstractSyncRequestRateLimiterPerformanceTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.util.Set;
 
 
-public class HazelcastSlidingWindowSyncRequestRateLimiterPerformanceTest extends AbstractSyncRateLimiterPerformanceTest {
+public class HazelcastSlidingWindowSyncRequestRequestRateLimiterPerformanceTest extends AbstractSyncRequestRateLimiterPerformanceTest {
 
     private static HazelcastInstance hz;
 

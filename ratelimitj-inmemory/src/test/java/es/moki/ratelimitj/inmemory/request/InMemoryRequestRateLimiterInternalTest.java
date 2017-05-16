@@ -1,11 +1,11 @@
-package es.moki.ratelimitj.inmemory;
+package es.moki.ratelimitj.inmemory.request;
 
 
 import com.google.common.collect.ImmutableSet;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
-import es.moki.ratelimitj.test.time.TimeBanditSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
+import es.moki.ratelimitj.test.time.TimeBanditSupplier;
 import net.jodah.expiringmap.ExpiringMap;
 import org.junit.Ignore;
 import org.junit.jupiter.api.AfterAll;
@@ -39,7 +39,8 @@ public class InMemoryRequestRateLimiterInternalTest {
         return new InMemorySlidingWindowRequestRateLimiter(expiryingKeyMap, rules, timeSupplier);
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     public void shouldEventuallyCleanUpExpiredKeys() throws Exception {
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(1, TimeUnit.SECONDS, 5));
         RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);

@@ -7,7 +7,7 @@ import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.core.time.SystemTimeSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
-import es.moki.ratelimitj.inmemory.SavedKey;
+import es.moki.ratelimitj.inmemory.request.SavedKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

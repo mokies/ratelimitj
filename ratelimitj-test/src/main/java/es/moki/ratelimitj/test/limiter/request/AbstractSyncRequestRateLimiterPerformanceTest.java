@@ -1,4 +1,4 @@
-package es.moki.ratelimitj.test;
+package es.moki.ratelimitj.test.limiter.request;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 
-public abstract class AbstractSyncRateLimiterPerformanceTest {
+public abstract class AbstractSyncRequestRateLimiterPerformanceTest {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 

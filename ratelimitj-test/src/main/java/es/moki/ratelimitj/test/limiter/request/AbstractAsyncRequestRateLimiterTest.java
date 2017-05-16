@@ -1,4 +1,4 @@
-package es.moki.ratelimitj.test;
+package es.moki.ratelimitj.test.limiter.request;
 
 import com.google.common.collect.ImmutableSet;
 import es.moki.ratelimitj.core.limiter.request.AsyncRequestRateLimiter;
@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
-public abstract class AbstractAsyncRateLimiterTest {
+public abstract class AbstractAsyncRequestRateLimiterTest {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 

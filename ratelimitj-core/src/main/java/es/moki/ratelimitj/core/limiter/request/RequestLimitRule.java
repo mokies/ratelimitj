@@ -26,7 +26,7 @@ public class RequestLimitRule {
     }
 
     /**
-     * Initialise a regular rate limit. Imagine the whole duration window as being one large bucket with a single count.
+     * Initialise a request rate limit. Imagine the whole duration window as being one large bucket with a single count.
      *
      * @param duration The time the limit will be applied over.
      * @param timeUnit The time unit.
@@ -49,7 +49,7 @@ public class RequestLimitRule {
     }
 
     /**
-     * Applies a name to the rate limit that is useful for analysis of limits.
+     * Applies a name to the rate limit that is useful for metrics.
      *
      * @param name Defines a descriptive name for the rule limit.
      * @return a limit rule

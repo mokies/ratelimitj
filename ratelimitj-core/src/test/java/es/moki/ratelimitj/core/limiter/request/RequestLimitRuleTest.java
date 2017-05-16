@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class RequestLimitRulesTest {
+public class RequestLimitRuleTest {
 
     @Test
     public void shouldHaveDuration1Seconds() {

@@ -5,7 +5,7 @@ import com.lambdaworks.redis.api.StatefulRedisConnection;
 import es.moki.ratelimitj.core.limiter.request.AsyncRequestRateLimiter;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.time.TimeSupplier;
-import es.moki.ratelimitj.test.AbstractAsyncRateLimiterTest;
+import es.moki.ratelimitj.test.limiter.request.AbstractAsyncRequestRateLimiterTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeAll;
 import java.util.Set;
 
 
-public class RedisSlidingWindowAsyncRequestRateLimiterTest extends AbstractAsyncRateLimiterTest {
+public class RedisSlidingWindowAsyncRequestRateLimiterTest extends AbstractAsyncRequestRateLimiterTest {
 
     private static RedisClient client;
     private static StatefulRedisConnection<String, String> connect;

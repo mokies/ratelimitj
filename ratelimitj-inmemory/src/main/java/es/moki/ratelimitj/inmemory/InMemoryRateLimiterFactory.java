@@ -6,6 +6,7 @@ import es.moki.ratelimitj.core.limiter.request.AsyncRequestRateLimiter;
 import es.moki.ratelimitj.core.limiter.request.ReactiveRequestRateLimiter;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
+import es.moki.ratelimitj.inmemory.request.InMemorySlidingWindowRequestRateLimiter;
 
 import java.io.IOException;
 import java.util.Set;

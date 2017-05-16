@@ -1,16 +1,16 @@
-package es.moki.ratelimitj.inmemory;
+package es.moki.ratelimitj.inmemory.request;
 
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.core.time.TimeSupplier;
-import es.moki.ratelimitj.test.AbstractSyncRateLimiterPerformanceTest;
+import es.moki.ratelimitj.test.limiter.request.AbstractSyncRequestRateLimiterPerformanceTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.util.Set;
 
 
-public class InMemorySlidingWindowSyncRequestRateLimiterPerformanceTest extends AbstractSyncRateLimiterPerformanceTest {
+public class InMemorySlidingWindowSyncRequestRequestRateLimiterPerformanceTest extends AbstractSyncRequestRateLimiterPerformanceTest {
 
 
     @BeforeAll

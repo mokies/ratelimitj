@@ -1,4 +1,4 @@
-package es.moki.ratelimitj.test;
+package es.moki.ratelimitj.test.limiter.request;
 
 import com.google.common.collect.ImmutableSet;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public abstract class AbstractReactiveRateLimiterTest {
+public abstract class AbstractReactiveRequestRateLimiterTest {
 
     private final TimeBanditSupplier timeBandit = new TimeBanditSupplier();
 
