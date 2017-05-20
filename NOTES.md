@@ -3,3 +3,4 @@ https://github.com/dudleycarr/ratelimit.js
 https://github.com/nlap/dropwizard-ratelimit/blob/master/bundle/src/main/java/ca/nlap/dropwizard/ratelimit/RateLimitBundle.java
 https://github.com/juju/ratelimit
 https://github.com/touhonoob/RateLimit
+https://stripe.com/blog/rate-limiters
