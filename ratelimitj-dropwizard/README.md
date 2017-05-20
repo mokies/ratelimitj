@@ -47,7 +47,7 @@ public class UserResource {
 
     @GET
     @Path("/{id}")
-    @RateLimited(key = Key.AUTHENTICATED_USER, rates = {@Rate(duration = 10, timeUnit = TimeUnit.HOURS, limit = 10)})
+    @RateLimited(key = Key.AUTHENTICATED, rates = {@Rate(duration = 10, timeUnit = TimeUnit.HOURS, limit = 10)})
     public Response getLimitedByAuthenticatedUser(@Auth PrincipalImpl principle, @PathParam("id") final Integer id) {
         return Response.ok().build();
     }
