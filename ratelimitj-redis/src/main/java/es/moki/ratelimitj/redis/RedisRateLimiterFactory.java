@@ -2,22 +2,18 @@ package es.moki.ratelimitj.redis;
 
 import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.api.StatefulRedisConnection;
+import es.moki.ratelimitj.core.limiter.request.AbstractRequestRateLimiterFactory;
 import es.moki.ratelimitj.core.limiter.request.AsyncRequestRateLimiter;
 import es.moki.ratelimitj.core.limiter.request.ReactiveRequestRateLimiter;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
-import es.moki.ratelimitj.core.limiter.request.RequestRateLimiterFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
-public class RedisRateLimiterFactory implements RequestRateLimiterFactory {
-
-    private static final Logger LOG = LoggerFactory.getLogger(RedisRateLimiterFactory.class);
+public class RedisRateLimiterFactory extends AbstractRequestRateLimiterFactory<RedisSlidingWindowRequestRateLimiter> {
 
     private final RedisClient client;
     private StatefulRedisConnection<String, String> connection;
@@ -28,21 +24,20 @@ public class RedisRateLimiterFactory implements RequestRateLimiterFactory {
 
     @Override
     public RequestRateLimiter getInstance(Set<RequestLimitRule> rules) {
-        return create(rules);
+        return lookupInstance(rules);
     }
 
     @Override
     public AsyncRequestRateLimiter getInstanceAsync(Set<RequestLimitRule> rules) {
-        return create(rules);
+        return lookupInstance(rules);
     }
 
     @Override
     public ReactiveRequestRateLimiter getInstanceReactive(Set<RequestLimitRule> rules) {
-        return create(rules);
+        return lookupInstance(rules);
     }
 
-    private RedisSlidingWindowRequestRateLimiter create(Set<RequestLimitRule> rules) {
-        LOG.info("creating new RedisSlidingWindowRequestRateLimiter");
+    protected RedisSlidingWindowRequestRateLimiter create(Set<RequestLimitRule> rules) {
         return new RedisSlidingWindowRequestRateLimiter(getConnection(), rules);
     }
 

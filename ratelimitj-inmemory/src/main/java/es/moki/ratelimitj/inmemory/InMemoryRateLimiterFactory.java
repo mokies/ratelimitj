@@ -1,24 +1,19 @@
 package es.moki.ratelimitj.inmemory;
 
 
+import es.moki.ratelimitj.core.limiter.request.AbstractRequestRateLimiterFactory;
 import es.moki.ratelimitj.core.limiter.request.AsyncRequestRateLimiter;
 import es.moki.ratelimitj.core.limiter.request.ReactiveRequestRateLimiter;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
-import es.moki.ratelimitj.core.limiter.request.RequestRateLimiterFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Set;
 
-public class InMemoryRateLimiterFactory implements RequestRateLimiterFactory {
-
-    private static final Logger LOG = LoggerFactory.getLogger(InMemoryRateLimiterFactory.class);
+public class InMemoryRateLimiterFactory extends AbstractRequestRateLimiterFactory<InMemorySlidingWindowRequestRateLimiter> {
 
     @Override
     public RequestRateLimiter getInstance(Set<RequestLimitRule> rules) {
-        LOG.info("creating new InMemorySlidingWindowRequestRateLimiter");
         return lookupInstance(rules);
     }
 
@@ -32,7 +27,8 @@ public class InMemoryRateLimiterFactory implements RequestRateLimiterFactory {
         throw new RuntimeException("In memory reactive not yet implemented");
     }
 
-    private RequestRateLimiter lookupInstance(Set<RequestLimitRule> rules) {
+    @Override
+    protected InMemorySlidingWindowRequestRateLimiter create(Set<RequestLimitRule> rules) {
         return new InMemorySlidingWindowRequestRateLimiter(rules);
     }
 

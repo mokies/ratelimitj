@@ -86,5 +86,25 @@ public class RequestLimitRule {
         return limit;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
+        RequestLimitRule that = (RequestLimitRule) o;
+
+        if (durationSeconds != that.durationSeconds) return false;
+        if (limit != that.limit) return false;
+        if (precision != null ? !precision.equals(that.precision) : that.precision != null) return false;
+        return name != null ? name.equals(that.name) : that.name == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = durationSeconds;
+        result = 31 * result + (int) (limit ^ (limit >>> 32));
+        result = 31 * result + (precision != null ? precision.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        return result;
+    }
 }
