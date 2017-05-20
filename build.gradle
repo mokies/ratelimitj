@@ -102,7 +102,7 @@ configure([project(':ratelimitj-redis'), project(':ratelimitj-inmemory'), projec
         apply plugin: 'maven'
 
         project.group = 'es.moki.ratelimitj'
-        project.version = '0.3.2'
+        project.version = '0.3.3'
 
         // Signature of artifacts
         signing {
