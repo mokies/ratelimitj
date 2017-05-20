@@ -43,15 +43,15 @@ Example for Maven:
 
 | Feature       | Status      |
 | ------------- |-------------| 
-| Redis sliding window rate limiter | Stable |
-| Dropwizard integration - Bundle | Stable |
-| Hazelcast sliding window rate limiter | Development |
-| In-memory sliding window rate limiter | Development |
+| Redis sliding window rate limiter | production |
+| Dropwizard integration - Bundle | stable |
+| Hazelcast sliding window rate limiter | development |
+| In-memory sliding window rate limiter | development |
 | Better metrics logging | not started |
-| Rate limiting toggles (dark launch) for framework integration | Beta |
-| Whitelisting & blacklisting of keys | not started |
-| Rate limit HTTP header responses | not started |
-| Spring integration | not started |
+| Rate limiting toggles (dark launch) for framework integration | beta |
+| Whitelisting & blacklisting of keys | back log |
+| Rate limit HTTP header responses | back log |
+| Spring integration | back log |
 
 #### Credits
 This library was inspired by the following articles on sliding window rate limiting with Redis:
