@@ -10,17 +10,21 @@ import org.glassfish.jersey.server.model.AnnotatedMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Priority(Priorities.AUTHENTICATION + 1)
 public class RateLimit429EnforcerFilter implements ContainerRequestFilter {
 
     private static final int HTTP_STATUS_TOO_MANY_REQUESTS = 429;
@@ -36,6 +40,9 @@ public class RateLimit429EnforcerFilter implements ContainerRequestFilter {
     @Context
     private ResourceInfo resource;
 
+    @Context
+    private SecurityContext securityContext;
+
     @Override
     public void filter(final ContainerRequestContext requestContext) throws IOException {
 
@@ -45,7 +52,7 @@ public class RateLimit429EnforcerFilter implements ContainerRequestFilter {
         RequestRateLimiter rateLimit = factory.getInstance(toLimitRules(rateLimited));
         KeyProvider keyProvider = rateLimited.key();
 
-        String key = keyProvider.create(request, resource);
+        String key = keyProvider.create(request, resource, securityContext);
         boolean overLimit = rateLimit.overLimit(key);
         if (overLimit) {
             if (!rateLimited.reportOnly()) {
