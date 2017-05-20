@@ -1,8 +1,10 @@
 package es.moki.ratelimij.dropwizard.component.app.api;
 
-import es.moki.ratelimij.dropwizard.filter.Key;
-import es.moki.ratelimij.dropwizard.annotation.RateLimited;
 import es.moki.ratelimij.dropwizard.annotation.Rate;
+import es.moki.ratelimij.dropwizard.annotation.RateLimited;
+import es.moki.ratelimij.dropwizard.filter.Key;
+import io.dropwizard.auth.Auth;
+import io.dropwizard.auth.PrincipalImpl;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -17,9 +19,16 @@ import java.util.concurrent.TimeUnit;
 public class UserResource {
 
     @GET
-    @Path("/{id}")
-    @RateLimited(key = Key.DEFAULT, rates = {@Rate(duration = 10, timeUnit = TimeUnit.HOURS, limit = 5)})
-    public Response get(@PathParam("id") final Integer id) {
+    @Path("/{id}/default")
+    @RateLimited(key = Key.ANY, rates = {@Rate(duration = 10, timeUnit = TimeUnit.HOURS, limit = 5)})
+    public Response getLimitedByDefault(@PathParam("id") final Integer id) {
+        return Response.ok().build();
+    }
+
+    @GET
+    @Path("/{id}/authenticated")
+    @RateLimited(key = Key.AUTHENTICATED, rates = {@Rate(duration = 10, timeUnit = TimeUnit.HOURS, limit = 10)})
+    public Response getLimitedByAuthenticatedUser(@Auth PrincipalImpl principle, @PathParam("id") final Integer id) {
         return Response.ok().build();
     }
 }

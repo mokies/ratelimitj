@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import java.util.stream.IntStream;
 
@@ -24,7 +25,7 @@ public class DropwizardRateLimitComponentTest {
     @ClassRule
     public static final DropwizardAppRule<Configuration> RULE =
             new DropwizardAppRule<>(RateLimitApplication.class, ResourceHelpers.resourceFilePath("ratelimit-app.yml"));
-
+    
 //    @BeforeAll
 //    public static void beforeAll() {
 //        client = RedisClient.create("redis://localhost");
@@ -49,7 +50,7 @@ public class DropwizardRateLimitComponentTest {
         final RestClient client = new RestClient();
 
         IntStream.rangeClosed(1, 2)
-                .forEach(i -> assertThat(client.get().getStatus()).isEqualTo(200));
+                .forEach(i -> assertThat(client.getLimitedByDefault().getStatus()).isEqualTo(200));
 
         IntStream.rangeClosed(1, 5)
                 .forEach(i -> assertThat(client.login().getStatus()).isEqualTo(200));
@@ -57,9 +58,19 @@ public class DropwizardRateLimitComponentTest {
         assertThat(client.login().getStatus()).isEqualTo(429);
 
         IntStream.rangeClosed(1, 3)
-                .forEach(i -> assertThat(client.get().getStatus()).isEqualTo(200));
+                .forEach(i -> assertThat(client.getLimitedByDefault().getStatus()).isEqualTo(200));
 
-        assertThat(client.get().getStatus()).isEqualTo(429);
+        assertThat(client.getLimitedByDefault().getStatus()).isEqualTo(429);
+    }
+
+    @Test
+    public void shouldLimitAuthenticatedUser() {
+        final RestClient client = new RestClient();
+
+        IntStream.rangeClosed(1, 10)
+                .forEach(i -> assertThat(client.getLimitedByAuthenticatedUser().getStatus()).isEqualTo(200));
+
+        assertThat(client.getLimitedByAuthenticatedUser().getStatus()).isEqualTo(429);
     }
 
     private static class RestClient {
@@ -73,13 +84,23 @@ public class DropwizardRateLimitComponentTest {
                     .post(Entity.json(loginForm()));
         }
 
-        Response get() {
+        Response getLimitedByDefault() {
             return client.target(
-                    String.format("http://localhost:%d/application/user/{id}", RULE.getLocalPort()))
+                    String.format("http://localhost:%d/application/user/{id}/default", RULE.getLocalPort()))
                     .resolveTemplate("id", 1)
                     .request()
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer secret")
                     .get();
         }
+
+        Response getLimitedByAuthenticatedUser() {
+               return client.target(
+                       String.format("http://localhost:%d/application/user/{id}/authenticated", RULE.getLocalPort()))
+                       .resolveTemplate("id", 1)
+                       .request()
+                       .header(HttpHeaders.AUTHORIZATION, "Bearer secret")
+                       .get();
+           }
 
         private LoginRequest loginForm() {
             return new LoginRequest("heisenberg", "abc123");

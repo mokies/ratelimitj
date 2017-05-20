@@ -21,6 +21,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -52,16 +53,21 @@ public class RateLimit429EnforcerFilter implements ContainerRequestFilter {
         RequestRateLimiter rateLimit = factory.getInstance(toLimitRules(rateLimited));
         KeyProvider keyProvider = rateLimited.key();
 
-        String key = keyProvider.create(request, resource, securityContext);
-        boolean overLimit = rateLimit.overLimit(key);
-        if (overLimit) {
-            if (!rateLimited.reportOnly()) {
-                LOG.info("rate-limit key '{}' over limit. HTTP Status 429 returned.", key);
-                requestContext.abortWith(Response.status(HTTP_STATUS_TOO_MANY_REQUESTS).build());
-            } else {
-                LOG.info("rate-limit key '{}' over limit. ReportOnly is true, no action taken.", key);
+        Optional<String> key = keyProvider.create(request, resource, securityContext);
+
+        if (key.isPresent()) {
+            boolean overLimit = rateLimit.overLimit(key.get());
+            if (overLimit) {
+                if (!rateLimited.reportOnly()) {
+                    LOG.info("rate-limit key '{}' over limit. HTTP Status 429 returned.", key);
+                    requestContext.abortWith(Response.status(HTTP_STATUS_TOO_MANY_REQUESTS).build());
+                } else {
+                    LOG.info("rate-limit key '{}' over limit. ReportOnly is true, no action taken.", key);
+                }
+                LOG.debug("rate-limit key '{}' under limit.", key);
             }
-            LOG.debug("rate-limit key '{}' under limit.", key);
+        }  else {
+            LOG.warn("No key was provided by the key provide '{}'", keyProvider.getClass());
         }
     }
 

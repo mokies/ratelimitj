@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class LoginResource {
 
     @POST
-    @RateLimited(key = Key.DEFAULT, rates = {
+    @RateLimited(key = Key.ANY, rates = {
             @Rate(duration = 10, timeUnit = TimeUnit.HOURS, limit = 5)})
     public Response login(final LoginRequest login) {
         return Response.ok().build();

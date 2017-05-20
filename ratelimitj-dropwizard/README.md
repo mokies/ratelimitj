@@ -39,25 +39,23 @@ public class RateLimitApplication extends Application<Configuration> {
 }
 ```
 
-#### Basic Usage Example
+#### Dropwizard Authenticated User Usage Example
 ```java
-@Path("/login")
+@Path("/user")
 @Consumes(MediaType.APPLICATION_JSON)
-public class LoginResource {
+public class UserResource {
 
-    @POST
-    @RateLimited(
-            key = Key.DEFAULT, 
-            rates = { @Rate(duration = 10, timeUnit = TimeUnit.HOURS, limit = 5) })
-    public Response login(final LoginRequest login) {
-
+    @GET
+    @Path("/{id}")
+    @RateLimited(key = Key.AUTHENTICATED_USER, rates = {@Rate(duration = 10, timeUnit = TimeUnit.HOURS, limit = 10)})
+    public Response getLimitedByAuthenticatedUser(@Auth PrincipalImpl principle, @PathParam("id") final Integer id) {
         return Response.ok().build();
     }
 }
 ```
 
 #### Dark Launch
-When introducing rate limits to a production environment it can be helpful to first evaluate request patterns to avoid over limiting.
+When introducing rate limiters to a production environment it can be helpful to first evaluate request patterns to avoid over limiting.
 To disable enforcement include the 'reportOnly = true' on the @RateLimit annotation.
 
 ```java

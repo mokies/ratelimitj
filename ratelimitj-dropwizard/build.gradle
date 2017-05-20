@@ -2,14 +2,15 @@ description 'RateLimitJ Dropwizard'
 
 project.ext.release = true
 
-ext.dropWizardVersion = '1.1.1'
+ext.dropWizardVersion = '1.1.0'
 
 dependencies {
 
     compile(
             project(':ratelimitj-core'),
             "io.dropwizard:dropwizard-core:${dropWizardVersion}",
-            "io.dropwizard:dropwizard-jersey:${dropWizardVersion}"
+            "io.dropwizard:dropwizard-jersey:${dropWizardVersion}",
+            "io.dropwizard:dropwizard-auth:${dropWizardVersion}"
     )
 
    	testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"

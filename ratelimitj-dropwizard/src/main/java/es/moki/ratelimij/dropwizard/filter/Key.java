@@ -14,23 +14,52 @@ import static java.util.Objects.isNull;
 public enum Key implements KeyProvider {
 
     /**
-     * The default key will use the first of authenticated Principle (dropwizard auth), X-Forwarded-For eader
+     * The default key will be the concatenation of the resource name and the first of Authenticated Principle (dropwizard auth), X-Forwarded-For eader
      * or HTTPServlet Remote Address IP as the rate limit key.
      */
-    DEFAULT {
+    ANY {
         @Override
-        public String create(final HttpServletRequest request,
-                             final ResourceInfo resource,
-                             final SecurityContext securityContext) {
-            return "rlj:" + resourceKey(resource) + ":" + requestKey(request, securityContext);
+        public Optional<String> create(final HttpServletRequest request,
+                                       final ResourceInfo resource,
+                                       final SecurityContext securityContext) {
+            return requestKey(request, securityContext)
+                    .map(requestKey -> "rlj:" + resourceKey(resource) + ":" + requestKey);
         }
 
-        private String requestKey(final HttpServletRequest request, final SecurityContext securityContext) {
+        private Optional<String> requestKey(final HttpServletRequest request, final SecurityContext securityContext) {
             return selectOptional(
                     () -> userRequestKey(securityContext),
                     () -> xForwardedForRequestKey(request),
-                    () -> ipRequestKey(request))
-                    .orElse("NO_REQUEST_KEY");
+                    () -> ipRequestKey(request));
+        }
+    },
+
+    /**
+     * The default key will be the concatenation of the resource name and Dropwizard authenticated principle.
+     */
+    AUTHENTICATED {
+        @Override
+        public Optional<String> create(final HttpServletRequest request,
+                                       final ResourceInfo resource,
+                                       final SecurityContext securityContext) {
+            return requestKey(securityContext)
+                    .map(requestKey -> "rlj:" + resourceKey(resource) + ":" + requestKey);
+        }
+
+        private Optional<String> requestKey(final SecurityContext securityContext) {
+            return userRequestKey(securityContext);
+        }
+    },
+
+    /**
+     * The default key will be the of the resource name
+     */
+    RESOURCE {
+        @Override
+        public Optional<String> create(final HttpServletRequest request,
+                                       final ResourceInfo resource,
+                                       final SecurityContext securityContext) {
+            return Optional.of("rlj:" + resourceKey(resource));
         }
     };
 
