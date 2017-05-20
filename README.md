@@ -46,7 +46,7 @@ Example for Maven:
 | Redis sliding window rate limiter | production |
 | Dropwizard integration - Bundle | stable |
 | Hazelcast sliding window rate limiter | development |
-| In-memory sliding window rate limiter | development |
+| In-memory sliding window rate limiter | beta |
 | Better metrics logging | not started |
 | Rate limiting toggles (dark launch) for framework integration | beta |
 | Whitelisting & blacklisting of keys | back log |
