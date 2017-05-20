@@ -30,12 +30,6 @@ public class RateLimitApplication extends Application<Configuration> {
 
         bootstrap.addBundle(new RateLimitBundle(factory));
     }
-
-    @Override
-    public void run(Configuration configuration, Environment environment) throws Exception {
-
-        environment.jersey().register(new LoginResource());
-    }
 }
 ```
 
