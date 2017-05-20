@@ -14,7 +14,7 @@ import static java.util.Objects.isNull;
 public enum Key implements KeyProvider {
 
     /**
-     * The default key will be the concatenation of the resource name and the first of Authenticated Principle (dropwizard auth), X-Forwarded-For eader
+     * The 'any' key will be the concatenation of the resource name and the first of Authenticated Principle (dropwizard auth), X-Forwarded-For eader
      * or HTTPServlet Remote Address IP as the rate limit key.
      */
     ANY {
@@ -23,7 +23,7 @@ public enum Key implements KeyProvider {
                                        final ResourceInfo resource,
                                        final SecurityContext securityContext) {
             return requestKey(request, securityContext)
-                    .map(requestKey -> "rlj:" + resourceKey(resource) + ":" + requestKey);
+                    .map(requestKey -> combinedKey(resource, requestKey));
         }
 
         private Optional<String> requestKey(final HttpServletRequest request, final SecurityContext securityContext) {
@@ -35,7 +35,7 @@ public enum Key implements KeyProvider {
     },
 
     /**
-     * The default key will be the concatenation of the resource name and Dropwizard authenticated principle.
+     * The 'authenticated' key will be the concatenation of the resource name and Dropwizard authenticated principle.
      */
     AUTHENTICATED {
         @Override
@@ -43,11 +43,30 @@ public enum Key implements KeyProvider {
                                        final ResourceInfo resource,
                                        final SecurityContext securityContext) {
             return requestKey(securityContext)
-                    .map(requestKey -> "rlj:" + resourceKey(resource) + ":" + requestKey);
+                    .map(requestKey -> combinedKey(resource, requestKey));
         }
 
         private Optional<String> requestKey(final SecurityContext securityContext) {
             return userRequestKey(securityContext);
+        }
+    },
+
+    /**
+     * The 'IP' key will be the concatenation of the resource name and IP (X-Forwarded-For or servlet remote address).
+     */
+    IP {
+        @Override
+        public Optional<String> create(final HttpServletRequest request,
+                                       final ResourceInfo resource,
+                                       final SecurityContext securityContext) {
+            return requestKey(request)
+                    .map(requestKey -> combinedKey(resource, requestKey));
+        }
+
+        private Optional<String> requestKey(final HttpServletRequest request) {
+            return selectOptional(
+                    () -> xForwardedForRequestKey(request),
+                    () -> ipRequestKey(request));
         }
     },
 
@@ -65,7 +84,11 @@ public enum Key implements KeyProvider {
 
     private static final String X_FORWARDED_FOR = "X-Forwarded-For";
 
-    private static String resourceKey(final ResourceInfo resource) {
+    private static String combinedKey(ResourceInfo resource, String requestKey) {
+        return "rlj:" + resourceKey(resource) + ":" + requestKey;
+    }
+
+    private static String resourceKey(ResourceInfo resource) {
         return resource.getResourceClass().getTypeName()
                 + "#" + resource.getResourceMethod().getName();
     }

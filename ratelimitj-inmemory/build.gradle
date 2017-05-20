@@ -1,5 +1,7 @@
 description 'RateLimitJ Hazelcast'
 
+project.ext.release = true
+
 dependencies {
 
     implementation(
