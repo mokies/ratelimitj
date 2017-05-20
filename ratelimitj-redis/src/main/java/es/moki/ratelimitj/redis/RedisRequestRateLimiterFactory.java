@@ -24,17 +24,17 @@ public class RedisRequestRateLimiterFactory implements RequestRateLimiterFactory
 
     @Override
     public RequestRateLimiter getInstance(Set<RequestLimitRule> rules) {
-        return new RedisSlidingWindowRequestRequestRequestRateLimiter(getConnection(), rules);
+        return new RedisSlidingWindowRequestRateLimiter(getConnection(), rules);
     }
 
     @Override
     public AsyncRequestRateLimiter getInstanceAsync(Set<RequestLimitRule> rules) {
-        return new RedisSlidingWindowRequestRequestRequestRateLimiter(getConnection(), rules);
+        return new RedisSlidingWindowRequestRateLimiter(getConnection(), rules);
     }
 
     @Override
     public ReactiveRequestRateLimiter getInstanceReactive(Set<RequestLimitRule> rules) {
-        return new RedisSlidingWindowRequestRequestRequestRateLimiter(getConnection(), rules);
+        return new RedisSlidingWindowRequestRateLimiter(getConnection(), rules);
     }
 
     @Override

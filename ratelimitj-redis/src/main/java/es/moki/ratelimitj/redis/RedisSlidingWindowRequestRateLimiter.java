@@ -21,9 +21,9 @@ import static com.lambdaworks.redis.ScriptOutputType.VALUE;
 import static java.util.Objects.requireNonNull;
 
 @ThreadSafe
-public class RedisSlidingWindowRequestRequestRequestRateLimiter implements RequestRateLimiter, AsyncRequestRateLimiter, ReactiveRequestRateLimiter {
+public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter, AsyncRequestRateLimiter, ReactiveRequestRateLimiter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RedisSlidingWindowRequestRequestRequestRateLimiter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RedisSlidingWindowRequestRateLimiter.class);
 
     private final LimitRuleJsonSerialiser serialiser = new LimitRuleJsonSerialiser();
 
@@ -32,11 +32,11 @@ public class RedisSlidingWindowRequestRequestRequestRateLimiter implements Reque
     private final String rulesJson;
     private final TimeSupplier timeSupplier;
 
-    public RedisSlidingWindowRequestRequestRequestRateLimiter(StatefulRedisConnection<String, String> connection, Set<RequestLimitRule> rules) {
+    public RedisSlidingWindowRequestRateLimiter(StatefulRedisConnection<String, String> connection, Set<RequestLimitRule> rules) {
         this(connection, rules, new SystemTimeSupplier());
     }
 
-    public RedisSlidingWindowRequestRequestRequestRateLimiter(StatefulRedisConnection<String, String> connection, Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
+    public RedisSlidingWindowRequestRateLimiter(StatefulRedisConnection<String, String> connection, Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
         this.connection = connection;
         scriptLoader = new RedisScriptLoader(connection, "sliding-window-ratelimit.lua");
         rulesJson = serialiserLimitRules(rules);

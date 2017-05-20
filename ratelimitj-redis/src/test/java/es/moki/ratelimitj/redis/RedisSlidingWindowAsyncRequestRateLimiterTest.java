@@ -39,6 +39,6 @@ public class RedisSlidingWindowAsyncRequestRateLimiterTest extends AbstractAsync
 
     @Override
     protected AsyncRequestRateLimiter getAsyncRateLimiter(Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
-        return new RedisSlidingWindowRequestRequestRequestRateLimiter(connect, rules, timeSupplier);
+        return new RedisSlidingWindowRequestRateLimiter(connect, rules, timeSupplier);
     }
 }
