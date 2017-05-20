@@ -7,7 +7,7 @@ import es.moki.ratelimij.dropwizard.component.app.api.LoginResource;
 import es.moki.ratelimij.dropwizard.component.app.api.UserResource;
 import es.moki.ratelimij.dropwizard.component.app.auth.TestOAuthAuthenticator;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiterFactory;
-import es.moki.ratelimitj.redis.RedisRequestRateLimiterFactory;
+import es.moki.ratelimitj.inmemory.InMemoryRateLimiterFactory;
 import io.dropwizard.Application;
 import io.dropwizard.Configuration;
 import io.dropwizard.auth.AuthDynamicFeature;
@@ -25,7 +25,9 @@ public class RateLimitApplication extends Application<Configuration> {
 
     public void initialize(Bootstrap<Configuration> bootstrap) {
         redisClient = RedisClient.create("redis://localhost");
-        RequestRateLimiterFactory factory = new RedisRequestRateLimiterFactory(redisClient);
+//        RequestRateLimiterFactory factory = new RedisRateLimiterFactory(redisClient);
+
+        RequestRateLimiterFactory factory = new InMemoryRateLimiterFactory();
 
         bootstrap.addBundle(new RateLimitBundle(factory));
     }
