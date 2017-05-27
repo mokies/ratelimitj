@@ -62,7 +62,7 @@ subprojects {
             assertj: 'org.assertj:assertj-core:3.7.0',
             junit  : "org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion",
             mockito: 'org.mockito:mockito-core:2.8.9',
-            guava  : 'com.google.guava:guava:21.0',
+            guava  : 'com.google.guava:guava:22.0',
             logback: 'ch.qos.logback:logback-classic:1.2.3',
             findbugs: 'com.google.code.findbugs:jsr305:3.0.2'
     ]
