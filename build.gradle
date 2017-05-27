@@ -59,7 +59,7 @@ subprojects {
 
     ext.libraries = [
             slf4j  : 'org.slf4j:slf4j-api:1.7.25',
-            assertj: 'org.assertj:assertj-core:3.7.0',
+            assertj: 'org.assertj:assertj-core:3.8.0',
             junit  : "org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion",
             mockito: 'org.mockito:mockito-core:2.8.9',
             guava  : 'com.google.guava:guava:22.0',
