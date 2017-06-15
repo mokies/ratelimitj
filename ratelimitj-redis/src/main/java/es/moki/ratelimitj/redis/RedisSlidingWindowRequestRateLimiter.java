@@ -83,7 +83,7 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
     @Override
     public boolean overLimit(String key, int weight) {
         try {
-            return overLimitAsync(key, weight).toCompletableFuture().get(10, TimeUnit.SECONDS);
+            return atOrOverLimitAsync(key, weight, false).toCompletableFuture().get(10, TimeUnit.SECONDS);
         } catch (Exception e) {
             throw new RuntimeException("Failed to determine overLimit", e);
         }
@@ -91,7 +91,11 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
 
     @Override
     public boolean atLimit(String key) {
-        return false; // TODO
+        try {
+            return atOrOverLimitAsync(key, 0, true).toCompletableFuture().get(10, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to determine overLimit", e);
+        }
     }
 
     @Override
@@ -118,5 +122,21 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
         return Mono.fromFuture(resetLimitAsync(key).toCompletableFuture());
     }
 
+    private CompletionStage<Boolean> atOrOverLimitAsync(String key, int weight, boolean checkAtLimitOnly) {
+        requireNonNull(key);
 
+        LOG.debug("overLimit for key '{}' of weight {}", key, weight);
+
+        String sha = scriptLoader.scriptSha();
+
+        return timeSupplier.getAsync().thenCompose(time ->
+                connection.async().evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight), checkAtLimitOnly ? "1" : "0")
+        ).thenApply(result -> {
+            boolean overLimit = "1".equals(result);
+            LOG.debug("over limit {}", overLimit);
+            return overLimit;
+        });
+
+        // TODO handle scenario where script is not loaded, flush scripts and test scenario
+    }
 }

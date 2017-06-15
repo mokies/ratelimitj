@@ -3,6 +3,7 @@
 local limits = cjson.decode(ARGV[1])
 local now = tonumber(ARGV[2])
 local weight = tonumber(ARGV[3] or '1')
+local check_at_limit_only = tonumber(ARGV[4] or '0') == 1
 local longest_duration = limits[1][1] or 0
 local saved_keys = {}
 
@@ -48,10 +49,18 @@ for i, limit in ipairs(limits) do
             cur = redis.call('HGET', key, saved.count_key)
         end
         -- check our limits
-        if tonumber(cur or '0') + weight > limit[2] then
-            return '1'
+        local count = tonumber(cur or '0') + weight
+        if count > limit[2] then
+            return '1' -- over limit
+        elseif check_at_limit_only and count == limit[2] then
+            return '1' -- at limit
         end
     end
+end
+
+-- Not asked to update and not at limit
+if check_at_limit_only then
+    return '0'
 end
 
 -- there is enough resources, update the counts
