@@ -46,12 +46,12 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
     // TODO support muli keys
     @Override
     public boolean overLimit(String key, int weight) {
-        return eqOrGeLimit(key, weight, false);
+        return eqOrGeLimit(key, weight,false);
     }
 
     @Override
     public boolean geLimit(String key, int weight) {
-        return eqOrGeLimit(key, 0, true);
+        return eqOrGeLimit(key, weight,true);
     }
 
     @Override

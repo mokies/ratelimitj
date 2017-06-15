@@ -92,7 +92,7 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
     @Override
     public boolean geLimit(String key, int weight) {
         try {
-            return eqOrGeLimitAsync(key, 0, false).toCompletableFuture().get(10, TimeUnit.SECONDS);
+            return eqOrGeLimitAsync(key, weight, false).toCompletableFuture().get(10, TimeUnit.SECONDS);
         } catch (Exception e) {
             throw new RuntimeException("Failed to determine overLimit", e);
         }

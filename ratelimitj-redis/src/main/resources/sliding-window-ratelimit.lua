@@ -6,6 +6,7 @@ local weight = tonumber(ARGV[3] or '1')
 local strictly_greater = tonumber(ARGV[4] or '1') == 1
 local longest_duration = limits[1][1] or 0
 local saved_keys = {}
+local ge_limit = '0'
 
 -- handle cleanup and limit checks
 for i, limit in ipairs(limits) do
@@ -44,16 +45,19 @@ for i, limit in ipairs(limits) do
         local cur
         if #dele > 0 then
             redis.call('HDEL', key, unpack(dele))
-            cur = redis.call('HINCRBY', key, saved.count_key, -decr)
+            -- Guard against "-0" => "ERR value is not an integer or out of range"
+            if decr ~= 0 then
+                cur = redis.call('HINCRBY', key, saved.count_key, -decr)
+            end
         else
             cur = redis.call('HGET', key, saved.count_key)
         end
         -- check our limits
         local count = tonumber(cur or '0') + weight
         if count > limit[2] then
-            return '1' -- over limit
+            return '1' -- over limit, don't record request
         elseif count == limit[2] and not strictly_greater then
-            return '1' -- at limit
+            ge_limit = '1' -- at limit, do record request
         end
     end
 end
@@ -76,4 +80,4 @@ if longest_duration > 0 then
         redis.call('EXPIRE', key, longest_duration)
     end
 end
-return '0'
+return ge_limit

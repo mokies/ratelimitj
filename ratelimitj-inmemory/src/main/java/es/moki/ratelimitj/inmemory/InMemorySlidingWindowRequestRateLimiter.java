@@ -54,12 +54,12 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
     // TODO support muli keys
     @Override
     public boolean overLimit(String key, int weight) {
-        return eqOrGeLimit(key, weight, true);
+        return eqOrGeLimit(key, weight,true);
     }
 
     @Override
     public boolean geLimit(String key, int weight) {
-        return eqOrGeLimit(key, 0, false);
+        return eqOrGeLimit(key, weight, false);
     }
 
     @Override
@@ -92,6 +92,7 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
         List<SavedKey> savedKeys = new ArrayList<>(rules.size());
 
         Map<String, Long> keyMap = getMap(key, longestDurationSeconds);
+        boolean geLimit = false;
 
         // TODO perform each rule calculation in parallel
         for (RequestLimitRule rule : rules) {
@@ -134,9 +135,9 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
             // check our limits
             long count = coalesce(cur, 0L) + weight;
             if (count > rule.getLimit()) {
-                return true; // over limit
+                return true; // over limit, don't record request
             } else if (!strictlyGreater && count == rule.getLimit()) {
-                return true; // at limit
+                geLimit = true; // at limit, do record request
             }
         }
 
@@ -154,6 +155,6 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
             }
         }
 
-        return false;
+        return geLimit;
     }
 }
