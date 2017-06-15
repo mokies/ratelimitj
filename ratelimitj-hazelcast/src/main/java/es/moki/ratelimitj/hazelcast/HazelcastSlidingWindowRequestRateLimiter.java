@@ -46,12 +46,12 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
     // TODO support muli keys
     @Override
     public boolean overLimit(String key, int weight) {
-        return eqOrGeLimit(key, weight,false);
+        return eqOrGeLimit(key, weight, false);
     }
 
     @Override
     public boolean geLimit(String key, int weight) {
-        return eqOrGeLimit(key, weight,true);
+        return eqOrGeLimit(key, weight, true);
     }
 
     @Override
@@ -82,6 +82,7 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
         List<SavedKey> savedKeys = new ArrayList<>(rules.size());
 
         IMap<String, Long> hcKeyMap = getMap(key, longestDuration);
+        boolean geLimit = false;
 
         // TODO perform each rule calculation in parallel
         for (RequestLimitRule rule : rules) {
@@ -129,7 +130,7 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
             if (count > rule.getLimit()) {
                 return true; // over limit
             } else if (!strictlyGreater && count == rule.getLimit()) {
-                return true; // at limit
+                geLimit = true; // at limit, do record request
             }
         }
 
@@ -145,6 +146,6 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
 
         }
 
-        return false;
+        return geLimit;
     }
 }

@@ -54,7 +54,7 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
     // TODO support muli keys
     @Override
     public boolean overLimit(String key, int weight) {
-        return eqOrGeLimit(key, weight,true);
+        return eqOrGeLimit(key, weight, true);
     }
 
     @Override
