@@ -46,12 +46,12 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
     // TODO support muli keys
     @Override
     public boolean overLimit(String key, int weight) {
-        return atOrOverLimit(key, weight, false);
+        return eqOrGeLimit(key, weight, false);
     }
 
     @Override
-    public boolean atLimit(String key) {
-        return atOrOverLimit(key, 0, true);
+    public boolean geLimit(String key, int weight) {
+        return eqOrGeLimit(key, 0, true);
     }
 
     @Override
@@ -68,7 +68,7 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
         return hz.getMap(key);
     }
 
-    private boolean atOrOverLimit(String key, int weight, boolean checkAtLimitOnly) {
+    private boolean eqOrGeLimit(String key, int weight, boolean strictlyGreater) {
 
         requireNonNull(key, "key cannot be null");
         requireNonNull(rules, "rules cannot be null");
@@ -128,14 +128,9 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
             long count = Optional.ofNullable(cur).orElse(0L) + weight;
             if (count > rule.getLimit()) {
                 return true; // over limit
-            } else if (checkAtLimitOnly && count == rule.getLimit()) {
+            } else if (!strictlyGreater && count == rule.getLimit()) {
                 return true; // at limit
             }
-        }
-
-        // Not asked to update and not at limit
-        if (checkAtLimitOnly) {
-            return false;
         }
 
         // there is enough resources, update the counts

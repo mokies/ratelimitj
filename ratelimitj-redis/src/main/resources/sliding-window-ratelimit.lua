@@ -3,7 +3,7 @@
 local limits = cjson.decode(ARGV[1])
 local now = tonumber(ARGV[2])
 local weight = tonumber(ARGV[3] or '1')
-local check_at_limit_only = tonumber(ARGV[4] or '0') == 1
+local strictly_greater = tonumber(ARGV[4] or '1') == 1
 local longest_duration = limits[1][1] or 0
 local saved_keys = {}
 
@@ -52,25 +52,20 @@ for i, limit in ipairs(limits) do
         local count = tonumber(cur or '0') + weight
         if count > limit[2] then
             return '1' -- over limit
-        elseif check_at_limit_only and count == limit[2] then
+        elseif count == limit[2] and not strictly_greater then
             return '1' -- at limit
         end
     end
 end
 
--- Not asked to update and not at limit
-if check_at_limit_only then
-    return '0'
-end
-
--- there is enough resources, update the counts
+-- there is enough resources, update the counts IFF needed
 for i, limit in ipairs(limits) do
     local saved = saved_keys[i]
     for j, key in ipairs(KEYS) do
-        -- update the current timestamp, count, and bucket count
-        redis.call('HSET', key, saved.ts_key, saved.trim_before)
-        redis.call('HINCRBY', key, saved.count_key, weight)
-        redis.call('HINCRBY', key, saved.count_key .. saved.block_id, weight)
+         -- update the current timestamp, count, and bucket count
+         redis.call('HSET', key, saved.ts_key, saved.trim_before)
+         redis.call('HINCRBY', key, saved.count_key, weight)
+         redis.call('HINCRBY', key, saved.count_key .. saved.block_id, weight)
     end
 end
 

@@ -54,12 +54,12 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
     // TODO support muli keys
     @Override
     public boolean overLimit(String key, int weight) {
-        return atOrOverLimit(key, weight, false);
+        return eqOrGeLimit(key, weight, true);
     }
 
     @Override
-    public boolean atLimit(String key) {
-        return atOrOverLimit(key, 0, true);
+    public boolean geLimit(String key, int weight) {
+        return eqOrGeLimit(key, 0, false);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
         }
     }
 
-    private boolean atOrOverLimit(String key, int weight, boolean checkAtLimitOnly) {
+    private boolean eqOrGeLimit(String key, int weight, boolean strictlyGreater) {
 
         requireNonNull(key, "key cannot be null");
         requireNonNull(rules, "rules cannot be null");
@@ -135,14 +135,9 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
             long count = coalesce(cur, 0L) + weight;
             if (count > rule.getLimit()) {
                 return true; // over limit
-            } else if (checkAtLimitOnly && count == rule.getLimit()) {
+            } else if (!strictlyGreater && count == rule.getLimit()) {
                 return true; // at limit
             }
-        }
-
-        // Not asked to update and not at limit
-        if (checkAtLimitOnly) {
-            return false;
         }
 
         // there is enough resources, update the counts

@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-//        mavenCentral()
+        mavenCentral()
         mavenLocal()
     }
     dependencies {
@@ -96,27 +96,14 @@ ext {
 
 configure([project(':ratelimitj-redis'), project(':ratelimitj-inmemory'), project(':ratelimitj-core'), project(':ratelimitj-dropwizard')]) {
 
+    apply plugin: 'signing'
     apply plugin: 'maven'
 
     project.group = 'es.moki.ratelimitj'
     project.version = '0.3.4'
 
-    uploadArchives {
-        repositories {
-            mavenLocal()
-        }
-    }
-
-    uploadArchives.dependsOn build
-
     // OSSRH publication
     if (ossrhUser != "") {
-
-        apply plugin: 'signing'
-        apply plugin: 'maven'
-
-        project.group = 'es.moki.ratelimitj'
-        project.version = '0.3.4'
 
         // Signature of artifacts
         signing {
@@ -166,8 +153,15 @@ configure([project(':ratelimitj-redis'), project(':ratelimitj-inmemory'), projec
                 }
             }
         }
-        uploadArchives.dependsOn build
+    } else {
+        uploadArchives {
+            repositories {
+                mavenLocal()
+            }
+        }
     }
+
+    uploadArchives.dependsOn build
 
 }
 
