@@ -21,6 +21,13 @@ public interface RequestRateLimiter {
     boolean overLimit(String key, int weight);
 
     /**
+     * Determine if the given key has previously reached the configured rate limit.
+     * @param key key.
+     * @return {@code true} if the key is at the limit, otherwise {@code false}
+     */
+    boolean atLimit(String key);
+
+    /**
      * Resets the accumulated rate for the given key.
      * @param key key.
      * @return {@code true} if the key existed, otherwise {@code false} .

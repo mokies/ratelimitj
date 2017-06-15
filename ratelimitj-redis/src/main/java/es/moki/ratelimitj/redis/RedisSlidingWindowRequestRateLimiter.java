@@ -90,6 +90,11 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
     }
 
     @Override
+    public boolean atLimit(String key) {
+        return false; // TODO
+    }
+
+    @Override
     public boolean resetLimit(String key) {
         try {
             return resetLimitAsync(key).toCompletableFuture().get(10, TimeUnit.SECONDS);

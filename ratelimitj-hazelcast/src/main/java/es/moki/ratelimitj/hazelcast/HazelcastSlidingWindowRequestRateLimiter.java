@@ -46,6 +46,29 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
     // TODO support muli keys
     @Override
     public boolean overLimit(String key, int weight) {
+        return atOrOverLimit(key, weight, false);
+    }
+
+    @Override
+    public boolean atLimit(String key) {
+        return atOrOverLimit(key, 0, true);
+    }
+
+    @Override
+    public boolean resetLimit(String key) {
+        throw new RuntimeException("Not implemented");
+    }
+
+    private IMap<String, Long> getMap(String key, int longestDuration) {
+
+        MapConfig mapConfig = hz.getConfig().getMapConfig(key);
+        mapConfig.setTimeToLiveSeconds(longestDuration);
+        mapConfig.setAsyncBackupCount(1);
+        mapConfig.setBackupCount(0);
+        return hz.getMap(key);
+    }
+
+    private boolean atOrOverLimit(String key, int weight, boolean checkAtLimitOnly) {
 
         requireNonNull(key, "key cannot be null");
         requireNonNull(rules, "rules cannot be null");
@@ -102,9 +125,17 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
             }
 
             // check our limits
-            if (Optional.ofNullable(cur).orElse(0L) + weight > rule.getLimit()) {
-                return true;
+            long count = Optional.ofNullable(cur).orElse(0L) + weight;
+            if (count > rule.getLimit()) {
+                return true; // over limit
+            } else if (checkAtLimitOnly && count == rule.getLimit()) {
+                return true; // at limit
             }
+        }
+
+        // Not asked to update and not at limit
+        if (checkAtLimitOnly) {
+            return false;
         }
 
         // there is enough resources, update the counts
@@ -121,19 +152,4 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
 
         return false;
     }
-
-    @Override
-    public boolean resetLimit(String key) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    private IMap<String, Long> getMap(String key, int longestDuration) {
-
-        MapConfig mapConfig = hz.getConfig().getMapConfig(key);
-        mapConfig.setTimeToLiveSeconds(longestDuration);
-        mapConfig.setAsyncBackupCount(1);
-        mapConfig.setBackupCount(0);
-        return hz.getMap(key);
-    }
-
 }

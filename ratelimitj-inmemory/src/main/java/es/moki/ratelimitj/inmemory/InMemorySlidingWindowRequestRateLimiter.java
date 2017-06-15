@@ -54,6 +54,31 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
     // TODO support muli keys
     @Override
     public boolean overLimit(String key, int weight) {
+        return atOrOverLimit(key, weight, false);
+    }
+
+    @Override
+    public boolean atLimit(String key) {
+        return atOrOverLimit(key, 0, true);
+    }
+
+    @Override
+    public boolean resetLimit(String key) {
+        return expiryingKeyMap.remove(key) != null;
+    }
+
+    private ConcurrentMap<String, Long> getMap(String key, int longestDuration) {
+        synchronized (key) {
+            ConcurrentMap<String, Long> keyMap = expiryingKeyMap.get(key);
+            if (keyMap == null) {
+                keyMap = new ConcurrentHashMap<>();
+                expiryingKeyMap.put(key, keyMap, ExpirationPolicy.CREATED, longestDuration, TimeUnit.SECONDS);
+            }
+            return keyMap;
+        }
+    }
+
+    private boolean atOrOverLimit(String key, int weight, boolean checkAtLimitOnly) {
 
         requireNonNull(key, "key cannot be null");
         requireNonNull(rules, "rules cannot be null");
@@ -107,9 +132,17 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
             }
 
             // check our limits
-            if (coalesce(cur, 0L) + weight > rule.getLimit()) {
-                return true;
+            long count = coalesce(cur, 0L) + weight;
+            if (count > rule.getLimit()) {
+                return true; // over limit
+            } else if (checkAtLimitOnly && count == rule.getLimit()) {
+                return true; // at limit
             }
+        }
+
+        // Not asked to update and not at limit
+        if (checkAtLimitOnly) {
+            return false;
         }
 
         // there is enough resources, update the counts
@@ -128,21 +161,4 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
 
         return false;
     }
-
-    @Override
-    public boolean resetLimit(String key) {
-        return expiryingKeyMap.remove(key) != null;
-    }
-
-    private ConcurrentMap<String, Long> getMap(String key, int longestDuration) {
-        synchronized (key) {
-            ConcurrentMap<String, Long> keyMap = expiryingKeyMap.get(key);
-            if (keyMap == null) {
-                keyMap = new ConcurrentHashMap<>();
-                expiryingKeyMap.put(key, keyMap, ExpirationPolicy.CREATED, longestDuration, TimeUnit.SECONDS);
-            }
-            return keyMap;
-        }
-    }
-
 }
