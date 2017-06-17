@@ -1,5 +1,7 @@
 package es.moki.ratelimitj.inmemory;
 
+import de.jkeylockmanager.manager.KeyLockManager;
+import de.jkeylockmanager.manager.KeyLockManagers;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.core.time.SystemTimeSupplier;
@@ -28,7 +30,8 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
 
     private final Set<RequestLimitRule> rules;
     private final TimeSupplier timeSupplier;
-    private final ExpiringMap<String, ConcurrentMap<String, Long>> expiryingKeyMap;
+    private final ExpiringMap<String, ConcurrentMap<String, Long>> expiringKeyMap;
+    private final KeyLockManager lockManager = KeyLockManagers.newLock();
 
     public InMemorySlidingWindowRequestRateLimiter(Set<RequestLimitRule> rules) {
         this(rules, new SystemTimeSupplier());
@@ -37,11 +40,11 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
     public InMemorySlidingWindowRequestRateLimiter(Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
         this.rules = rules;
         this.timeSupplier = timeSupplier;
-        this.expiryingKeyMap = ExpiringMap.builder().variableExpiration().build();
+        this.expiringKeyMap = ExpiringMap.builder().variableExpiration().build();
     }
 
-    InMemorySlidingWindowRequestRateLimiter(ExpiringMap<String, ConcurrentMap<String, Long>> expiryingKeyMap, Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
-        this.expiryingKeyMap = expiryingKeyMap;
+    InMemorySlidingWindowRequestRateLimiter(ExpiringMap<String, ConcurrentMap<String, Long>> expiringKeyMap, Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
+        this.expiringKeyMap = expiringKeyMap;
         this.rules = rules;
         this.timeSupplier = timeSupplier;
     }
@@ -69,18 +72,20 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
 
     @Override
     public boolean resetLimit(String key) {
-        return expiryingKeyMap.remove(key) != null;
+        return expiringKeyMap.remove(key) != null;
     }
 
     private ConcurrentMap<String, Long> getMap(String key, int longestDuration) {
-        synchronized (key) {
-            ConcurrentMap<String, Long> keyMap = expiryingKeyMap.get(key);
+
+        // Currently unable to putIfAbsent when using jodah's expiry map so will wrap in a lock
+        return lockManager.executeLocked(key, () -> {
+            ConcurrentMap<String, Long> keyMap = expiringKeyMap.get(key);
             if (keyMap == null) {
                 keyMap = new ConcurrentHashMap<>();
-                expiryingKeyMap.put(key, keyMap, ExpirationPolicy.CREATED, longestDuration, TimeUnit.SECONDS);
+                expiringKeyMap.put(key, keyMap, ExpirationPolicy.CREATED, longestDuration, TimeUnit.SECONDS);
             }
             return keyMap;
-        }
+        });
     }
 
     private boolean eqOrGeLimit(String key, int weight, boolean strictlyGreater) {
@@ -152,7 +157,7 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
             keyMap.put(savedKey.tsKey, savedKey.trimBefore);
 
             Long computedCountKeyValue = keyMap.compute(savedKey.countKey, (k, v) -> coalesce(v, 0L) + weight);
-            Long computedCountKeyBlockIdValue = keyMap.compute(savedKey.countKey + savedKey.blockId, (k, v) -> coalesce(v, 0L)+ weight);
+            Long computedCountKeyBlockIdValue = keyMap.compute(savedKey.countKey + savedKey.blockId, (k, v) -> coalesce(v, 0L) + weight);
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("{} {}={}", key, savedKey.countKey, computedCountKeyValue);

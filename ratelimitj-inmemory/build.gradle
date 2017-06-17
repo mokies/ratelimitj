@@ -1,4 +1,4 @@
-description 'RateLimitJ Hazelcast'
+description 'RateLimitJ In-memory'
 
 project.ext.release = true
 
@@ -8,6 +8,7 @@ dependencies {
             project(':ratelimitj-core'),
             libraries.slf4j,
             'net.jodah:expiringmap:0.5.8',
+            'de.jkeylockmanager:jkeylockmanager:2.1.0',
             libraries.findbugs
     )
 
