@@ -5,7 +5,6 @@ import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import es.moki.ratelimitj.test.time.TimeBanditSupplier;
-import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -29,13 +28,13 @@ public abstract class AbstractSyncRateLimiterTest {
 
         IntStream.rangeClosed(1, 5).forEach(value -> {
             timeBandit.addUnixTimeMilliSeconds(1000L);
-            assertThat(requestRateLimiter.overLimit("ip:127.0.1.5")).isFalse();
+            assertThat(requestRateLimiter.overLimit("ip:127.0.1.1")).isFalse();
         });
 
-        assertThat(requestRateLimiter.overLimit("ip:127.0.1.5")).isTrue();
+        assertThat(requestRateLimiter.overLimit("ip:127.0.1.1")).isTrue();
     }
 
-    @Test  @Ignore
+    @Test
     public void shouldGeLimitSingleWindowSync() throws Exception {
 
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 5));
@@ -43,10 +42,24 @@ public abstract class AbstractSyncRateLimiterTest {
 
         IntStream.rangeClosed(1, 4).forEach(value -> {
             timeBandit.addUnixTimeMilliSeconds(1000L);
-            assertThat(requestRateLimiter.geLimit("ip:127.0.1.8")).isFalse();
+            assertThat(requestRateLimiter.geLimit("ip:127.0.1.2")).isFalse();
         });
 
-        assertThat(requestRateLimiter.geLimit("ip:127.0.1.8")).isTrue();
+        assertThat(requestRateLimiter.geLimit("ip:127.0.1.2")).isTrue();
+    }
+
+    @Test
+    public void shouldLimitWithWeightSingleWindowSync() throws Exception {
+
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 10));
+        RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
+
+        IntStream.rangeClosed(1, 5).forEach(value -> {
+            timeBandit.addUnixTimeMilliSeconds(1000L);
+            assertThat(requestRateLimiter.overLimit("ip:127.0.1.2", 2)).isFalse();
+        });
+
+        assertThat(requestRateLimiter.overLimit("ip:127.0.1.2",2)).isTrue();
     }
 
     @Test
