@@ -37,7 +37,7 @@ public abstract class AbstractAsyncRateLimiterTest {
 
         Stream.generate(() -> "ip:127.0.0.2").limit(5).forEach(key -> {
             timeBandit.addUnixTimeMilliSeconds(1000L);
-            stageAsserts.add(rateLimiter.overLimitAsync(key)
+            stageAsserts.add(rateLimiter.overLimitOrIncrementAsync(key)
                     .thenAccept(result -> assertThat(result).isFalse()));
         });
 
@@ -45,7 +45,7 @@ public abstract class AbstractAsyncRateLimiterTest {
             stage.toCompletableFuture().get();
         }
 
-        assertThat(rateLimiter.overLimitAsync("ip:127.0.0.2").toCompletableFuture().get()).isTrue();
+        assertThat(rateLimiter.overLimitOrIncrementAsync("ip:127.0.0.2").toCompletableFuture().get()).isTrue();
     }
 
 
@@ -60,7 +60,7 @@ public abstract class AbstractAsyncRateLimiterTest {
         Stream.generate(() -> "ip:127.0.0.10").limit(5).forEach(key -> {
             timeBandit.addUnixTimeMilliSeconds(200L);
             log.debug("incrementing rate limiter");
-            stageAsserts.add(rateLimiter.overLimitAsync(key)
+            stageAsserts.add(rateLimiter.overLimitOrIncrementAsync(key)
                     .thenAccept(result -> assertThat(result).isFalse()));
         });
 
@@ -68,9 +68,9 @@ public abstract class AbstractAsyncRateLimiterTest {
             stage.toCompletableFuture().get();
         }
 
-        assertThat(rateLimiter.overLimitAsync("ip:127.0.0.10").toCompletableFuture().get()).isTrue();
+        assertThat(rateLimiter.overLimitOrIncrementAsync("ip:127.0.0.10").toCompletableFuture().get()).isTrue();
         timeBandit.addUnixTimeMilliSeconds(1000L);
-        assertThat(rateLimiter.overLimitAsync("ip:127.0.0.10").toCompletableFuture().get()).isFalse();
+        assertThat(rateLimiter.overLimitOrIncrementAsync("ip:127.0.0.10").toCompletableFuture().get()).isFalse();
     }
 
     @Test
@@ -80,13 +80,13 @@ public abstract class AbstractAsyncRateLimiterTest {
 
         String key =  "ip:127.1.0.1";
 
-        assertThat(rateLimiter.overLimitAsync(key).toCompletableFuture().get()).isFalse();
-        assertThat(rateLimiter.overLimitAsync(key).toCompletableFuture().get()).isTrue();
+        assertThat(rateLimiter.overLimitOrIncrementAsync(key).toCompletableFuture().get()).isFalse();
+        assertThat(rateLimiter.overLimitOrIncrementAsync(key).toCompletableFuture().get()).isTrue();
 
         assertThat(rateLimiter.resetLimitAsync(key).toCompletableFuture().get()).isTrue();
         assertThat(rateLimiter.resetLimitAsync(key).toCompletableFuture().get()).isFalse();
 
-        assertThat(rateLimiter.overLimitAsync(key).toCompletableFuture().get()).isFalse();
+        assertThat(rateLimiter.overLimitOrIncrementAsync(key).toCompletableFuture().get()).isFalse();
     }
 
 }

@@ -6,7 +6,9 @@ package es.moki.ratelimitj.core.limiter.request;
 public interface RequestRateLimiter {
 
     /**
-     * Determine if the given key, after incrementing by 1, has exceeded the configured rate limit.
+     * Determine if the given key, after incrementing by one, has exceeded the configured rate limit.
+     * If the limit has not been exceed the limit will be incremented by one.
+     *
      * @param key key.
      * @return {@code true} if the key is over the limit, otherwise {@code false}
      */
@@ -19,6 +21,13 @@ public interface RequestRateLimiter {
      * @return {@code true} if the key has exceeded the limit, otherwise {@code false} .
      */
     boolean overLimit(String key, int weight);
+
+    /**
+     * Determine if the given key, after incrementing by one, is &gt;= the configured rate limit.
+     * @param key key.
+     * @return {@code true} if the key is &gt;== the limit, otherwise {@code false} .
+     */
+    boolean geLimit(String key);
 
     /**
      * Determine if the given key, after incrementing by the given weight, is &gt;= the configured rate limit.

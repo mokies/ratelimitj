@@ -8,9 +8,9 @@ import reactor.core.publisher.Mono;
  */
 public interface ReactiveRequestRateLimiter {
 
-    Mono<Boolean> overLimitReactive(String key);
+    Mono<Boolean> overLimitOrIncrementReactive(String key);
 
-    Mono<Boolean> overLimitReactive(String key, int weight);
+    Mono<Boolean> overLimitOrIncrementReactive(String key, int weight);
 
     Mono<Boolean> resetLimitReactive(String key);
 }

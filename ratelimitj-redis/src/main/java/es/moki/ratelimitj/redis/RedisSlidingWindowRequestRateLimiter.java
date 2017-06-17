@@ -47,12 +47,12 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
         return serialiser.encode(rules);
     }
 
-    public CompletionStage<Boolean> overLimitAsync(String key) {
-        return overLimitAsync(key, 1);
+    public CompletionStage<Boolean> overLimitOrIncrementAsync(String key) {
+        return overLimitOrIncrementAsync(key, 1);
     }
 
     // TODO support multi keys
-    public CompletionStage<Boolean> overLimitAsync(String key, int weight) {
+    public CompletionStage<Boolean> overLimitOrIncrementAsync(String key, int weight) {
         requireNonNull(key);
 
         LOG.debug("overLimit for key '{}' of weight {}", key, weight);
@@ -90,6 +90,11 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
     }
 
     @Override
+    public boolean geLimit(String key) {
+        return geLimit(key, 1);
+    }
+
+    @Override
     public boolean geLimit(String key, int weight) {
         try {
             return eqOrGeLimitAsync(key, weight, false).toCompletableFuture().get(10, TimeUnit.SECONDS);
@@ -108,13 +113,13 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
     }
 
     @Override
-    public Mono<Boolean> overLimitReactive(String key) {
-        return Mono.fromFuture(overLimitAsync(key).toCompletableFuture());
+    public Mono<Boolean> overLimitOrIncrementReactive(String key) {
+        return Mono.fromFuture(overLimitOrIncrementAsync(key).toCompletableFuture());
     }
 
     @Override
-    public Mono<Boolean> overLimitReactive(String key, int weight) {
-        return Mono.fromFuture(overLimitAsync(key, weight).toCompletableFuture());
+    public Mono<Boolean> overLimitOrIncrementReactive(String key, int weight) {
+        return Mono.fromFuture(overLimitOrIncrementAsync(key, weight).toCompletableFuture());
     }
 
     @Override

@@ -50,6 +50,11 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
     }
 
     @Override
+    public boolean geLimit(String key) {
+        return geLimit(key, 1);
+    }
+
+    @Override
     public boolean geLimit(String key, int weight) {
         return eqOrGeLimit(key, weight, true);
     }
