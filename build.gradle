@@ -1,6 +1,7 @@
 buildscript {
     repositories {
         mavenCentral()
+        mavenLocal()
     }
     dependencies {
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
@@ -95,14 +96,14 @@ ext {
 
 configure([project(':ratelimitj-redis'), project(':ratelimitj-inmemory'), project(':ratelimitj-core'), project(':ratelimitj-dropwizard')]) {
 
+    apply plugin: 'signing'
+    apply plugin: 'maven'
+
+    project.group = 'es.moki.ratelimitj'
+    project.version = '0.3.4'
+
     // OSSRH publication
     if (ossrhUser != "") {
-
-        apply plugin: 'signing'
-        apply plugin: 'maven'
-
-        project.group = 'es.moki.ratelimitj'
-        project.version = '0.3.3'
 
         // Signature of artifacts
         signing {
@@ -152,8 +153,15 @@ configure([project(':ratelimitj-redis'), project(':ratelimitj-inmemory'), projec
                 }
             }
         }
-        uploadArchives.dependsOn build
+    } else {
+        uploadArchives {
+            repositories {
+                mavenLocal()
+            }
+        }
     }
+
+    uploadArchives.dependsOn build
 
 }
 

@@ -46,6 +46,29 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
     // TODO support muli keys
     @Override
     public boolean overLimit(String key, int weight) {
+        return eqOrGeLimit(key, weight, false);
+    }
+
+    @Override
+    public boolean geLimit(String key, int weight) {
+        return eqOrGeLimit(key, weight, true);
+    }
+
+    @Override
+    public boolean resetLimit(String key) {
+        throw new RuntimeException("Not implemented");
+    }
+
+    private IMap<String, Long> getMap(String key, int longestDuration) {
+
+        MapConfig mapConfig = hz.getConfig().getMapConfig(key);
+        mapConfig.setTimeToLiveSeconds(longestDuration);
+        mapConfig.setAsyncBackupCount(1);
+        mapConfig.setBackupCount(0);
+        return hz.getMap(key);
+    }
+
+    private boolean eqOrGeLimit(String key, int weight, boolean strictlyGreater) {
 
         requireNonNull(key, "key cannot be null");
         requireNonNull(rules, "rules cannot be null");
@@ -59,6 +82,7 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
         List<SavedKey> savedKeys = new ArrayList<>(rules.size());
 
         IMap<String, Long> hcKeyMap = getMap(key, longestDuration);
+        boolean geLimit = false;
 
         // TODO perform each rule calculation in parallel
         for (RequestLimitRule rule : rules) {
@@ -102,8 +126,11 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
             }
 
             // check our limits
-            if (Optional.ofNullable(cur).orElse(0L) + weight > rule.getLimit()) {
-                return true;
+            long count = Optional.ofNullable(cur).orElse(0L) + weight;
+            if (count > rule.getLimit()) {
+                return true; // over limit
+            } else if (!strictlyGreater && count == rule.getLimit()) {
+                geLimit = true; // at limit, do record request
             }
         }
 
@@ -119,21 +146,6 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
 
         }
 
-        return false;
+        return geLimit;
     }
-
-    @Override
-    public boolean resetLimit(String key) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    private IMap<String, Long> getMap(String key, int longestDuration) {
-
-        MapConfig mapConfig = hz.getConfig().getMapConfig(key);
-        mapConfig.setTimeToLiveSeconds(longestDuration);
-        mapConfig.setAsyncBackupCount(1);
-        mapConfig.setBackupCount(0);
-        return hz.getMap(key);
-    }
-
 }

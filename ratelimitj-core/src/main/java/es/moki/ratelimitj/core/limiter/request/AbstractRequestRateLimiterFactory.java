@@ -19,7 +19,7 @@ public abstract class AbstractRequestRateLimiterFactory<T> implements RequestRat
     protected T lookupInstance(Set<RequestLimitRule> rules) {
         T rateLimiter = rateLimiterInstances.get(rules);
             if (rateLimiter == null) {
-                LOG.info("creating new InMemorySlidingWindowRequestRateLimiter");
+                LOG.info("creating new RequestRateLimiter");
                 rateLimiterInstances.putIfAbsent(rules, create(rules));
                 // small race condition window, so lookup again
                 rateLimiter = rateLimiterInstances.get(rules);

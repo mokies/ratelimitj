@@ -3,8 +3,10 @@
 local limits = cjson.decode(ARGV[1])
 local now = tonumber(ARGV[2])
 local weight = tonumber(ARGV[3] or '1')
+local strictly_greater = tonumber(ARGV[4] or '1') == 1
 local longest_duration = limits[1][1] or 0
 local saved_keys = {}
+local ge_limit = '0'
 
 -- handle cleanup and limit checks
 for i, limit in ipairs(limits) do
@@ -43,25 +45,31 @@ for i, limit in ipairs(limits) do
         local cur
         if #dele > 0 then
             redis.call('HDEL', key, unpack(dele))
-            cur = redis.call('HINCRBY', key, saved.count_key, -decr)
+            -- Guard against "-0" => "ERR value is not an integer or out of range"
+            if decr ~= 0 then
+                cur = redis.call('HINCRBY', key, saved.count_key, -decr)
+            end
         else
             cur = redis.call('HGET', key, saved.count_key)
         end
         -- check our limits
-        if tonumber(cur or '0') + weight > limit[2] then
-            return '1'
+        local count = tonumber(cur or '0') + weight
+        if count > limit[2] then
+            return '1' -- over limit, don't record request
+        elseif count == limit[2] and not strictly_greater then
+            ge_limit = '1' -- at limit, do record request
         end
     end
 end
 
--- there is enough resources, update the counts
+-- there is enough resources, update the counts IFF needed
 for i, limit in ipairs(limits) do
     local saved = saved_keys[i]
     for j, key in ipairs(KEYS) do
-        -- update the current timestamp, count, and bucket count
-        redis.call('HSET', key, saved.ts_key, saved.trim_before)
-        redis.call('HINCRBY', key, saved.count_key, weight)
-        redis.call('HINCRBY', key, saved.count_key .. saved.block_id, weight)
+         -- update the current timestamp, count, and bucket count
+         redis.call('HSET', key, saved.ts_key, saved.trim_before)
+         redis.call('HINCRBY', key, saved.count_key, weight)
+         redis.call('HINCRBY', key, saved.count_key .. saved.block_id, weight)
     end
 end
 
@@ -72,4 +80,4 @@ if longest_duration > 0 then
         redis.call('EXPIRE', key, longest_duration)
     end
 end
-return '0'
+return ge_limit

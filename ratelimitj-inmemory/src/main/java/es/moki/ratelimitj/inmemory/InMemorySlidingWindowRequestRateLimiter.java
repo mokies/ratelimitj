@@ -54,6 +54,31 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
     // TODO support muli keys
     @Override
     public boolean overLimit(String key, int weight) {
+        return eqOrGeLimit(key, weight, true);
+    }
+
+    @Override
+    public boolean geLimit(String key, int weight) {
+        return eqOrGeLimit(key, weight, false);
+    }
+
+    @Override
+    public boolean resetLimit(String key) {
+        return expiryingKeyMap.remove(key) != null;
+    }
+
+    private ConcurrentMap<String, Long> getMap(String key, int longestDuration) {
+        synchronized (key) {
+            ConcurrentMap<String, Long> keyMap = expiryingKeyMap.get(key);
+            if (keyMap == null) {
+                keyMap = new ConcurrentHashMap<>();
+                expiryingKeyMap.put(key, keyMap, ExpirationPolicy.CREATED, longestDuration, TimeUnit.SECONDS);
+            }
+            return keyMap;
+        }
+    }
+
+    private boolean eqOrGeLimit(String key, int weight, boolean strictlyGreater) {
 
         requireNonNull(key, "key cannot be null");
         requireNonNull(rules, "rules cannot be null");
@@ -67,6 +92,7 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
         List<SavedKey> savedKeys = new ArrayList<>(rules.size());
 
         Map<String, Long> keyMap = getMap(key, longestDurationSeconds);
+        boolean geLimit = false;
 
         // TODO perform each rule calculation in parallel
         for (RequestLimitRule rule : rules) {
@@ -107,8 +133,11 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
             }
 
             // check our limits
-            if (coalesce(cur, 0L) + weight > rule.getLimit()) {
-                return true;
+            long count = coalesce(cur, 0L) + weight;
+            if (count > rule.getLimit()) {
+                return true; // over limit, don't record request
+            } else if (!strictlyGreater && count == rule.getLimit()) {
+                geLimit = true; // at limit, do record request
             }
         }
 
@@ -126,23 +155,6 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
             }
         }
 
-        return false;
+        return geLimit;
     }
-
-    @Override
-    public boolean resetLimit(String key) {
-        return expiryingKeyMap.remove(key) != null;
-    }
-
-    private ConcurrentMap<String, Long> getMap(String key, int longestDuration) {
-        synchronized (key) {
-            ConcurrentMap<String, Long> keyMap = expiryingKeyMap.get(key);
-            if (keyMap == null) {
-                keyMap = new ConcurrentHashMap<>();
-                expiryingKeyMap.put(key, keyMap, ExpirationPolicy.CREATED, longestDuration, TimeUnit.SECONDS);
-            }
-            return keyMap;
-        }
-    }
-
 }
