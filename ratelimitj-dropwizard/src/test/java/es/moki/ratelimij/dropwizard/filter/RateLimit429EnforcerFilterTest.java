@@ -57,7 +57,7 @@ public class RateLimit429EnforcerFilterTest {
     public void shouldNotLimit() {
 
         when(requestRateLimiterFactory.getInstance(anySet())).thenReturn(requestRateLimiter);
-        when(requestRateLimiter.overLimit(anyString())).thenReturn(false);
+        when(requestRateLimiter.overLimitWhenIncremented(anyString())).thenReturn(false);
 
         Response response = rule.getJerseyTest().target("/test/{id}").resolveTemplate("id", 1)
                 .request(MediaType.APPLICATION_JSON_TYPE)
@@ -71,7 +71,7 @@ public class RateLimit429EnforcerFilterTest {
     public void shouldLimit() {
 
         when(requestRateLimiterFactory.getInstance(anySet())).thenReturn(requestRateLimiter);
-        when(requestRateLimiter.overLimit(anyString())).thenReturn(true);
+        when(requestRateLimiter.overLimitWhenIncremented(anyString())).thenReturn(true);
 
         Response response = rule.getJerseyTest().target("/test/{id}").resolveTemplate("id", 1)
                 .request(MediaType.APPLICATION_JSON_TYPE)
@@ -85,7 +85,7 @@ public class RateLimit429EnforcerFilterTest {
     public void shouldReportOnly() {
 
         when(requestRateLimiterFactory.getInstance(anySet())).thenReturn(requestRateLimiter);
-        when(requestRateLimiter.overLimit(anyString())).thenReturn(true);
+        when(requestRateLimiter.overLimitWhenIncremented(anyString())).thenReturn(true);
 
 
         Response response = rule.getJerseyTest().target("/test/reportOnly/{id}").resolveTemplate("id", 1)

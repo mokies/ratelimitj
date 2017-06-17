@@ -56,7 +56,7 @@ public class RateLimit429EnforcerFilter implements ContainerRequestFilter {
         Optional<String> key = keyProvider.create(request, resource, securityContext);
 
         if (key.isPresent()) {
-            boolean overLimit = rateLimit.overLimit(key.get());
+            boolean overLimit = rateLimit.overLimitWhenIncremented(key.get());
             if (overLimit) {
                 if (!rateLimited.reportOnly()) {
                     LOG.info("rate-limit key '{}' over limit. HTTP Status 429 returned.", key);

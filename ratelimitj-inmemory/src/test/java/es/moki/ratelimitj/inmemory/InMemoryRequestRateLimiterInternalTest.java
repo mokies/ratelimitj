@@ -48,7 +48,7 @@ public class InMemoryRequestRateLimiterInternalTest {
 
         IntStream.rangeClosed(1, 5).forEach(value -> {
             timeBandit.addUnixTimeMilliSeconds(100L);
-            assertThat(requestRateLimiter.overLimit(key)).isFalse();
+            assertThat(requestRateLimiter.overLimitWhenIncremented(key)).isFalse();
         });
 
         while (expiryingKeyMap.size() != 0) {

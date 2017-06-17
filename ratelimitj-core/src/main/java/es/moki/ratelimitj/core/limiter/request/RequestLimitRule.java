@@ -33,7 +33,6 @@ public class RequestLimitRule {
      * @param limit    A number representing the maximum operations that can be performed in the given duration.
      * @return A limit rule.
      */
-
     public static RequestLimitRule of(int duration, TimeUnit timeUnit, long limit) {
         return new RequestLimitRule((int) timeUnit.toSeconds(duration), limit);
     }
@@ -86,7 +85,7 @@ public class RequestLimitRule {
     public long getLimit() {
         return limit;
     }
-    
+
 
     @Override
     public boolean equals(Object o) {

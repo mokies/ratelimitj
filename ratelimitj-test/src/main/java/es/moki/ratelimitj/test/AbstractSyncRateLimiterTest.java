@@ -28,10 +28,12 @@ public abstract class AbstractSyncRateLimiterTest {
 
         IntStream.rangeClosed(1, 5).forEach(value -> {
             timeBandit.addUnixTimeMilliSeconds(1000L);
-            assertThat(requestRateLimiter.overLimit("ip:127.0.1.1")).isFalse();
+            assertThat(requestRateLimiter.overLimitWhenIncremented("ip:127.0.1.1")).isFalse();
         });
 
-        assertThat(requestRateLimiter.overLimit("ip:127.0.1.1")).isTrue();
+//        assertThat(requestRateLimiter.isOverLimit("ip:127.0.1.1")).isFalse();
+        assertThat(requestRateLimiter.overLimitWhenIncremented("ip:127.0.1.1")).isTrue();
+//        assertThat(requestRateLimiter.isOverLimit("ip:127.0.1.1")).isTrue();
     }
 
     @Test
@@ -42,10 +44,12 @@ public abstract class AbstractSyncRateLimiterTest {
 
         IntStream.rangeClosed(1, 4).forEach(value -> {
             timeBandit.addUnixTimeMilliSeconds(1000L);
-            assertThat(requestRateLimiter.geLimit("ip:127.0.1.2")).isFalse();
+            assertThat(requestRateLimiter.geLimitWhenIncremented("ip:127.0.1.2")).isFalse();
         });
 
-        assertThat(requestRateLimiter.geLimit("ip:127.0.1.2")).isTrue();
+//        assertThat(requestRateLimiter.isGeLimit("ip:127.0.1.1")).isFalse();
+        assertThat(requestRateLimiter.geLimitWhenIncremented("ip:127.0.1.2")).isTrue();
+//        assertThat(requestRateLimiter.isGeLimit("ip:127.0.1.1")).isTrue();
     }
 
     @Test
@@ -56,10 +60,10 @@ public abstract class AbstractSyncRateLimiterTest {
 
         IntStream.rangeClosed(1, 5).forEach(value -> {
             timeBandit.addUnixTimeMilliSeconds(1000L);
-            assertThat(requestRateLimiter.overLimit("ip:127.0.1.2", 2)).isFalse();
+            assertThat(requestRateLimiter.overLimitWhenIncremented("ip:127.0.1.2", 2)).isFalse();
         });
 
-        assertThat(requestRateLimiter.overLimit("ip:127.0.1.2",2)).isTrue();
+        assertThat(requestRateLimiter.overLimitWhenIncremented("ip:127.0.1.2",2)).isTrue();
     }
 
     @Test
@@ -71,15 +75,15 @@ public abstract class AbstractSyncRateLimiterTest {
         IntStream.rangeClosed(1, 5).forEach(value -> {
             timeBandit.addUnixTimeMilliSeconds(1000L);
             IntStream.rangeClosed(1, 10).forEach(
-                    keySuffix -> assertThat(requestRateLimiter.overLimit("ip:127.0.0." + keySuffix)).isFalse());
+                    keySuffix -> assertThat(requestRateLimiter.overLimitWhenIncremented("ip:127.0.0." + keySuffix)).isFalse());
         });
 
         IntStream.rangeClosed(1, 10).forEach(
-                keySuffix -> assertThat(requestRateLimiter.overLimit("ip:127.0.0." + keySuffix)).isTrue());
+                keySuffix -> assertThat(requestRateLimiter.overLimitWhenIncremented("ip:127.0.0." + keySuffix)).isTrue());
 
         timeBandit.addUnixTimeMilliSeconds(5000L);
         IntStream.rangeClosed(1, 10).forEach(
-                keySuffix -> assertThat(requestRateLimiter.overLimit("ip:127.0.0." + keySuffix)).isFalse());
+                keySuffix -> assertThat(requestRateLimiter.overLimitWhenIncremented("ip:127.0.0." + keySuffix)).isFalse());
     }
 
     @Test
@@ -88,13 +92,13 @@ public abstract class AbstractSyncRateLimiterTest {
         RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
 
         String key = "ip:127.1.0.1";
-        assertThat(requestRateLimiter.overLimit(key)).isFalse();
-        assertThat(requestRateLimiter.overLimit(key)).isTrue();
+        assertThat(requestRateLimiter.overLimitWhenIncremented(key)).isFalse();
+        assertThat(requestRateLimiter.overLimitWhenIncremented(key)).isTrue();
 
         assertThat(requestRateLimiter.resetLimit(key)).isTrue();
         assertThat(requestRateLimiter.resetLimit(key)).isFalse();
 
-        assertThat(requestRateLimiter.overLimit(key)).isFalse();
+        assertThat(requestRateLimiter.overLimitWhenIncremented(key)).isFalse();
     }
 
 }

@@ -22,7 +22,6 @@ public enum Key implements KeyProvider {
      * <li>X-Forwarded-For Header IP address</li>
      * <li>servlet remote address IP</li>
      * </ul>
-     * </p>
      */
     ANY {
         @Override

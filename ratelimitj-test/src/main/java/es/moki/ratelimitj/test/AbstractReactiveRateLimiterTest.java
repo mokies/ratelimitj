@@ -30,12 +30,12 @@ public abstract class AbstractReactiveRateLimiterTest {
                 .repeat(5)
                 .flatMap(key -> {
                     timeBandit.addUnixTimeMilliSeconds(100);
-                    return rateLimiter.overLimitOrIncrementReactive(key);
+                    return rateLimiter.overLimitReactive(key);
                 });
 
         overLimitFlux.toStream().forEach(result -> assertThat(result).isFalse());
 
-        assertThat(rateLimiter.overLimitOrIncrementReactive("ip:127.0.1.5").block()).isTrue();
+        assertThat(rateLimiter.overLimitReactive("ip:127.0.1.5").block()).isTrue();
     }
 
     @Test
@@ -49,7 +49,7 @@ public abstract class AbstractReactiveRateLimiterTest {
                 .repeat(5)
                 .flatMap(key -> {
                     timeBandit.addUnixTimeMilliSeconds(100);
-                    return rateLimiter.overLimitOrIncrementReactive(key);
+                    return rateLimiter.overLimitReactive(key);
                 })
                 .toStream()
                 .forEach(result -> assertThat(result).isFalse());
@@ -61,12 +61,12 @@ public abstract class AbstractReactiveRateLimiterTest {
                 .repeat(5)
                 .flatMap(key -> {
                     timeBandit.addUnixTimeMilliSeconds(100);
-                    return rateLimiter.overLimitOrIncrementReactive(key);
+                    return rateLimiter.overLimitReactive(key);
                 })
                 .toStream()
                 .forEach(result -> assertThat(result).isFalse());
 
-        assertThat(rateLimiter.overLimitOrIncrementReactive("ip:127.0.1.6").block()).isTrue();
+        assertThat(rateLimiter.overLimitReactive("ip:127.0.1.6").block()).isTrue();
     }
 
     @Test
@@ -76,13 +76,13 @@ public abstract class AbstractReactiveRateLimiterTest {
 
         String key =  "ip:127.1.0.1";
 
-        assertThat(rateLimiter.overLimitOrIncrementReactive(key).block()).isFalse();
-        assertThat(rateLimiter.overLimitOrIncrementReactive(key).block()).isTrue();
+        assertThat(rateLimiter.overLimitReactive(key).block()).isFalse();
+        assertThat(rateLimiter.overLimitReactive(key).block()).isTrue();
 
         assertThat(rateLimiter.resetLimitReactive(key).block()).isTrue();
         assertThat(rateLimiter.resetLimitReactive(key).block()).isFalse();
 
-        assertThat(rateLimiter.overLimitOrIncrementReactive(key).block()).isFalse();
+        assertThat(rateLimiter.overLimitReactive(key).block()).isFalse();
     }
 
 }

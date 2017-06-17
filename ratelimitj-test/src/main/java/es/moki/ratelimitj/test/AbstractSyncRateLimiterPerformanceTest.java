@@ -39,7 +39,7 @@ public abstract class AbstractSyncRateLimiterPerformanceTest {
         int total = 10_000;
         IntStream.rangeClosed(1, total).map(i -> rand.nextInt(128)).forEach(value -> {
             timeBandit.addUnixTimeMilliSeconds(200L);
-            requestRateLimiter.overLimit("ip:127.0.0." + value);
+            requestRateLimiter.overLimitWhenIncremented("ip:127.0.0." + value);
         });
 
         double transactionsPerSecond = Math.ceil((double) total / watch.elapsed(TimeUnit.MILLISECONDS) * 1000);

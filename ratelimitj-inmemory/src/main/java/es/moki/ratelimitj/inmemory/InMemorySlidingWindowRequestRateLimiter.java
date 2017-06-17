@@ -50,25 +50,34 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
     }
 
     @Override
-    public boolean overLimit(String key) {
-        return overLimit(key, 1);
+    public boolean overLimitWhenIncremented(String key) {
+        return overLimitWhenIncremented(key, 1);
     }
 
-    // TODO support muli keys
     @Override
-    public boolean overLimit(String key, int weight) {
+    public boolean overLimitWhenIncremented(String key, int weight) {
         return eqOrGeLimit(key, weight, true);
     }
 
     @Override
-    public boolean geLimit(String key) {
-        return geLimit(key, 1);
+    public boolean geLimitWhenIncremented(String key) {
+        return geLimitWhenIncremented(key, 1);
     }
 
     @Override
-    public boolean geLimit(String key, int weight) {
+    public boolean geLimitWhenIncremented(String key, int weight) {
         return eqOrGeLimit(key, weight, false);
     }
+
+//    @Override
+//    public boolean isOverLimit(String key) {
+//        return overLimitWhenIncremented(key, 0);
+//    }
+//
+//    @Override
+//    public boolean isGeLimit(String key) {
+//        return geLimitWhenIncremented(key, 0);
+//    }
 
     @Override
     public boolean resetLimit(String key) {

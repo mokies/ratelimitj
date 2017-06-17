@@ -8,9 +8,9 @@ import java.util.concurrent.CompletionStage;
  */
 public interface AsyncRequestRateLimiter {
 
-    CompletionStage<Boolean> overLimitOrIncrementAsync(String key);
+    CompletionStage<Boolean> overLimitAsync(String key);
 
-    CompletionStage<Boolean> overLimitOrIncrementAsync(String key, int weight);
+    CompletionStage<Boolean> overLimitAsync(String key, int weight);
 
     CompletionStage<Boolean> resetLimitAsync(String key);
 }

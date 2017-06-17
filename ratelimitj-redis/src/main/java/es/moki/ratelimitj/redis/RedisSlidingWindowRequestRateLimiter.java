@@ -3,9 +3,9 @@ package es.moki.ratelimitj.redis;
 
 import com.lambdaworks.redis.api.StatefulRedisConnection;
 import es.moki.ratelimitj.core.limiter.request.AsyncRequestRateLimiter;
+import es.moki.ratelimitj.core.limiter.request.ReactiveRequestRateLimiter;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
-import es.moki.ratelimitj.core.limiter.request.ReactiveRequestRateLimiter;
 import es.moki.ratelimitj.core.time.SystemTimeSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import org.slf4j.Logger;
@@ -47,27 +47,14 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
         return serialiser.encode(rules);
     }
 
-    public CompletionStage<Boolean> overLimitOrIncrementAsync(String key) {
-        return overLimitOrIncrementAsync(key, 1);
+    // TODO support multi keys
+
+    public CompletionStage<Boolean> overLimitAsync(String key) {
+        return overLimitAsync(key, 1);
     }
 
-    // TODO support multi keys
-    public CompletionStage<Boolean> overLimitOrIncrementAsync(String key, int weight) {
-        requireNonNull(key);
-
-        LOG.debug("overLimit for key '{}' of weight {}", key, weight);
-
-        String sha = scriptLoader.scriptSha();
-
-        return timeSupplier.getAsync().thenCompose(time ->
-                connection.async().evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight))
-        ).thenApply(result -> {
-            boolean overLimit = "1".equals(result);
-            LOG.debug("over limit {}", overLimit);
-            return overLimit;
-        });
-
-        // TODO handle scenario where script is not loaded, flush scripts and test scenario
+    public CompletionStage<Boolean> overLimitAsync(String key, int weight) {
+        return eqOrGeLimitAsync(key, weight, true);
     }
 
     @Override
@@ -76,50 +63,56 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
     }
 
     @Override
-    public boolean overLimit(String key) {
-        return overLimit(key, 1);
+    public boolean overLimitWhenIncremented(String key) {
+        return overLimitWhenIncremented(key, 1);
     }
 
     @Override
-    public boolean overLimit(String key, int weight) {
-        try {
-            return eqOrGeLimitAsync(key, weight, true).toCompletableFuture().get(10, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to determine overLimit", e);
-        }
+    public boolean overLimitWhenIncremented(String key, int weight) {
+        return toBlocking(eqOrGeLimitAsync(key, weight, true));
     }
 
     @Override
-    public boolean geLimit(String key) {
-        return geLimit(key, 1);
+    public boolean geLimitWhenIncremented(String key) {
+        return geLimitWhenIncremented(key, 1);
     }
 
     @Override
-    public boolean geLimit(String key, int weight) {
-        try {
-            return eqOrGeLimitAsync(key, weight, false).toCompletableFuture().get(10, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to determine overLimit", e);
-        }
+    public boolean geLimitWhenIncremented(String key, int weight) {
+        return toBlocking(eqOrGeLimitAsync(key, weight, false));
     }
+
+//    @Override
+//    public boolean isOverLimit(String key) {
+//        return overLimitWhenIncremented(key, 0);
+//    }
+//
+//    @Override
+//    public boolean isGeLimit(String key) {
+//        return geLimitWhenIncremented(key, 0);
+//    }
 
     @Override
     public boolean resetLimit(String key) {
+        return toBlocking(resetLimitAsync(key));
+    }
+
+    private boolean toBlocking(CompletionStage<Boolean> completionStage) {
         try {
-            return resetLimitAsync(key).toCompletableFuture().get(10, TimeUnit.SECONDS);
+            return completionStage.toCompletableFuture().get(10, TimeUnit.SECONDS);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to resetLimit", e);
+            throw new RuntimeException("Failed to complete operation", e);
         }
     }
 
     @Override
-    public Mono<Boolean> overLimitOrIncrementReactive(String key) {
-        return Mono.fromFuture(overLimitOrIncrementAsync(key).toCompletableFuture());
+    public Mono<Boolean> overLimitReactive(String key) {
+        return Mono.fromFuture(overLimitAsync(key).toCompletableFuture());
     }
 
     @Override
-    public Mono<Boolean> overLimitOrIncrementReactive(String key, int weight) {
-        return Mono.fromFuture(overLimitOrIncrementAsync(key, weight).toCompletableFuture());
+    public Mono<Boolean> overLimitReactive(String key, int weight) {
+        return Mono.fromFuture(overLimitAsync(key, weight).toCompletableFuture());
     }
 
     @Override
@@ -130,15 +123,15 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
     private CompletionStage<Boolean> eqOrGeLimitAsync(String key, int weight, boolean strictlyGreater) {
         requireNonNull(key);
 
-        LOG.debug("overLimit for key '{}' of weight {}", key, weight);
-
         String sha = scriptLoader.scriptSha();
 
         return timeSupplier.getAsync().thenCompose(time ->
                 connection.async().evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight), strictlyGreater ? "1" : "0")
         ).thenApply(result -> {
             boolean overLimit = "1".equals(result);
-            LOG.debug("over limit {}", overLimit);
+            if (overLimit) {
+                LOG.debug("Requests matched by key '{}' incremented by weight {} are greater than {} the limit", key, weight, strictlyGreater ? "" : "or equal to ");
+            }
             return overLimit;
         });
 
