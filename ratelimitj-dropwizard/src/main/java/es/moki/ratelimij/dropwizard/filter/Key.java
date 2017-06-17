@@ -14,8 +14,15 @@ import static java.util.Objects.isNull;
 public enum Key implements KeyProvider {
 
     /**
-     * The 'any' key will be the concatenation of the resource name and the first of Authenticated Principle (dropwizard auth), X-Forwarded-For eader
-     * or HTTPServlet Remote Address IP as the rate limit key.
+     * The 'any' key will be the concatenation of the resource name and the first of:
+     *
+     * <p>
+     * <ul>
+     * <li>authenticated principle (Dropwizard auth)</li>
+     * <li>X-Forwarded-For Header IP address</li>
+     * <li>servlet remote address IP</li>
+     * </ul>
+     * </p>
      */
     ANY {
         @Override
@@ -35,7 +42,7 @@ public enum Key implements KeyProvider {
     },
 
     /**
-     * The 'authenticated' key will be the concatenation of the resource name and Dropwizard authenticated principle.
+     * The 'authenticated' key will be the concatenation of the resource name and authenticated principle (Dropwizard auth).
      */
     AUTHENTICATED {
         @Override
@@ -52,7 +59,7 @@ public enum Key implements KeyProvider {
     },
 
     /**
-     * The 'IP' key will be the concatenation of the resource name and IP (X-Forwarded-For or servlet remote address).
+     * The 'ip' key will be the concatenation of the resource name and IP (X-Forwarded-For Header or servlet remote address).
      */
     IP {
         @Override
@@ -71,7 +78,7 @@ public enum Key implements KeyProvider {
     },
 
     /**
-     * The default key will be the of the resource name
+     * The 'resource' key will be the of the resource name.
      */
     RESOURCE {
         @Override
