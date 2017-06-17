@@ -13,7 +13,6 @@ plugins {
     id 'com.gradle.build-scan' version '1.8'
 }
 
-
 //apply plugin: 'org.junit.platform.gradle.plugin'
 
 defaultTasks 'check'
@@ -51,7 +50,7 @@ subprojects {
 
     checkstyle {
         configFile = rootProject.file('gradle/config/checkstyle/checkstyle.xml')
-        toolVersion = '7.6.1'
+        toolVersion = '7.8.1'
     } 
 
     ext.junitVintageVersion = '4.12.0-M4'
@@ -59,12 +58,12 @@ subprojects {
     ext.junitJupiterVersion = '5.0.0-M4'
 
     ext.libraries = [
-            slf4j  : 'org.slf4j:slf4j-api:1.7.25',
-            assertj: 'org.assertj:assertj-core:3.8.0',
-            junit  : "org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion",
-            mockito: 'org.mockito:mockito-core:2.8.47',
-            guava  : 'com.google.guava:guava:22.0',
-            logback: 'ch.qos.logback:logback-classic:1.2.3',
+            slf4j   : 'org.slf4j:slf4j-api:1.7.25',
+            assertj : 'org.assertj:assertj-core:3.8.0',
+            junit   : "org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion",
+            mockito : 'org.mockito:mockito-core:2.8.47',
+            guava   : 'com.google.guava:guava:22.0',
+            logback : 'ch.qos.logback:logback-classic:1.2.3',
             findbugs: 'com.google.code.findbugs:jsr305:3.0.2'
     ]
 }
@@ -85,7 +84,6 @@ subprojects {
         archives javadocJar, sourcesJar
     }
 }
-
 
 ext {
     // Credentials for publication repositories (needed only for publishing)
@@ -162,7 +160,6 @@ configure([project(':ratelimitj-redis'), project(':ratelimitj-inmemory'), projec
     }
 
     uploadArchives.dependsOn build
-
 }
 
 task codeCoverageReport(type: JacocoReport) {
