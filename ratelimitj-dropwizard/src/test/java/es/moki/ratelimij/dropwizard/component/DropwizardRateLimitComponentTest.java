@@ -25,7 +25,7 @@ public class DropwizardRateLimitComponentTest {
     @ClassRule
     public static final DropwizardAppRule<Configuration> RULE =
             new DropwizardAppRule<>(RateLimitApplication.class, ResourceHelpers.resourceFilePath("ratelimit-app.yml"));
-    
+
 //    @BeforeAll
 //    public static void beforeAll() {
 //        client = RedisClient.create("redis://localhost");
@@ -94,13 +94,13 @@ public class DropwizardRateLimitComponentTest {
         }
 
         Response getLimitedByAuthenticatedUser() {
-               return client.target(
-                       String.format("http://localhost:%d/application/user/{id}/authenticated", RULE.getLocalPort()))
-                       .resolveTemplate("id", 1)
-                       .request()
-                       .header(HttpHeaders.AUTHORIZATION, "Bearer secret")
-                       .get();
-           }
+            return client.target(
+                    String.format("http://localhost:%d/application/user/{id}/authenticated", RULE.getLocalPort()))
+                    .resolveTemplate("id", 1)
+                    .request()
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer secret")
+                    .get();
+        }
 
         private LoginRequest loginForm() {
             return new LoginRequest("heisenberg", "abc123");

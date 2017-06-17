@@ -27,7 +27,7 @@ public class RateLimitApplication extends Application<Configuration> {
         redisClient = RedisClient.create("redis://localhost");
         RequestRateLimiterFactory factory = new RedisRateLimiterFactory(redisClient);
 
-//        RequestRateLimiterFactory factory = new InMemoryRateLimiterFactory();
+        //RequestRateLimiterFactory factory = new InMemoryRateLimiterFactory();
 
         bootstrap.addBundle(new RateLimitBundle(factory));
     }
@@ -40,8 +40,8 @@ public class RateLimitApplication extends Application<Configuration> {
 
         environment.jersey().register(new AuthDynamicFeature(
                 new OAuthCredentialAuthFilter.Builder<PrincipalImpl>()
-                    .setAuthenticator(new TestOAuthAuthenticator()).setPrefix("Bearer")
-                    .buildAuthFilter()));
+                        .setAuthenticator(new TestOAuthAuthenticator()).setPrefix("Bearer")
+                        .buildAuthFilter()));
         environment.jersey().register(RolesAllowedDynamicFeature.class);
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(PrincipalImpl.class));
 

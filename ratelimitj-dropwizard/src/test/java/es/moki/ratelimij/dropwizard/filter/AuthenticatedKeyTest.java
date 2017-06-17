@@ -28,7 +28,7 @@ public class AuthenticatedKeyTest {
     @Before
     public void beforeEach() throws Exception {
         doReturn(Object.class).when(resource).getResourceClass();
-        when(resource.getResourceMethod()).thenReturn(Object.class.getMethod("wait", null));
+        when(resource.getResourceMethod()).thenReturn(Object.class.getMethod("wait"));
     }
 
     @DisplayName("AUTHENTICATED key should start with 'rlj' prefix")

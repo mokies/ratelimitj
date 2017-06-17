@@ -28,8 +28,7 @@ public class IpKeyTest {
     @Before
     public void beforeEach() throws Exception {
         doReturn(Object.class).when(resource).getResourceClass();
-        when(resource.getResourceMethod()).thenReturn(Object.class.getMethod("wait", null));
-
+        when(resource.getResourceMethod()).thenReturn(Object.class.getMethod("wait"));
     }
 
     @DisplayName("IP key should start with 'rlj' prefix")
@@ -73,13 +72,13 @@ public class IpKeyTest {
     }
 
     @DisplayName("IP key should return absent if no key available")
-     @Test
-     public void shouldBeAbsent() {
-         when(request.getRemoteAddr()).thenReturn(null);
+    @Test
+    public void shouldBeAbsent() {
+        when(request.getRemoteAddr()).thenReturn(null);
 
-         Optional<String> keyName = Key.IP.create(request, resource, null);
- 
-         assertThat(keyName).isNotPresent();
-     }
+        Optional<String> keyName = Key.IP.create(request, resource, null);
+
+        assertThat(keyName).isNotPresent();
+    }
 
 }
