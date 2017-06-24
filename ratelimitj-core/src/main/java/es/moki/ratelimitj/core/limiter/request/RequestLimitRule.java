@@ -92,10 +92,10 @@ public class RequestLimitRule {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RequestLimitRule that = (RequestLimitRule) o;
-        return durationSeconds == that.durationSeconds &&
-                limit == that.limit &&
-                Objects.equals(precision, that.precision) &&
-                Objects.equals(name, that.name);
+        return durationSeconds == that.durationSeconds
+                && limit == that.limit
+                && Objects.equals(precision, that.precision)
+                && Objects.equals(name, that.name);
     }
 
     @Override
