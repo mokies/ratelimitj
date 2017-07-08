@@ -53,6 +53,22 @@ Example for Maven:
 | Rate limit HTTP header responses | back log |
 | Spring integration | back log |
 
+Building
+-----------
+
+RateLimitJ is built with Gradle and requires a local Redis for the Redis module. 
+Running `docker-compose up -d` will start Redis.
+
+To build:
+
+```
+$ git clone https://github.com/mokies/ratelimij.git
+$ cd ratelimij/
+$ docker-compose up -d
+$ ./gradlew
+```
+
+
 #### Credits
 This library was inspired by the following articles on sliding window rate limiting with Redis:
 
