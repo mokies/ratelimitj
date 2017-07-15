@@ -106,12 +106,12 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
     }
 
     @Override
-    public Mono<Boolean> overLimitReactive(String key) {
+    public Mono<Boolean> overLimitWhenIncrementedReactive(String key) {
         return Mono.fromFuture(overLimitAsync(key).toCompletableFuture());
     }
 
     @Override
-    public Mono<Boolean> overLimitReactive(String key, int weight) {
+    public Mono<Boolean> overLimitWhenIncrementedReactive(String key, int weight) {
         return Mono.fromFuture(overLimitAsync(key, weight).toCompletableFuture());
     }
 

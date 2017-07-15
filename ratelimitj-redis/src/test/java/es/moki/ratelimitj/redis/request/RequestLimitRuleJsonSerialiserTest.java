@@ -3,7 +3,6 @@ package es.moki.ratelimitj.redis.request;
 
 import com.google.common.collect.ImmutableList;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
-import es.moki.ratelimitj.redis.request.LimitRuleJsonSerialiser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -32,4 +31,5 @@ public class RequestLimitRuleJsonSerialiserTest {
 
         assertThat(serialiser.encode(rules)).isEqualTo("[[10,10,4],[60,20,8]]");
     }
+
 }
