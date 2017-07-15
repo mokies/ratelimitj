@@ -23,11 +23,12 @@ The Redis Module support (RateLimiter)[], (AsyncRateLimiter)[] and (ReactiveRate
     import com.lambdaworks.redis.RedisClient;
     import es.moki.ratelimitj.redis.request.RedisSlidingWindowRequestRateLimiter;
 
-    RedisClient client = RedisClient.create("redis://localhost");
-    Set<LimitRule> rules = Collections.singleton(LimitRule.of(1, TimeUnit.MINUTES, 50)); // 50 request per minute, per key
-    RedisRateLimit requestRateLimiter = new RedisSlidingWindowRequestRateLimiter(client, rules);
+    StatefulRedisConnection connection = RedisClient.create("redis://localhost").connect();
     
-    boolean overLimit = requestRateLimiter.overLimit("ip:127.0.0.2");
+    Set<RequestLimitRule> rules = Collections.singleton(RequestLimitRule.of(1, TimeUnit.MINUTES, 50)); // 50 request per minute, per key
+    RequestRateLimiter requestRateLimiter = new RedisSlidingWindowRequestRateLimiter(client, rules);
+        
+    boolean overLimit = requestRateLimiter.overLimitWhenIncremented("ip:127.0.0.2");
 ```
 
 #### Multi Rule Reactive Example
@@ -35,15 +36,15 @@ The Redis Module support (RateLimiter)[], (AsyncRateLimiter)[] and (ReactiveRate
     import com.lambdaworks.redis.RedisClient;
     import es.moki.ratelimitj.redis.request.RedisSlidingWindowRequestRateLimiter;
 
-    RedisClient client = RedisClient.create("redis://localhost");
+    StatefulRedisConnection connection = RedisClient.create("redis://localhost").connect();
 
-    Set<LimitRule> rules = new HashSet<>();
-    rules.add(LimitRule.of(1, TimeUnit.SECONDS, 10));
-    rules.add(LimitRule.of(3600, TimeUnit.SECONDS, 240).withPrecision(60));
-
-    RedisRateLimit requestRateLimiter = new RedisSlidingWindowRequestRateLimiter(client, rules);
+    Set<RequestLimitRule> rules = new HashSet<>();
+    rules.add(RequestLimitRule.of(1, TimeUnit.SECONDS, 10));
+    rules.add(RequestLimitRule.of(3600, TimeUnit.SECONDS, 240).withPrecision(60));
     
-    Mono<Boolean> observable = requestRateLimiter.overLimitReactive("ip:127.0.1.6");
+    ReactiveRequestRateLimiter requestRateLimiter = new RedisSlidingWindowRequestRateLimiter(connection, rules);
+        
+    Mono<Boolean> observable = requestRateLimiter.overLimitWhenIncrementedReactive("ip:127.0.1.6");
 ```
 
 ### Dependencies
