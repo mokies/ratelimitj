@@ -1,4 +1,4 @@
-RateLimitJ - inmemory
+RateLimitJ - Inmemory
 ==================
 
 The RateLimitJ Inmemory module provides an implementation of a configurable sliding window rate limiting algorithm.
