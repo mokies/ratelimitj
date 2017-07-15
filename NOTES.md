@@ -8,3 +8,12 @@ https://stripe.com/blog/rate-limiters
 
 Enhancements 
 - Toggle silent failures
+- Implement Concurrent Redis
+- Implement Concurrent Dropwizard annotations and bindings
+- Implement Reactive Request Inmemory 
+- Implement Spring integration
+- Improve metrics and instrumentation
+- Improve test coverage
+- Improve performance testing
+- Improve documentation
+
