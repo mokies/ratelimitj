@@ -13,6 +13,7 @@ A Java library for rate limiting, assembled using extensible storage and applica
 RateLimitJ provides the following stable plugable modules:
 
 * [Redis sliding window rate limiter](ratelimitj-redis)
+* [In-memory sliding window rate limiter](ratelimitj-inmemory)
 * [Dropwizard integration](ratelimitj-dropwizard)
 
 
@@ -45,8 +46,8 @@ Example for Maven:
 | ------------- |-------------| 
 | Redis sliding window rate limiter | production |
 | Dropwizard integration - Bundle | stable |
+| In-memory sliding window rate limiter | stable |
 | Hazelcast sliding window rate limiter | development |
-| In-memory sliding window rate limiter | beta |
 | Better metrics logging | not started |
 | Rate limiting toggles (dark launch) for framework integration | beta |
 | Whitelisting & blacklisting of keys | back log |
