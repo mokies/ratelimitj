@@ -1,8 +1,9 @@
-package es.moki.ratelimitj.redis;
+package es.moki.ratelimitj.redis.request;
 
 
 import com.google.common.collect.ImmutableList;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
+import es.moki.ratelimitj.redis.request.LimitRuleJsonSerialiser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

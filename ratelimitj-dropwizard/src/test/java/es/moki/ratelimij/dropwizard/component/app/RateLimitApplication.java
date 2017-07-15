@@ -7,7 +7,7 @@ import es.moki.ratelimij.dropwizard.component.app.api.LoginResource;
 import es.moki.ratelimij.dropwizard.component.app.api.UserResource;
 import es.moki.ratelimij.dropwizard.component.app.auth.TestOAuthAuthenticator;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiterFactory;
-import es.moki.ratelimitj.redis.RedisRateLimiterFactory;
+import es.moki.ratelimitj.redis.request.RedisRateLimiterFactory;
 import io.dropwizard.Application;
 import io.dropwizard.Configuration;
 import io.dropwizard.auth.AuthDynamicFeature;

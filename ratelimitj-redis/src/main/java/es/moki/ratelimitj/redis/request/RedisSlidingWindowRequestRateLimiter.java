@@ -1,4 +1,4 @@
-package es.moki.ratelimitj.redis;
+package es.moki.ratelimitj.redis.request;
 
 
 import com.lambdaworks.redis.api.StatefulRedisConnection;
