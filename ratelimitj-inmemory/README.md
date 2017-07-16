@@ -12,7 +12,7 @@ The Inmemory Module supports (RequestRateLimiter)[], (ConcurrentRequestLimiter)[
 <dependency>
   <groupId>es.moki.ratelimitj</groupId>
   <artifactId>ratelimitj-inmemory</artifactId>
-  <version>x.x.x</version>
+  <version>${ratelimitj-inmemory.version}</version>
 </dependency>
 ```
  
