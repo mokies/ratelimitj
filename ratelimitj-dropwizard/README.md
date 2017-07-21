@@ -20,13 +20,26 @@ The RateLimitJ Dropwizard module provides integration with Dropwizard and annota
  
 ### Usage
 
-#### Basic Configuration Example
+#### Basic Redis Configuration Example
 ```java
 public class RateLimitApplication extends Application<Configuration> {
 
     public void initialize(Bootstrap<Configuration> bootstrap) {
         RedisClient redisClient = RedisClient.create("redis://localhost");
         RateLimiterFactory factory = new RedisRateLimiterFactory(redisClient);
+        RateLimiterFactor factory = new InMemoryRateLimiterFactory();
+
+        bootstrap.addBundle(new RateLimitBundle(factory));
+    }
+}
+```
+
+#### Basic InMemory Configuration Example
+```java
+public class RateLimitApplication extends Application<Configuration> {
+
+    public void initialize(Bootstrap<Configuration> bootstrap) {
+        RateLimiterFactor factory = new InMemoryRateLimiterFactory();
 
         bootstrap.addBundle(new RateLimitBundle(factory));
     }
