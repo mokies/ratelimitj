@@ -1,13 +1,14 @@
 package es.moki.ratelimitj.core.limiter.concurrent;
 
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class ConcurrentLimitRule {
 
-    private int concurrentLimit;
-    private long timeoutMillis;
-    private String name;
+    private final int concurrentLimit;
+    private final long timeoutMillis;
+    private final String name;
 
     private ConcurrentLimitRule(int concurrentLimit, long timeoutMillis) {
          this(concurrentLimit, timeoutMillis, null);
@@ -52,5 +53,20 @@ public class ConcurrentLimitRule {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ConcurrentLimitRule that = (ConcurrentLimitRule) o;
+        return concurrentLimit == that.concurrentLimit &&
+                timeoutMillis == that.timeoutMillis &&
+                Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(concurrentLimit, timeoutMillis, name);
     }
 }
