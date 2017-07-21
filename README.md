@@ -1,3 +1,5 @@
+![RateLimitJ Logo](https://github.com/mokies/ratelimitj/blob/master/img/ratelimitj-logo-small.png "RateLimitJ")
+
 RateLimitJ
 ============
 
