@@ -1,10 +1,10 @@
 package es.moki.ratelimitj.test.limiter.request;
 
 import com.google.common.collect.ImmutableSet;
-import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.ReactiveRequestRateLimiter;
-import es.moki.ratelimitj.test.time.TimeBanditSupplier;
+import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.time.TimeSupplier;
+import es.moki.ratelimitj.test.time.TimeBanditSupplier;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 
@@ -20,7 +20,7 @@ public abstract class AbstractReactiveRequestRateLimiterTest {
     protected abstract ReactiveRequestRateLimiter getRateLimiter(Set<RequestLimitRule> rules, TimeSupplier timeSupplier);
 
     @Test
-    public void shouldLimitSingleWindowSync() throws Exception {
+    public void shouldLimitSingleWindowReactive() throws Exception {
 
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 5));
         ReactiveRequestRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
@@ -39,7 +39,26 @@ public abstract class AbstractReactiveRequestRateLimiterTest {
     }
 
     @Test
-    public void shouldLimitDualWindowAsync() throws Exception {
+    public void shouldGeLimitSingleWindowReactive() throws Exception {
+
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 5));
+        ReactiveRequestRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
+
+        Flux<Boolean> geLimtLimitFlux = Flux
+                        .just("ip:127.0.1.2")
+                        .repeat(4)
+                        .flatMap(key -> {
+                            timeBandit.addUnixTimeMilliSeconds(100);
+                            return rateLimiter.overLimitWhenIncrementedReactive(key);
+                        });
+
+        geLimtLimitFlux.toStream().forEach(result -> assertThat(result).isFalse());
+
+        assertThat(rateLimiter.overLimitWhenIncrementedReactive("ip:127.0.1.2").block()).isTrue();
+    }
+
+    @Test
+    public void shouldLimitDualWindowReactive() throws Exception {
 
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(1, TimeUnit.SECONDS, 5), RequestLimitRule.of(10, TimeUnit.SECONDS, 10));
         ReactiveRequestRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);

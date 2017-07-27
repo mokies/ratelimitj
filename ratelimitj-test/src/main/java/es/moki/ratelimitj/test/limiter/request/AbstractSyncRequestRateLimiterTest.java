@@ -31,9 +31,7 @@ public abstract class AbstractSyncRequestRateLimiterTest {
             assertThat(requestRateLimiter.overLimitWhenIncremented("ip:127.0.1.1")).isFalse();
         });
 
-//        assertThat(requestRateLimiter.isOverLimit("ip:127.0.1.1")).isFalse();
         assertThat(requestRateLimiter.overLimitWhenIncremented("ip:127.0.1.1")).isTrue();
-//        assertThat(requestRateLimiter.isOverLimit("ip:127.0.1.1")).isTrue();
     }
 
     @Test
@@ -47,9 +45,7 @@ public abstract class AbstractSyncRequestRateLimiterTest {
             assertThat(requestRateLimiter.geLimitWhenIncremented("ip:127.0.1.2")).isFalse();
         });
 
-//        assertThat(requestRateLimiter.isGeLimit("ip:127.0.1.1")).isFalse();
         assertThat(requestRateLimiter.geLimitWhenIncremented("ip:127.0.1.2")).isTrue();
-//        assertThat(requestRateLimiter.isGeLimit("ip:127.0.1.1")).isTrue();
     }
 
     @Test

@@ -97,14 +97,6 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
         return toBlocking(resetLimitAsync(key));
     }
 
-    private boolean toBlocking(CompletionStage<Boolean> completionStage) {
-        try {
-            return completionStage.toCompletableFuture().get(10, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to complete operation", e);
-        }
-    }
-
     @Override
     public Mono<Boolean> overLimitWhenIncrementedReactive(String key) {
         return Mono.fromFuture(overLimitAsync(key).toCompletableFuture());
@@ -113,6 +105,16 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
     @Override
     public Mono<Boolean> overLimitWhenIncrementedReactive(String key, int weight) {
         return Mono.fromFuture(overLimitAsync(key, weight).toCompletableFuture());
+    }
+
+    @Override
+    public  Mono<Boolean> geLimitWhenIncrementedReactive(String key) {
+        return Mono.fromFuture(eqOrGeLimitAsync(key, 1, false).toCompletableFuture());
+    }
+
+    @Override
+    public  Mono<Boolean> geLimitWhenIncrementedReactive(String key, int weight) {
+        return Mono.fromFuture(eqOrGeLimitAsync(key, weight, false).toCompletableFuture());
     }
 
     @Override
@@ -136,5 +138,13 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
         });
 
         // TODO handle scenario where script is not loaded, flush scripts and test scenario
+    }
+
+    private boolean toBlocking(CompletionStage<Boolean> completionStage) {
+        try {
+            return completionStage.toCompletableFuture().get(10, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to complete operation", e);
+        }
     }
 }

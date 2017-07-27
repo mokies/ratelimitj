@@ -16,4 +16,5 @@ Enhancements
 - Improve test coverage
 - Improve performance testing
 - Improve documentation
+- Caching over limit reative wrapper that reduces load on backing implementation when under heavy load
 
