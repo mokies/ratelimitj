@@ -44,7 +44,7 @@ public abstract class AbstractReactiveRequestRateLimiterTest {
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 5));
         ReactiveRequestRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
 
-        Flux<Boolean> geLimtLimitFlux = Flux
+        Flux<Boolean> geLimitLimitFlux = Flux
                         .just("ip:127.0.1.2")
                         .repeat(4)
                         .flatMap(key -> {
@@ -52,7 +52,7 @@ public abstract class AbstractReactiveRequestRateLimiterTest {
                             return rateLimiter.overLimitWhenIncrementedReactive(key);
                         });
 
-        geLimtLimitFlux.toStream().forEach(result -> assertThat(result).isFalse());
+        geLimitLimitFlux.toStream().forEach(result -> assertThat(result).isFalse());
 
         assertThat(rateLimiter.overLimitWhenIncrementedReactive("ip:127.0.1.2").block()).isTrue();
     }
