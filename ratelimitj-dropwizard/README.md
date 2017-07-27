@@ -27,7 +27,6 @@ public class RateLimitApplication extends Application<Configuration> {
     public void initialize(Bootstrap<Configuration> bootstrap) {
         RedisClient redisClient = RedisClient.create("redis://localhost");
         RateLimiterFactory factory = new RedisRateLimiterFactory(redisClient);
-        RateLimiterFactor factory = new InMemoryRateLimiterFactory();
 
         bootstrap.addBundle(new RateLimitBundle(factory));
     }
