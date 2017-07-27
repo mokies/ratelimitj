@@ -10,11 +10,13 @@ Enhancements
 - Toggle silent failures
 - Implement Concurrent Redis
 - Implement Concurrent Dropwizard annotations and bindings
-- Implement Reactive Request Inmemory 
+- Implement Reactive Request Inmemory. I don't think this is of value.
 - Implement Spring integration
 - Improve metrics and instrumentation
 - Improve test coverage
 - Improve performance testing
 - Improve documentation
-- Caching over limit reative wrapper that reduces load on backing implementation when under heavy load
+- Caching over limit reative wrapper that reduces load on backing implementation when under heavy load.
+Refer to Google Site Reliability Engineering book and Cloudflare rate limiting blog post.
+- Remove dependency on Guava once upgrade to Lettuce 5.0 complete.
 
