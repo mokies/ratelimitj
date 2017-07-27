@@ -26,7 +26,7 @@ The Redis Module support (RateLimiter)[], (AsyncRateLimiter)[] and (ReactiveRate
     StatefulRedisConnection connection = RedisClient.create("redis://localhost").connect();
     
     Set<RequestLimitRule> rules = Collections.singleton(RequestLimitRule.of(1, TimeUnit.MINUTES, 50)); // 50 request per minute, per key
-    RequestRateLimiter requestRateLimiter = new RedisSlidingWindowRequestRateLimiter(client, rules);
+    RequestRateLimiter requestRateLimiter = new RedisSlidingWindowRequestRateLimiter(connection, rules);
         
     boolean overLimit = requestRateLimiter.overLimitWhenIncremented("ip:127.0.0.2");
 ```
