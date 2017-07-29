@@ -16,7 +16,7 @@ Enhancements
 - Improve test coverage
 - Improve performance testing
 - Improve documentation
-- Caching over limit reative wrapper that reduces load on backing implementation when under heavy load.
+- Caching/Streaming/Buffering over limit reative wrapper that reduces load on backing implementation when under heavy load.
 Refer to Google Site Reliability Engineering book and Cloudflare rate limiting blog post.
 - Remove dependency on Guava once upgrade to Lettuce 5.0 complete.
 
