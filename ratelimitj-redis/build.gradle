@@ -13,7 +13,7 @@ dependencies {
     )
 
     api(
-            'biz.paluch.redis:lettuce:4.3.3.Final',
+            'biz.paluch.redis:lettuce:4.3.3.Final'
     )
 
     testCompile(

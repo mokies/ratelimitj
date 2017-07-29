@@ -1,9 +1,16 @@
 package es.moki.ratelimitj.core.limiter.concurrent;
 
 
-public interface Baton extends AutoCloseable {
+import java.util.Optional;
+import java.util.function.Supplier;
 
-    void close();
+public interface Baton {
 
-    void pass();
+    void release();
+
+    <T> Optional<T> get(Supplier<T> action);
+
+    void doAction(Runnable action);
+
+    boolean hasAcquired();
 }

@@ -1,12 +1,10 @@
 package es.moki.ratelimitj.core.limiter.concurrent;
 
 
-import java.util.Optional;
-
 public interface ConcurrentRequestLimiter {
 
-    Optional<? extends AutoCloseable> takeBaton(String key);
+    Baton acquire(String key);
 
-    Optional<? extends AutoCloseable> takeBaton(String key, int weight);
+    Baton acquire(String key, int weight);
 
 }

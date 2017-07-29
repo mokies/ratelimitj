@@ -6,7 +6,6 @@ import es.moki.ratelimitj.core.limiter.concurrent.ConcurrentLimitRule;
 import es.moki.ratelimitj.test.limiter.concurrent.AbstractSyncConcurrentRateLimiterTest;
 import org.junit.Test;
 
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,16 +17,16 @@ public class InMemoryConcurrentSyncRequestRateLimiterTest extends AbstractSyncCo
         InMemoryConcurrentRequestRateLimiter limiter = new InMemoryConcurrentRequestRateLimiter(
                 ConcurrentLimitRule.of(2, TimeUnit.MINUTES, 1));
 
-        assertThat(limiter.takeBaton("key")).isPresent();
-        Optional<Baton> baton1 = limiter.takeBaton("key");
-        Optional<Baton> baton2 = limiter.takeBaton("key");
+        assertThat(limiter.acquire("key").hasAcquired()).isTrue();
+        Baton baton1 = limiter.acquire("key");
+        Baton baton2 = limiter.acquire("key");
 
-        assertThat(baton1).isPresent();
-        assertThat(baton2).isNotPresent();
-        baton1.get().close();
+        assertThat(baton1.hasAcquired()).isTrue();
+        assertThat(baton2.hasAcquired()).isFalse();
+        baton1.release();
 
-        Optional<Baton> baton3 = limiter.takeBaton("key");
-        assertThat(baton3).isPresent();
+        Baton baton3 = limiter.acquire("key");
+        assertThat(baton3.hasAcquired()).isTrue();
     }
 
     @Test
@@ -35,8 +34,8 @@ public class InMemoryConcurrentSyncRequestRateLimiterTest extends AbstractSyncCo
         InMemoryConcurrentRequestRateLimiter limiter = new InMemoryConcurrentRequestRateLimiter(
                 ConcurrentLimitRule.of(2, TimeUnit.MINUTES, 1));
 
-        assertThat(limiter.takeBaton("key", 2)).isPresent();
-        assertThat(limiter.takeBaton("key")).isNotPresent();
+        assertThat(limiter.acquire("key", 2).hasAcquired()).isTrue();
+        assertThat(limiter.acquire("key").hasAcquired()).isFalse();
     }
 
     @Test
@@ -44,14 +43,36 @@ public class InMemoryConcurrentSyncRequestRateLimiterTest extends AbstractSyncCo
         InMemoryConcurrentRequestRateLimiter limiter = new InMemoryConcurrentRequestRateLimiter(
                 ConcurrentLimitRule.of(1, TimeUnit.MILLISECONDS, 500));
 
-        assertThat(limiter.takeBaton("key")).isPresent();
-        assertThat(limiter.takeBaton("key")).isNotPresent();
+        assertThat(limiter.acquire("key").hasAcquired()).isTrue();
+        assertThat(limiter.acquire("key").hasAcquired()).isFalse();
 
         Thread.sleep(1000);
 
-        assertThat(limiter.takeBaton("key")).isPresent();
-        assertThat(limiter.takeBaton("key")).isNotPresent();
+        assertThat(limiter.acquire("key").hasAcquired()).isTrue();
+        assertThat(limiter.acquire("key").hasAcquired()).isFalse();
+    }
 
+    @Test
+    public void shouldDoWork() {
+        InMemoryConcurrentRequestRateLimiter limiter = new InMemoryConcurrentRequestRateLimiter(
+                ConcurrentLimitRule.of(1, TimeUnit.MINUTES, 1));
+
+        Integer result = limiter.acquire("key")
+                .get(this::executeSomeMethod)
+                .orElseThrow(() -> new RuntimeException("concurrent limit exceeded"));
+
+        assertThat(result).isEqualTo(1);
+        
+        assertThat(limiter.acquire("key").hasAcquired()).isTrue();
+        assertThat(limiter.acquire("key").hasAcquired()).isFalse();
+
+
+        limiter.acquire("key").doAction(this::executeSomeMethod);
+    }
+
+
+    private Integer executeSomeMethod() {
+        return 1;
     }
 
 }
