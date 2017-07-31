@@ -13,10 +13,13 @@ hs_err_pid*
 # Build Output
 build
 
+
 !gradle/wrapper/gradle-wrapper.jar
 
 .gradle/
 
+# IntelliJ
+/out/
 !.idea/
 .idea/*
 classes/*
@@ -26,3 +29,5 @@ classes/*
 *.log.gz
 
 bin/*
+/ratelimitj-test/out/
+/ratelimitj-redis/out/
