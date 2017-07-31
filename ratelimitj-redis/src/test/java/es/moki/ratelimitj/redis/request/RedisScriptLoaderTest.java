@@ -21,7 +21,7 @@ public class RedisScriptLoaderTest {
 
     @AfterAll
     public static void afterAll() {
-        client.shutdown();
+        client.shutdownAsync();
     }
 
     @Test

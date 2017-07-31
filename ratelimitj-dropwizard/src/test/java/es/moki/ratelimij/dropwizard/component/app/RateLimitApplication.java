@@ -60,7 +60,7 @@ public class RateLimitApplication extends Application<Configuration> {
                 try (StatefulRedisConnection<String, String> connection = redisClient.connect()) {
                     connection.sync().flushdb();
                 }
-                redisClient.shutdown();
+                redisClient.shutdownAsync();
             }
         });
 

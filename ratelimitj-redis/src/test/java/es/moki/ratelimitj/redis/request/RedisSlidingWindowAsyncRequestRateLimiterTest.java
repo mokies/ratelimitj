@@ -5,7 +5,6 @@ import com.lambdaworks.redis.api.StatefulRedisConnection;
 import es.moki.ratelimitj.core.limiter.request.AsyncRequestRateLimiter;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.time.TimeSupplier;
-import es.moki.ratelimitj.redis.request.RedisSlidingWindowRequestRateLimiter;
 import es.moki.ratelimitj.test.limiter.request.AbstractAsyncRequestRateLimiterTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -27,8 +26,7 @@ public class RedisSlidingWindowAsyncRequestRateLimiterTest extends AbstractAsync
 
     @AfterAll
     public static void afterAll() {
-        connect.close();
-        client.shutdown();
+        client.shutdownAsync();
     }
 
     @AfterEach

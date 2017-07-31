@@ -22,8 +22,7 @@ public class RedisTimeSupplierTest {
 
     @AfterAll
     public static void afterAll() {
-        connect.close();
-        client.shutdown();
+        client.shutdownAsync();
     }
 
     @Test

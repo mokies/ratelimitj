@@ -43,7 +43,7 @@ public class RedisRateLimiterFactory extends AbstractRequestRateLimiterFactory<R
 
     @Override
     public void close() throws IOException {
-        client.shutdown();
+        client.shutdownAsync();
     }
 
     private StatefulRedisConnection<String, String> getConnection() {
