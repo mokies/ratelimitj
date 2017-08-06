@@ -19,4 +19,10 @@ public class SystemTimeSupplierTest {
         Long time = new SystemTimeSupplier().getAsync().toCompletableFuture().get();
         assertThat(time).isCloseTo(System.currentTimeMillis() / 1000L, Offset.offset(2L));
     }
+
+    @Test
+    public void shouldGetReactiveSystemCurrentTime() throws Exception {
+        Long time = new SystemTimeSupplier().getReactive().block();
+        assertThat(time).isCloseTo(System.currentTimeMillis() / 1000L, Offset.offset(2L));
+    }
 }

@@ -1,0 +1,12 @@
+server:
+  type: simple
+  connector:
+    type: http
+    port: 18080
+
+logging:
+
+  level: INFO
+
+  appenders:
+    - type: console

@@ -36,4 +36,10 @@ public class RedisTimeSupplierTest {
         Long time = new RedisTimeSupplier(connect).getAsync().toCompletableFuture().get();
         assertThat(time).isNotNull().isNotNegative().isNotZero();
     }
+
+    @Test
+    public void shouldGetReactiveSystemCurrentTime() throws Exception {
+        Long time = new RedisTimeSupplier(connect).getReactive().block();
+        assertThat(time).isNotNull().isNotNegative().isNotZero();
+    }
 }

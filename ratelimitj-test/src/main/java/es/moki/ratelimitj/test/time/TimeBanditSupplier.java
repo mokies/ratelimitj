@@ -2,6 +2,7 @@ package es.moki.ratelimitj.test.time;
 
 
 import es.moki.ratelimitj.core.time.TimeSupplier;
+import reactor.core.publisher.Mono;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -25,6 +26,11 @@ public class TimeBanditSupplier implements TimeSupplier {
     @Override
     public CompletionStage<Long> getAsync() {
         return CompletableFuture.completedFuture(get());
+    }
+
+    @Override
+    public Mono<Long> getReactive() {
+        return Mono.just(get());
     }
 
     @Override

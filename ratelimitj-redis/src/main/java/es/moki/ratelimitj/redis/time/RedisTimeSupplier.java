@@ -3,6 +3,8 @@ package es.moki.ratelimitj.redis.time;
 
 import com.lambdaworks.redis.api.StatefulRedisConnection;
 import es.moki.ratelimitj.core.time.TimeSupplier;
+import reactor.core.publisher.Mono;
+import rx.functions.Func1;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.concurrent.CompletionStage;
@@ -29,6 +31,11 @@ public class RedisTimeSupplier implements TimeSupplier {
     public CompletionStage<Long> getAsync() {
         return connection.async().time().thenApply(strings -> Long.parseLong(strings.get(0)));
     }
+
+//    @Override
+//    public Mono<Long> getReactive() {
+//       Long time = connection.reactive().time().map(Long::parseLong);
+//    }
 
     @Override
     public long get() {
