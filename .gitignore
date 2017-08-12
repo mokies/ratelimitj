@@ -7,23 +7,20 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-# IDE
-*.iml
-
 # Build Output
 build
-
 
 !gradle/wrapper/gradle-wrapper.jar
 
 .gradle/
 
 # IntelliJ
-/out/
+*.iml
 !.idea/
 .idea/*
 classes/*
 !.idea/runConfigurations/
+*/out/
 
 *.log
 *.log.gz

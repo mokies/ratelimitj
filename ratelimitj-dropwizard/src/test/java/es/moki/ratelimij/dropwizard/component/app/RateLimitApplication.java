@@ -1,7 +1,5 @@
 package es.moki.ratelimij.dropwizard.component.app;
 
-import com.lambdaworks.redis.RedisClient;
-import com.lambdaworks.redis.api.StatefulRedisConnection;
 import es.moki.ratelimij.dropwizard.RateLimitBundle;
 import es.moki.ratelimij.dropwizard.component.app.api.LoginResource;
 import es.moki.ratelimij.dropwizard.component.app.api.UserResource;
@@ -17,6 +15,8 @@ import io.dropwizard.auth.oauth.OAuthCredentialAuthFilter;
 import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.api.StatefulRedisConnection;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
 public class RateLimitApplication extends Application<Configuration> {

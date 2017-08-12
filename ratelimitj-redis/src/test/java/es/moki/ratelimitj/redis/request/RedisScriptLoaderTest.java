@@ -1,7 +1,7 @@
 package es.moki.ratelimitj.redis.request;
 
 
-import com.lambdaworks.redis.RedisClient;
+import io.lettuce.core.RedisClient;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;

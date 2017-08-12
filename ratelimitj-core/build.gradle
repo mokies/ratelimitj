@@ -5,7 +5,7 @@ project.ext.release = true
 dependencies {
 
     api(
-            'io.projectreactor:reactor-core:3.0.7.RELEASE',
+            'io.projectreactor:reactor-core:3.1.0.M3',
     )
 
     implementation(

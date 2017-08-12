@@ -2,10 +2,10 @@ package es.moki.ratelimitj.redis.request;
 
 
 import com.google.common.collect.ImmutableSet;
-import com.lambdaworks.redis.RedisClient;
-import com.lambdaworks.redis.api.StatefulRedisConnection;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.api.StatefulRedisConnection;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

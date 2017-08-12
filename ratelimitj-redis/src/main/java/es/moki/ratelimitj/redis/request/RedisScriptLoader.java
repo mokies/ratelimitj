@@ -3,7 +3,7 @@ package es.moki.ratelimitj.redis.request;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
-import com.lambdaworks.redis.api.StatefulRedisConnection;
+import io.lettuce.core.api.StatefulRedisConnection;
 
 import java.io.IOException;
 import java.net.URL;
