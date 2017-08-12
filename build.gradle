@@ -3,17 +3,12 @@ buildscript {
         mavenCentral()
         mavenLocal()
     }
-    dependencies {
-        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.5.3"
-//        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0-M3'
-    }
 }
 
 plugins {
     id 'com.gradle.build-scan' version '1.8'
 }
 
-//apply plugin: 'org.junit.platform.gradle.plugin'
 
 defaultTasks 'check'
 
