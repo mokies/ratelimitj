@@ -8,7 +8,6 @@ dependencies {
             project(':ratelimitj-core'),
             'com.eclipsesource.minimal-json:minimal-json:0.9.4',
             libraries.findbugs,
-            libraries.guava,
             libraries.slf4j
     )
 
