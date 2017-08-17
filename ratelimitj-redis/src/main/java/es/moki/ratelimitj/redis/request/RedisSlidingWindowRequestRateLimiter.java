@@ -135,16 +135,14 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
         String sha = scriptLoader.scriptSha();
 
         return timeSupplier.getReactive().flatMapMany(time ->
-                    connection.reactive().evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight), toRedisStrictlyGreater(strictlyGreater))
-        ).next().map(result -> {
-            boolean overLimit = "1".equals(result);
-
-            // TODO improve logging
-            if (overLimit) {
-                LOG.debug("Requests matched by key '{}' incremented by weight {} are greater than {} the limit", key, weight, strictlyGreater ? "" : "or equal to ");
-            }
-            return overLimit;
-        });
+                connection.reactive().evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight), toRedisStrictlyGreater(strictlyGreater)))
+                .next()
+                .map("1"::equals)
+                .doOnSuccess(over -> {
+                    if (over) {
+                        LOG.debug("Requests matched by key '{}' incremented by weight {} are greater than {}the limit", key, weight, strictlyGreater ? "" : "or equal to ");
+                    }
+                });
 
         // TODO handle scenario where script is not loaded, flush scripts and test scenario
     }
