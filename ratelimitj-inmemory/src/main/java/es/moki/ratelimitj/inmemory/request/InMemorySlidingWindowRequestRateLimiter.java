@@ -161,16 +161,18 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
         }
 
         // there is enough resources, update the counts
-        for (SavedKey savedKey : savedKeys) {
-            //update the current timestamp, count, and bucket count
-            keyMap.put(savedKey.tsKey, savedKey.trimBefore);
+        if (weight != 0) {
+            for (SavedKey savedKey : savedKeys) {
+                //update the current timestamp, count, and bucket count
+                keyMap.put(savedKey.tsKey, savedKey.trimBefore);
 
-            Long computedCountKeyValue = keyMap.compute(savedKey.countKey, (k, v) -> coalesce(v, 0L) + weight);
-            Long computedCountKeyBlockIdValue = keyMap.compute(savedKey.countKey + savedKey.blockId, (k, v) -> coalesce(v, 0L) + weight);
+                Long computedCountKeyValue = keyMap.compute(savedKey.countKey, (k, v) -> coalesce(v, 0L) + weight);
+                Long computedCountKeyBlockIdValue = keyMap.compute(savedKey.countKey + savedKey.blockId, (k, v) -> coalesce(v, 0L) + weight);
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("{} {}={}", key, savedKey.countKey, computedCountKeyValue);
-                LOG.debug("{} {}={}", key, savedKey.countKey + savedKey.blockId, computedCountKeyBlockIdValue);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("{} {}={}", key, savedKey.countKey, computedCountKeyValue);
+                    LOG.debug("{} {}={}", key, savedKey.countKey + savedKey.blockId, computedCountKeyBlockIdValue);
+                }
             }
         }
 
