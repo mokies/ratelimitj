@@ -17,7 +17,6 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.TimeUnit;
 
 import static io.lettuce.core.ScriptOutputType.VALUE;
 import static java.util.Objects.requireNonNull;
@@ -26,6 +25,8 @@ import static java.util.Objects.requireNonNull;
 public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter, AsyncRequestRateLimiter, ReactiveRequestRateLimiter {
 
     private static final Logger LOG = LoggerFactory.getLogger(RedisSlidingWindowRequestRateLimiter.class);
+
+    private static final Duration BLOCK_TIMEOUT = Duration.of(5, ChronoUnit.SECONDS);
 
     private final LimitRuleJsonSerialiser serialiser = new LimitRuleJsonSerialiser();
 
@@ -71,7 +72,7 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
 
     @Override
     public boolean overLimitWhenIncremented(String key, int weight) {
-        return eqOrGeLimitReactive(key, weight, true).block(Duration.of(2, ChronoUnit.SECONDS));
+        return eqOrGeLimitReactive(key, weight, true).block(BLOCK_TIMEOUT);
     }
 
     @Override
@@ -81,7 +82,7 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
 
     @Override
     public boolean geLimitWhenIncremented(String key, int weight) {
-        return eqOrGeLimitReactive(key, weight, false).block(Duration.of(2, ChronoUnit.SECONDS));
+        return eqOrGeLimitReactive(key, weight, false).block(BLOCK_TIMEOUT);
     }
 
 //    @Override
@@ -96,7 +97,7 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
 
     @Override
     public boolean resetLimit(String key) {
-        return toBlocking(resetLimitAsync(key));
+        return resetLimitReactive(key).block(BLOCK_TIMEOUT);
     }
 
     @Override
@@ -131,11 +132,12 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
     private Mono<Boolean> eqOrGeLimitReactive(String key, int weight, boolean strictlyGreater) {
         requireNonNull(key);
 
-        //TODO script load can be reactive
+        // TODO script load can be reactive
+        // TODO handle scenario where script is not loaded, flush scripts and test scenario
         String sha = scriptLoader.scriptSha();
 
         return timeSupplier.getReactive().flatMapMany(time ->
-                connection.reactive().evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight), toRedisStrictlyGreater(strictlyGreater)))
+                connection.reactive().evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight), toStringOneZero(strictlyGreater)))
                 .next()
                 .map("1"::equals)
                 .doOnSuccess(over -> {
@@ -143,19 +145,10 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
                         LOG.debug("Requests matched by key '{}' incremented by weight {} are greater than {}the limit", key, weight, strictlyGreater ? "" : "or equal to ");
                     }
                 });
-
-        // TODO handle scenario where script is not loaded, flush scripts and test scenario
     }
 
-    private String toRedisStrictlyGreater(boolean strictlyGreater) {
+    private String toStringOneZero(boolean strictlyGreater) {
         return strictlyGreater ? "1" : "0";
     }
 
-    private boolean toBlocking(CompletionStage<Boolean> completionStage) {
-        try {
-            return completionStage.toCompletableFuture().get(10, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to complete operation", e);
-        }
-    }
 }
