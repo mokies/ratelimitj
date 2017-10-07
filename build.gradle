@@ -41,7 +41,7 @@ allprojects {
 subprojects {
 
     apply plugin: 'pmd'
-    apply plugin: 'findbugs'
+//    apply plugin: 'findbugs'
     apply plugin: 'checkstyle'
     apply plugin: 'maven-publish'
     apply plugin: 'maven'
