@@ -12,7 +12,7 @@ dependencies {
     )
 
     api(
-            'io.lettuce:lettuce-core:5.0.0.RC1'
+            'io.lettuce:lettuce-core:5.0.0.RELEASE'
     )
 
     testCompile(
