@@ -7,9 +7,9 @@ import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import es.moki.ratelimitj.test.time.TimeBanditSupplier;
 import net.jodah.expiringmap.ExpiringMap;
-import org.junit.Ignore;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -40,7 +40,7 @@ public class InMemoryRequestRateLimiterInternalTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void shouldEventuallyCleanUpExpiredKeys() throws Exception {
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(1, TimeUnit.SECONDS, 5));
         RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);

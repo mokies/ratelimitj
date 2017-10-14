@@ -4,7 +4,7 @@ package es.moki.ratelimitj.inmemory.concurrent;
 import es.moki.ratelimitj.core.limiter.concurrent.Baton;
 import es.moki.ratelimitj.core.limiter.concurrent.ConcurrentLimitRule;
 import es.moki.ratelimitj.test.limiter.concurrent.AbstractSyncConcurrentRateLimiterTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 

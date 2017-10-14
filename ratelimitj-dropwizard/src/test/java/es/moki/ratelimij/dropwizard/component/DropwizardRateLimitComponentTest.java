@@ -7,8 +7,6 @@ import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -19,13 +17,15 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
-@RunWith(JUnitPlatform.class)
 public class DropwizardRateLimitComponentTest {
 
     @ClassRule
     public static final DropwizardAppRule<Configuration> RULE =
             new DropwizardAppRule<>(RateLimitApplication.class, ResourceHelpers.resourceFilePath("ratelimit-app.yml"));
 
+//    private static RedisClient client;
+//    private static StatefulRedisConnection connect;
+//
 //    @BeforeAll
 //    public static void beforeAll() {
 //        client = RedisClient.create("redis://localhost");

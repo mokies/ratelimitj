@@ -4,7 +4,7 @@ package es.moki.ratelimitj.inmemory;
 import com.google.common.collect.ImmutableSet;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 

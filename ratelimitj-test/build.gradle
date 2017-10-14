@@ -1,4 +1,4 @@
-description 'RateLimitJ Redis'
+description 'RateLimitJ Test'
 
 dependencies {
 
@@ -6,11 +6,8 @@ dependencies {
             project(':ratelimitj-core'),
             libraries.assertj,
             libraries.guava,
-            libraries.slf4j
+            libraries.slf4j,
+            'org.junit.jupiter:junit-jupiter-api:5.0.1'
     )
-
-    compile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
-    compile "org.junit.platform:junit-platform-runner:${junitPlatformVersion}"
-    runtime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
 
 }

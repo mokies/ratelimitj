@@ -6,29 +6,24 @@ import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public class RedisRateLimiterFactoryTest {
 
-    @Mock
-    private RedisClient client;
+    private RedisClient client = mock(RedisClient.class);
 
-    @Mock
-    private StatefulRedisConnection<String, String> connection;
+    private StatefulRedisConnection<String, String> connection = mock(StatefulRedisConnection.class);
 
     private RedisRateLimiterFactory factory;
 
-    @Before
+    @BeforeEach
     public void beforeEach() {
         factory = new RedisRateLimiterFactory(client);
         when(client.connect()).thenReturn(connection);

@@ -18,7 +18,4 @@ dependencies {
             libraries.logback,
     )
 
-    testCompile "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
-    testCompile "org.junit.platform:junit-platform-runner:${junitPlatformVersion}"
-    testRuntime "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
 }
