@@ -43,6 +43,13 @@ allprojects {
 
     junitPlatform {
         platformVersion '1.0.0'
+        filters {
+            engines {
+                include 'junit-jupiter'
+                // exclude 'junit-vintage'
+            }
+            includeClassNamePatterns '.*Test', '.*Tests'
+        }
     }
 
     dependencies {

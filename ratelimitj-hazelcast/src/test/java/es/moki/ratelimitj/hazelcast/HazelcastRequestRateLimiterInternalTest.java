@@ -2,14 +2,15 @@ package es.moki.ratelimitj.hazelcast;
 
 
 import com.google.common.collect.ImmutableSet;
-import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
-import es.moki.ratelimitj.test.time.TimeBanditSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
+import es.moki.ratelimitj.test.time.TimeBanditSupplier;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -17,6 +18,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
+import static es.moki.ratelimitj.hazelcast.HazelcastTestFactory.newStandaloneHazelcastInstance;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class HazelcastRequestRateLimiterInternalTest {
@@ -26,13 +28,18 @@ public class HazelcastRequestRateLimiterInternalTest {
     private final TimeBanditSupplier timeBandit = new TimeBanditSupplier();
 
     @BeforeAll
-    public static void before() {
-        hz = Hazelcast.newHazelcastInstance();
+    public static void beforeAll() {
+        hz = newStandaloneHazelcastInstance();
     }
 
     @AfterAll
-    public static void after() {
+    public static void afterAll() {
         hz.shutdown();
+    }
+
+    @AfterEach
+    public void afterEach() {
+        hz.getDistributedObjects().forEach(DistributedObject::destroy);
     }
 
     private RequestRateLimiter getRateLimiter(Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static es.moki.ratelimitj.core.RateLimitUtils.coalesce;
 import static java.util.Objects.requireNonNull;
 
 @ThreadSafe
@@ -46,7 +47,7 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
     // TODO support muli keys
     @Override
     public boolean overLimitWhenIncremented(String key, int weight) {
-        return eqOrGeLimit(key, weight, false);
+        return eqOrGeLimit(key, weight, true);
     }
 
     @Override
@@ -56,7 +57,7 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
 
     @Override
     public boolean geLimitWhenIncremented(String key, int weight) {
-        return eqOrGeLimit(key, weight, true);
+        return eqOrGeLimit(key, weight, false);
     }
 
 //    @Override
@@ -71,11 +72,16 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
 
     @Override
     public boolean resetLimit(String key) {
-        throw new RuntimeException("Not implemented");
+        IMap<Object, Object> map = hz.getMap(key);
+        if (map == null || map.isEmpty()) {
+            return false;
+        }
+        map.clear();
+        map.destroy();
+        return true;
     }
 
     private IMap<String, Long> getMap(String key, int longestDuration) {
-
         MapConfig mapConfig = hz.getConfig().getMapConfig(key);
         mapConfig.setTimeToLiveSeconds(longestDuration);
         mapConfig.setAsyncBackupCount(1);
@@ -141,9 +147,9 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
             }
 
             // check our limits
-            long count = Optional.ofNullable(cur).orElse(0L) + weight;
+            long count = coalesce(cur, 0L) + weight;
             if (count > rule.getLimit()) {
-                return true; // over limit
+                return true; // over limit, don't record request
             } else if (!strictlyGreater && count == rule.getLimit()) {
                 geLimit = true; // at limit, do record request
             }
