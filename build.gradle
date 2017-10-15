@@ -29,6 +29,8 @@ buildScan {
     link 'GitHub', 'https://github.com/mokies/ratelimitj'
 }
 
+ext.junitJupiterVersion  = '5.0.1'
+
 allprojects {
     repositories {
         mavenCentral()
@@ -46,15 +48,21 @@ allprojects {
         filters {
             engines {
                 include 'junit-jupiter'
-                // exclude 'junit-vintage'
+//                include 'junit-vintage'
             }
-            includeClassNamePatterns '.*Test', '.*Tests'
+            includeClassNamePatterns '.*Test'
         }
     }
 
     dependencies {
-        testCompile('org.junit.jupiter:junit-jupiter-api:5.0.1')
-        testRuntime('org.junit.jupiter:junit-jupiter-engine:5.0.1')
+        testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
+        testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
+
+//        testCompile("junit:junit:4.12")
+//        testRuntime("org.junit.vintage:junit-vintage-engine:4.12.0")
+
+        // To avoid compiler warnings about @API annotations in JUnit code https://github.com/junit-team/junit5-samples/issues/45
+        testCompileOnly('org.apiguardian:apiguardian-api:1.0.0')
     }
 
 }

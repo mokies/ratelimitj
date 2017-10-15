@@ -10,10 +10,10 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class InMemoryConcurrentSyncRequestRateLimiterTest extends AbstractSyncConcurrentRateLimiterTest {
+class InMemoryConcurrentSyncRequestRateLimiterTest extends AbstractSyncConcurrentRateLimiterTest {
 
     @Test
-    public void shouldPreventConcurrentRequests() {
+    void shouldPreventConcurrentRequests() {
         InMemoryConcurrentRequestRateLimiter limiter = new InMemoryConcurrentRequestRateLimiter(
                 ConcurrentLimitRule.of(2, TimeUnit.MINUTES, 1));
 
@@ -30,7 +30,7 @@ public class InMemoryConcurrentSyncRequestRateLimiterTest extends AbstractSyncCo
     }
 
     @Test
-    public void shouldPreventConcurrentRequestsWithWeight() {
+    void shouldPreventConcurrentRequestsWithWeight() {
         InMemoryConcurrentRequestRateLimiter limiter = new InMemoryConcurrentRequestRateLimiter(
                 ConcurrentLimitRule.of(2, TimeUnit.MINUTES, 1));
 
@@ -39,7 +39,7 @@ public class InMemoryConcurrentSyncRequestRateLimiterTest extends AbstractSyncCo
     }
 
     @Test
-    public void shouldTimeOutUnclosedBaton() throws Exception {
+    void shouldTimeOutUnclosedBaton() throws Exception {
         InMemoryConcurrentRequestRateLimiter limiter = new InMemoryConcurrentRequestRateLimiter(
                 ConcurrentLimitRule.of(1, TimeUnit.MILLISECONDS, 500));
 
@@ -53,7 +53,7 @@ public class InMemoryConcurrentSyncRequestRateLimiterTest extends AbstractSyncCo
     }
 
     @Test
-    public void shouldDoWork() {
+    void shouldDoWork() {
         InMemoryConcurrentRequestRateLimiter limiter = new InMemoryConcurrentRequestRateLimiter(
                 ConcurrentLimitRule.of(1, TimeUnit.MINUTES, 1));
 
@@ -69,7 +69,6 @@ public class InMemoryConcurrentSyncRequestRateLimiterTest extends AbstractSyncCo
 
         limiter.acquire("key").doAction(this::executeSomeMethod);
     }
-
 
     private Integer executeSomeMethod() {
         return 1;
