@@ -47,27 +47,32 @@ public class RateLimit429EnforcerFilter implements ContainerRequestFilter {
     @Override
     public void filter(final ContainerRequestContext requestContext) throws IOException {
 
-        AnnotatedMethod method = new AnnotatedMethod(resource.getResourceMethod());
-        RateLimited rateLimited = method.getAnnotation(RateLimited.class);
+        try {
+            AnnotatedMethod method = new AnnotatedMethod(resource.getResourceMethod());
+            RateLimited rateLimited = method.getAnnotation(RateLimited.class);
 
-        RequestRateLimiter rateLimit = factory.getInstance(toLimitRules(rateLimited));
-        KeyProvider keyProvider = rateLimited.key();
+            RequestRateLimiter rateLimit = factory.getInstance(toLimitRules(rateLimited));
+            KeyProvider keyProvider = rateLimited.key();
 
-        Optional<String> key = keyProvider.create(request, resource, securityContext);
+            Optional<String> key = keyProvider.create(request, resource, securityContext);
 
-        if (key.isPresent()) {
-            boolean overLimit = rateLimit.overLimitWhenIncremented(key.get());
-            if (overLimit) {
-                if (!rateLimited.reportOnly()) {
-                    LOG.info("rate-limit key '{}' over limit. HTTP Status 429 returned.", key);
-                    requestContext.abortWith(Response.status(HTTP_STATUS_TOO_MANY_REQUESTS).build());
-                } else {
-                    LOG.info("rate-limit key '{}' over limit. ReportOnly is true, no action taken.", key);
+            if (key.isPresent()) {
+                boolean overLimit = rateLimit.overLimitWhenIncremented(key.get());
+                if (overLimit) {
+                    if (!rateLimited.reportOnly()) {
+                        LOG.info("rate-limit key '{}' over limit. HTTP Status 429 returned.", key);
+                        requestContext.abortWith(Response.status(HTTP_STATUS_TOO_MANY_REQUESTS).build());
+                    } else {
+                        LOG.info("rate-limit key '{}' over limit. ReportOnly is true, no action taken.", key);
+                    }
+                    LOG.debug("rate-limit key '{}' under limit.", key);
                 }
-                LOG.debug("rate-limit key '{}' under limit.", key);
+            } else {
+                LOG.warn("No key was provided by the key provide '{}'", keyProvider.getClass());
             }
-        }  else {
-            LOG.warn("No key was provided by the key provide '{}'", keyProvider.getClass());
+        }
+        catch (Exception e) {
+            LOG.error("Error occurred checking rate-limit. Assuming under limit", e);
         }
     }
 

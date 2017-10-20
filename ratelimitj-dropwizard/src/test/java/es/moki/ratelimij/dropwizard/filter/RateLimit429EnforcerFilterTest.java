@@ -95,6 +95,21 @@ public class RateLimit429EnforcerFilterTest {
         assertThat(response.getStatus()).isEqualTo(200);
     }
 
+    @Test
+    @DisplayName("should not limit if the backing rate limiter throws exception")
+    public void shouldNotLimitIfBackingRateLimiterFails() {
+
+        when(requestRateLimiterFactory.getInstance(anySet())).thenReturn(requestRateLimiter);
+        when(requestRateLimiter.overLimitWhenIncremented(anyString())).thenThrow(new RuntimeException());
+
+        Response response = rule.getJerseyTest().target("/test/{id}").resolveTemplate("id", 1)
+                .request(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+
+        assertThat(response.getStatus()).isEqualTo(200);
+
+    }
+
     @Singleton
     public static class TestRateLimitingFactoryProvider extends AbstractValueFactoryProvider {
 
