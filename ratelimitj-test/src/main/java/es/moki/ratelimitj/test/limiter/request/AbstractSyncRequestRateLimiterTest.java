@@ -22,7 +22,7 @@ public abstract class AbstractSyncRequestRateLimiterTest {
     protected abstract RequestRateLimiter getRateLimiter(Set<RequestLimitRule> rules, TimeSupplier timeSupplier);
 
     @Test
-    public void shouldLimitSingleWindowSync() throws Exception {
+    void shouldLimitSingleWindowSync() throws Exception {
 
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 5));
         RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
@@ -36,7 +36,7 @@ public abstract class AbstractSyncRequestRateLimiterTest {
     }
 
     @Test
-    public void shouldGeLimitSingleWindowSync() throws Exception {
+    void shouldGeLimitSingleWindowSync() throws Exception {
 
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 5));
         RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
@@ -50,7 +50,7 @@ public abstract class AbstractSyncRequestRateLimiterTest {
     }
 
     @Test
-    public void shouldLimitWithWeightSingleWindowSync() throws Exception {
+    void shouldLimitWithWeightSingleWindowSync() throws Exception {
 
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 10));
         RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
@@ -64,7 +64,7 @@ public abstract class AbstractSyncRequestRateLimiterTest {
     }
 
     @Test
-    public void shouldLimitSingleWindowSyncWithMultipleKeys() throws Exception {
+    void shouldLimitSingleWindowSyncWithMultipleKeys() throws Exception {
 
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 5));
         RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
@@ -84,7 +84,7 @@ public abstract class AbstractSyncRequestRateLimiterTest {
     }
 
     @Test
-    public void shouldResetLimit() {
+    void shouldResetLimit() {
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(60, TimeUnit.SECONDS, 1));
         RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
 

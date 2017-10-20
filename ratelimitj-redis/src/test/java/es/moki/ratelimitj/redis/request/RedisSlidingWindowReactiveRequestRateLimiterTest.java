@@ -19,18 +19,18 @@ public class RedisSlidingWindowReactiveRequestRateLimiterTest extends AbstractRe
     private static StatefulRedisConnection<String, String> connect;
 
     @BeforeAll
-    public static void beforeAll() {
+    static void beforeAll() {
         client = RedisClient.create("redis://localhost");
         connect = client.connect();
     }
 
     @AfterAll
-    public static void afterAll() {
+    static void afterAll() {
         client.shutdownAsync();
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         try (StatefulRedisConnection<String, String> connection = client.connect()) {
             connection.sync().flushdb();
         }

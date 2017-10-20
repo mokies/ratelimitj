@@ -8,36 +8,36 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class RedisTimeSupplierTest {
+class RedisTimeSupplierTest {
 
     private static RedisClient client;
     private static StatefulRedisConnection<String, String> connect;
 
     @BeforeAll
-    public static void beforeAll() {
+    static void beforeAll() {
         client = RedisClient.create("redis://localhost");
         connect = client.connect();
     }
 
     @AfterAll
-    public static void afterAll() {
+    static void afterAll() {
         client.shutdownAsync();
     }
 
     @Test
-    public void shouldGetSystemCurrentTime() {
+    void shouldGetSystemCurrentTime() {
         Long time = new RedisTimeSupplier(connect).get();
         assertThat(time).isNotNull().isNotNegative().isNotZero();
     }
 
     @Test
-    public void shouldGetAsyncSystemCurrentTime() throws Exception {
+    void shouldGetAsyncSystemCurrentTime() throws Exception {
         Long time = new RedisTimeSupplier(connect).getAsync().toCompletableFuture().get();
         assertThat(time).isNotNull().isNotNegative().isNotZero();
     }
 
     @Test
-    public void shouldGetReactiveSystemCurrentTime() throws Exception {
+    void shouldGetReactiveSystemCurrentTime() throws Exception {
         Long time = new RedisTimeSupplier(connect).getReactive().block();
         assertThat(time).isNotNull().isNotNegative().isNotZero();
     }

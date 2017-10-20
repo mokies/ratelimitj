@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class RateLimitUtilsTest {
+class RateLimitUtilsTest {
 
     @Test
-    public void shouldReturnFirst() {
+    void shouldReturnFirst() {
         Object one = new Object();
         Object two = new Object();
 
@@ -15,7 +15,7 @@ public class RateLimitUtilsTest {
     }
 
     @Test
-    public void shouldReturnSecond() {
+    void shouldReturnSecond() {
         Object one = null;
         Object two = new Object();
 

@@ -28,7 +28,7 @@ public abstract class AbstractAsyncRequestRateLimiterTest {
     protected abstract AsyncRequestRateLimiter getAsyncRateLimiter(Set<RequestLimitRule> rule, TimeSupplier timeSupplier);
 
     @Test
-    public void shouldLimitSingleWindowAsync() throws Exception {
+    void shouldLimitSingleWindowAsync() throws Exception {
 
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 5));
         AsyncRequestRateLimiter rateLimiter = getAsyncRateLimiter(rules, timeBandit);
@@ -50,7 +50,7 @@ public abstract class AbstractAsyncRequestRateLimiterTest {
 
 
     @Test
-    public void shouldLimitDualWindowAsync() throws Exception {
+    void shouldLimitDualWindowAsync() throws Exception {
 
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(2, TimeUnit.SECONDS, 5), RequestLimitRule.of(10, TimeUnit.SECONDS, 20));
         AsyncRequestRateLimiter rateLimiter = getAsyncRateLimiter(rules, timeBandit);
@@ -74,7 +74,7 @@ public abstract class AbstractAsyncRequestRateLimiterTest {
     }
 
     @Test
-    public void shouldResetLimit() throws Exception {
+    void shouldResetLimit() throws Exception {
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(60, TimeUnit.SECONDS, 1));
         AsyncRequestRateLimiter rateLimiter = getAsyncRateLimiter(rules, timeBandit);
 

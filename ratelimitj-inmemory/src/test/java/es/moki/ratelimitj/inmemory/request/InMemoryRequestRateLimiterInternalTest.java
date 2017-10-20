@@ -18,7 +18,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class InMemoryRequestRateLimiterInternalTest {
+class InMemoryRequestRateLimiterInternalTest {
 
 
     private final TimeBanditSupplier timeBandit = new TimeBanditSupplier();
@@ -26,12 +26,12 @@ public class InMemoryRequestRateLimiterInternalTest {
     private final ExpiringMap expiryingKeyMap = ExpiringMap.builder().variableExpiration().build();
 
     @BeforeAll
-    public static void before() {
+    static void before() {
 
     }
 
     @AfterAll
-    public static void after() {
+    static void after() {
 
     }
 
@@ -41,7 +41,7 @@ public class InMemoryRequestRateLimiterInternalTest {
 
     @Test
     @Disabled
-    public void shouldEventuallyCleanUpExpiredKeys() throws Exception {
+    void shouldEventuallyCleanUpExpiredKeys() throws Exception {
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(1, TimeUnit.SECONDS, 5));
         RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
 

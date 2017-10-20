@@ -5,9 +5,9 @@ import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 
-public class HazelcastTestFactory {
+class HazelcastTestFactory {
 
-    public static HazelcastInstance newStandaloneHazelcastInstance() {
+    static HazelcastInstance newStandaloneHazelcastInstance() {
         Config config = new Config();
         config.setProperty("hazelcast.logging.type", "slf4j");
         config.setProperty("hazelcast.shutdownhook.enabled", "false");

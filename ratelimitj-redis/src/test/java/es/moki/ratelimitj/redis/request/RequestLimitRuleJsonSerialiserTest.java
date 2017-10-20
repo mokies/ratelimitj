@@ -10,13 +10,13 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class RequestLimitRuleJsonSerialiserTest {
+class RequestLimitRuleJsonSerialiserTest {
 
     private final LimitRuleJsonSerialiser serialiser = new LimitRuleJsonSerialiser();
 
     @Test
     @DisplayName("should encode limit rule in JSON array")
-    public void shouldEncode() {
+    void shouldEncode() {
 
         ImmutableList<RequestLimitRule> rules = ImmutableList.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 10L), RequestLimitRule.of(1, TimeUnit.MINUTES, 20L));
 
@@ -25,7 +25,7 @@ public class RequestLimitRuleJsonSerialiserTest {
 
     @Test
     @DisplayName("should encode limit rule with precision in JSON array")
-    public void shouldEncodeWithPrecisions() {
+    void shouldEncodeWithPrecisions() {
 
         ImmutableList<RequestLimitRule> rules = ImmutableList.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 10L).withPrecision(4), RequestLimitRule.of(1, TimeUnit.MINUTES, 20L).withPrecision(8));
 

@@ -20,17 +20,17 @@ public class HazelcastSlidingWindowSyncRequestRequestRateLimiterPerformanceTest 
     private static HazelcastInstance hz;
 
     @BeforeAll
-    public static void beforeAll() {
+    static void beforeAll() {
         hz = newStandaloneHazelcastInstance();
     }
 
     @AfterAll
-    public static void afterAll() {
+    static void afterAll() {
         hz.shutdown();
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         hz.getDistributedObjects().forEach(DistributedObject::destroy);
     }
 

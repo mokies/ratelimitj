@@ -10,12 +10,12 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class InMemoryRateLimiterFactoryTest {
+class InMemoryRateLimiterFactoryTest {
 
     private InMemoryRateLimiterFactory factory = new InMemoryRateLimiterFactory();
 
     @Test
-    public void shouldReturnTheSameInstanceForSameRules() {
+    void shouldReturnTheSameInstanceForSameRules() {
 
         RequestLimitRule rule1 = RequestLimitRule.of(1, TimeUnit.MINUTES, 10);
         RequestRateLimiter rateLimiter1 = factory.getInstance(ImmutableSet.of(rule1));
@@ -27,7 +27,7 @@ public class InMemoryRateLimiterFactoryTest {
     }
 
     @Test
-    public void shouldReturnTheSameInstanceForSameSetOfRules() {
+    void shouldReturnTheSameInstanceForSameSetOfRules() {
 
         RequestLimitRule rule1a = RequestLimitRule.of(1, TimeUnit.MINUTES, 10);
         RequestLimitRule rule1b = RequestLimitRule.of(1, TimeUnit.HOURS, 100);
@@ -41,7 +41,7 @@ public class InMemoryRateLimiterFactoryTest {
     }
 
     @Test
-    public void shouldNotReturnTheSameInstanceForSameRules() {
+    void shouldNotReturnTheSameInstanceForSameRules() {
 
         RequestLimitRule rule1 = RequestLimitRule.of(1, TimeUnit.MINUTES, 22);
         RequestRateLimiter rateLimiter1 = factory.getInstance(ImmutableSet.of(rule1));

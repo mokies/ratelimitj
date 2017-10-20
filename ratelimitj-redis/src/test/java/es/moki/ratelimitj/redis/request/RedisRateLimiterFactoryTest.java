@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class RedisRateLimiterFactoryTest {
+class RedisRateLimiterFactoryTest {
 
     private RedisClient client = mock(RedisClient.class);
 
@@ -24,13 +24,13 @@ public class RedisRateLimiterFactoryTest {
     private RedisRateLimiterFactory factory;
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         factory = new RedisRateLimiterFactory(client);
         when(client.connect()).thenReturn(connection);
     }
 
     @Test
-    public void shouldReturnTheSameInstanceForSameRules() {
+    void shouldReturnTheSameInstanceForSameRules() {
 
         RequestLimitRule rule1 = RequestLimitRule.of(1, TimeUnit.MINUTES, 10);
         RequestRateLimiter rateLimiter1 = factory.getInstance(ImmutableSet.of(rule1));
@@ -42,7 +42,7 @@ public class RedisRateLimiterFactoryTest {
     }
 
     @Test
-    public void shouldReturnTheSameInstanceForSameSetOfRules() {
+    void shouldReturnTheSameInstanceForSameSetOfRules() {
 
         RequestLimitRule rule1a = RequestLimitRule.of(1, TimeUnit.MINUTES, 10);
         RequestLimitRule rule1b = RequestLimitRule.of(1, TimeUnit.HOURS, 100);
@@ -56,7 +56,7 @@ public class RedisRateLimiterFactoryTest {
     }
 
     @Test
-    public void shouldNotReturnTheSameInstanceForSameRules() {
+    void shouldNotReturnTheSameInstanceForSameRules() {
 
         RequestLimitRule rule1 = RequestLimitRule.of(1, TimeUnit.MINUTES, 22);
         RequestRateLimiter rateLimiter1 = factory.getInstance(ImmutableSet.of(rule1));

@@ -21,24 +21,24 @@ import java.util.stream.IntStream;
 import static es.moki.ratelimitj.hazelcast.HazelcastTestFactory.newStandaloneHazelcastInstance;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class HazelcastRequestRateLimiterInternalTest {
+class HazelcastRequestRateLimiterInternalTest {
 
     private static HazelcastInstance hz;
 
     private final TimeBanditSupplier timeBandit = new TimeBanditSupplier();
 
     @BeforeAll
-    public static void beforeAll() {
+    static void beforeAll() {
         hz = newStandaloneHazelcastInstance();
     }
 
     @AfterAll
-    public static void afterAll() {
+    static void afterAll() {
         hz.shutdown();
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         hz.getDistributedObjects().forEach(DistributedObject::destroy);
     }
 
@@ -47,7 +47,7 @@ public class HazelcastRequestRateLimiterInternalTest {
     }
 
     @Test
-    public void shouldEventuallyCleanUpExpiredKeys() throws Exception {
+    void shouldEventuallyCleanUpExpiredKeys() throws Exception {
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(2, TimeUnit.SECONDS, 5));
         RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
 

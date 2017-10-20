@@ -27,7 +27,7 @@ public abstract class AbstractSyncRequestRateLimiterPerformanceTest {
     protected abstract RequestRateLimiter getRateLimiter(Set<RequestLimitRule> rules, TimeSupplier timeSupplier);
 
     @Test
-    public void shouldLimitDualWindowSyncTimed() throws Exception {
+    void shouldLimitDualWindowSyncTimed() throws Exception {
 
         Stopwatch watch = Stopwatch.createStarted();
 
