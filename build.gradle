@@ -15,8 +15,6 @@ plugins {
     id 'com.gradle.build-scan' version '1.8'
 }
 
-apply plugin: 'org.junit.platform.gradle.plugin'
-
 defaultTasks 'check'
 
 task wrapper(type: Wrapper) {
@@ -40,35 +38,12 @@ allprojects {
 
     apply plugin: 'java-library'
     apply plugin: 'jacoco'
-
-    sourceCompatibility = 1.8
-
-    junitPlatform {
-        platformVersion '1.0.0'
-        filters {
-            engines {
-                include 'junit-jupiter'
-//                include 'junit-vintage'
-            }
-            includeClassNamePatterns '.*Test'
-        }
-    }
-
-    dependencies {
-        testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
-        testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
-
-//        testCompile("junit:junit:4.12")
-//        testRuntime("org.junit.vintage:junit-vintage-engine:4.12.0")
-
-        // To avoid compiler warnings about @API annotations in JUnit code https://github.com/junit-team/junit5-samples/issues/45
-        testCompileOnly('org.apiguardian:apiguardian-api:1.0.0')
-    }
-
 }
 
 subprojects {
 
+    sourceCompatibility = 1.8
+    
     apply plugin: 'pmd'
 //    apply plugin: 'findbugs'
     apply plugin: 'checkstyle'
@@ -89,6 +64,29 @@ subprojects {
             findbugs: 'com.google.code.findbugs:jsr305:3.0.2'
     ]
 
+    apply plugin: 'org.junit.platform.gradle.plugin'
+
+
+    junitPlatform {
+        filters {
+            engines {
+    //            include 'junit-jupiter'
+    //            include 'junit-vintage'
+            }
+        }
+    }
+
+    dependencies {
+        testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
+        testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
+
+        testCompile("junit:junit:4.12")
+        testRuntime("org.junit.vintage:junit-vintage-engine:4.12.0")
+
+        // To avoid compiler warnings about @API annotations in JUnit code
+       	testCompileOnly('org.apiguardian:apiguardian-api:1.0.0')
+    }
+    
 }
 
 subprojects {

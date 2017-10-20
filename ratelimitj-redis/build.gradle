@@ -15,7 +15,7 @@ dependencies {
             libraries.slf4j
     )
 
-    testCompile(
+    testImplementation(
             project(':ratelimitj-test'),
             libraries.assertj,
             libraries.guava,

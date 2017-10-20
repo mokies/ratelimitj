@@ -9,7 +9,6 @@ import es.moki.ratelimitj.test.limiter.request.AbstractSyncRequestRateLimiterTes
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
@@ -39,17 +38,5 @@ public class HazelcastSlidingWindowSyncRequestRateLimiterTest extends AbstractSy
     protected RequestRateLimiter getRateLimiter(Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
         return new HazelcastSlidingWindowRequestRateLimiter(hz, rules, timeSupplier);
     }
-
-    @Test
-    public void failing() {
-        throw new RuntimeException();
-    }
-
-//    @Override
-//    @Test
-//    @Disabled
-//    public void shouldResetLimit() {
-//
-//    }
 
 }
