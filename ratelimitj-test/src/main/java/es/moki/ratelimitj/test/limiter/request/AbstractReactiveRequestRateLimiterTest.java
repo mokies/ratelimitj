@@ -49,12 +49,12 @@ public abstract class AbstractReactiveRequestRateLimiterTest {
                         .repeat(4)
                         .flatMap(key -> {
                             timeBandit.addUnixTimeMilliSeconds(100);
-                            return rateLimiter.overLimitWhenIncrementedReactive(key);
+                            return rateLimiter.geLimitWhenIncrementedReactive(key);
                         });
 
         geLimitLimitFlux.toStream().forEach(result -> assertThat(result).isFalse());
 
-        assertThat(rateLimiter.overLimitWhenIncrementedReactive("ip:127.0.1.2").block()).isTrue();
+        assertThat(rateLimiter.geLimitWhenIncrementedReactive("ip:127.0.1.2").block()).isTrue();
     }
 
     @Test
