@@ -209,6 +209,7 @@ task codeCoverageReport(type: JacocoReport) {
 codeCoverageReport.dependsOn {
     subprojects*.test
 }
+
 // http://nemerosa.ghost.io/2015/07/01/publishing-to-the-maven-central-using-gradle/
 // ./gradlew uploadArchives closeAndPromoteRepository
 

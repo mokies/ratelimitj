@@ -6,9 +6,11 @@ ext.dropWizardVersion = '1.2.0'
 
 dependencies {
 
-    compile(
+    api(
             project(':ratelimitj-core'),
             "io.dropwizard:dropwizard-core:${dropWizardVersion}",
+    )
+    implementation (
             "io.dropwizard:dropwizard-jersey:${dropWizardVersion}",
             "io.dropwizard:dropwizard-auth:${dropWizardVersion}"
     )

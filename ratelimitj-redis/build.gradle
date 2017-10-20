@@ -4,15 +4,15 @@ project.ext.release = true
 
 dependencies {
 
-    implementation(
+    api(
             project(':ratelimitj-core'),
+            'io.lettuce:lettuce-core:5.0.0.RELEASE'
+    )
+
+    implementation(
             'com.eclipsesource.minimal-json:minimal-json:0.9.4',
             libraries.findbugs,
             libraries.slf4j
-    )
-
-    api(
-            'io.lettuce:lettuce-core:5.0.0.RELEASE'
     )
 
     testCompile(
