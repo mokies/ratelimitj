@@ -57,8 +57,12 @@ public class ConcurrentLimitRule {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ConcurrentLimitRule that = (ConcurrentLimitRule) o;
         return concurrentLimit == that.concurrentLimit &&
                 timeoutMillis == that.timeoutMillis &&
