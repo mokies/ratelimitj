@@ -4,6 +4,13 @@ https://github.com/nlap/dropwizard-ratelimit/blob/master/bundle/src/main/java/ca
 https://github.com/juju/ratelimit
 https://github.com/touhonoob/RateLimit
 https://stripe.com/blog/rate-limiters
+https://github.com/bbeck/token-bucket
+https://news.ycombinator.com/item?id=13997029
+https://medium.com/smyte/rate-limiter-df3408325846
+https://github.com/lyft/ratelimit
+https://github.com/brandur/redis-cell/
+https://gist.github.com/ptarjan/e38f45f2dfe601419ca3af937fff574d
+https://stripe.com/blog/rate-limiters
 
 
 Enhancements 
