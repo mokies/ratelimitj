@@ -47,7 +47,7 @@ Example for Maven:
 | Feature       | Status      |
 | ------------- |-------------| 
 | Redis sliding window rate limiter | production |
-| Dropwizard integration - Bundle | stable |
+| Dropwizard integration - Bundle | production |
 | In-memory sliding window rate limiter | stable |
 | In-memory concurrent rate limiter | beta |
 | Rate limiting toggles (dark launch) for framework integration | beta |
