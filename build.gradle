@@ -9,20 +9,10 @@ buildscript {
     }
 }
 
-plugins {
-    id 'com.gradle.build-scan' version '1.8'
-}
-
 defaultTasks 'check'
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.3'
-}
-
-buildScan {
-    licenseAgreementUrl = 'https://gradle.com/terms-of-service'
-    licenseAgree = 'yes'
-    link 'GitHub', 'https://github.com/mokies/ratelimitj'
+    gradleVersion = '4.3.1'
 }
 
 ext.junitJupiterVersion  = '5.0.1'

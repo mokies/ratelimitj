@@ -28,3 +28,5 @@ classes/*
 bin/*
 /ratelimitj-test/out/
 /ratelimitj-redis/out/
+
+.java-version
