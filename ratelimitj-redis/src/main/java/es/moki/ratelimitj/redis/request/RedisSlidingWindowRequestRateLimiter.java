@@ -72,7 +72,7 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
 
     @Override
     public boolean overLimitWhenIncremented(String key, int weight) {
-        return eqOrGeLimitReactive(key, weight, true).block(BLOCK_TIMEOUT);
+        return throwOnTimeout(eqOrGeLimitReactive(key, weight, true));
     }
 
     @Override
@@ -82,7 +82,7 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
 
     @Override
     public boolean geLimitWhenIncremented(String key, int weight) {
-        return eqOrGeLimitReactive(key, weight, false).block(BLOCK_TIMEOUT);
+        return throwOnTimeout(eqOrGeLimitReactive(key, weight, false));
     }
 
 //    @Override
@@ -97,7 +97,7 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
 
     @Override
     public boolean resetLimit(String key) {
-        return resetLimitReactive(key).block(BLOCK_TIMEOUT);
+        return throwOnTimeout(resetLimitReactive(key));
     }
 
     @Override
@@ -149,6 +149,14 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
 
     private String toStringOneZero(boolean strictlyGreater) {
         return strictlyGreater ? "1" : "0";
+    }
+
+    private boolean throwOnTimeout(Mono<Boolean> mono) {
+        Boolean result = mono.block(BLOCK_TIMEOUT);
+        if (result == null) {
+            throw new RuntimeException("waited " + BLOCK_TIMEOUT + "before timing out");
+        }
+        return result;
     }
 
 }
