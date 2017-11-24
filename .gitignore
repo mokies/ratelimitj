@@ -26,7 +26,6 @@ classes/*
 *.log.gz
 
 bin/*
-/ratelimitj-test/out/
-/ratelimitj-redis/out/
+*/out/*
 
 .java-version
