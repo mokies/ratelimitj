@@ -70,8 +70,7 @@ public class RateLimit429EnforcerFilter implements ContainerRequestFilter {
             } else {
                 LOG.warn("No key was provided by the key provide '{}'", keyProvider.getClass());
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             LOG.error("Error occurred checking rate-limit. Assuming under limit", e);
         }
     }
