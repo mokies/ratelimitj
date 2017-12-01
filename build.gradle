@@ -40,7 +40,7 @@ subprojects {
 
     checkstyle {
         configFile = rootProject.file('gradle/config/checkstyle/checkstyle.xml')
-        toolVersion = '8.1'
+        toolVersion = '8.5'
     }
 
     tasks.withType(FindBugs) {
