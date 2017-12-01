@@ -20,9 +20,6 @@ The Redis Module support (RateLimiter)[], (AsyncRateLimiter)[] and (ReactiveRate
 
 #### Basic Synchronous Example
 ```java
-    import com.lambdaworks.redis.RedisClient;
-    import es.moki.ratelimitj.redis.request.RedisSlidingWindowRequestRateLimiter;
-
     StatefulRedisConnection connection = RedisClient.create("redis://localhost").connect();
     
     Set<RequestLimitRule> rules = Collections.singleton(RequestLimitRule.of(1, TimeUnit.MINUTES, 50)); // 50 request per minute, per key
@@ -33,9 +30,6 @@ The Redis Module support (RateLimiter)[], (AsyncRateLimiter)[] and (ReactiveRate
 
 #### Multi Rule Reactive Example
 ```java
-    import com.lambdaworks.redis.RedisClient;
-    import es.moki.ratelimitj.redis.request.RedisSlidingWindowRequestRateLimiter;
-
     StatefulRedisConnection connection = RedisClient.create("redis://localhost").connect();
 
     Set<RequestLimitRule> rules = new HashSet<>();
