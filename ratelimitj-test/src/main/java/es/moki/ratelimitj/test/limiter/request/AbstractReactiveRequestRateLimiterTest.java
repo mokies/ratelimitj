@@ -20,7 +20,7 @@ public abstract class AbstractReactiveRequestRateLimiterTest {
     protected abstract ReactiveRequestRateLimiter getRateLimiter(Set<RequestLimitRule> rules, TimeSupplier timeSupplier);
 
     @Test
-    void shouldLimitSingleWindowReactive() throws Exception {
+    void shouldLimitSingleWindowReactive() {
 
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 5));
         ReactiveRequestRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
@@ -39,7 +39,7 @@ public abstract class AbstractReactiveRequestRateLimiterTest {
     }
 
     @Test
-    void shouldGeLimitSingleWindowReactive() throws Exception {
+    void shouldGeLimitSingleWindowReactive() {
 
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 5));
         ReactiveRequestRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
@@ -58,7 +58,7 @@ public abstract class AbstractReactiveRequestRateLimiterTest {
     }
 
     @Test
-    void shouldLimitDualWindowReactive() throws Exception {
+    void shouldLimitDualWindowReactive() {
 
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(1, TimeUnit.SECONDS, 5), RequestLimitRule.of(10, TimeUnit.SECONDS, 10));
         ReactiveRequestRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
@@ -89,7 +89,7 @@ public abstract class AbstractReactiveRequestRateLimiterTest {
     }
 
     @Test
-    void shouldResetLimit() throws Exception {
+    void shouldResetLimit() {
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(60, TimeUnit.SECONDS, 1));
         ReactiveRequestRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
 

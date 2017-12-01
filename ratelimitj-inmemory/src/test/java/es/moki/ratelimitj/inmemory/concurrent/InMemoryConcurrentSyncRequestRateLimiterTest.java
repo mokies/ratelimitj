@@ -70,6 +70,7 @@ class InMemoryConcurrentSyncRequestRateLimiterTest extends AbstractSyncConcurren
         limiter.acquire("key").doAction(this::executeSomeMethod);
     }
 
+    @SuppressWarnings("SameReturnValue")
     private Integer executeSomeMethod() {
         return 1;
     }

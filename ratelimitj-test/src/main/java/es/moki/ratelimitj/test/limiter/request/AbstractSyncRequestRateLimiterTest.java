@@ -21,7 +21,7 @@ public abstract class AbstractSyncRequestRateLimiterTest {
     protected abstract RequestRateLimiter getRateLimiter(Set<RequestLimitRule> rules, TimeSupplier timeSupplier);
 
     @Test
-    void shouldLimitSingleWindowSync() throws Exception {
+    void shouldLimitSingleWindowSync()  {
 
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 5));
         RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
@@ -35,7 +35,7 @@ public abstract class AbstractSyncRequestRateLimiterTest {
     }
 
     @Test
-    void shouldGeLimitSingleWindowSync() throws Exception {
+    void shouldGeLimitSingleWindowSync() {
 
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 5));
         RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
@@ -49,7 +49,7 @@ public abstract class AbstractSyncRequestRateLimiterTest {
     }
 
     @Test
-    void shouldLimitWithWeightSingleWindowSync() throws Exception {
+    void shouldLimitWithWeightSingleWindowSync() {
 
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 10));
         RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
@@ -63,7 +63,7 @@ public abstract class AbstractSyncRequestRateLimiterTest {
     }
 
     @Test
-    void shouldLimitSingleWindowSyncWithMultipleKeys() throws Exception {
+    void shouldLimitSingleWindowSyncWithMultipleKeys() {
 
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 5));
         RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);

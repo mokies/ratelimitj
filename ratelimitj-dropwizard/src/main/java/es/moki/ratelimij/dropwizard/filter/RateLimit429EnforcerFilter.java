@@ -19,7 +19,6 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
@@ -45,7 +44,7 @@ public class RateLimit429EnforcerFilter implements ContainerRequestFilter {
     private SecurityContext securityContext;
 
     @Override
-    public void filter(final ContainerRequestContext requestContext) throws IOException {
+    public void filter(final ContainerRequestContext requestContext) {
 
         try {
             AnnotatedMethod method = new AnnotatedMethod(resource.getResourceMethod());

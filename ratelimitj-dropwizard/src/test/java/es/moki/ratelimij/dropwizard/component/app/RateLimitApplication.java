@@ -33,7 +33,7 @@ public class RateLimitApplication extends Application<Configuration> {
     }
 
     @Override
-    public void run(Configuration configuration, Environment environment) throws Exception {
+    public void run(Configuration configuration, Environment environment) {
 
         environment.jersey().register(new LoginResource());
         environment.jersey().register(new UserResource());
@@ -48,11 +48,11 @@ public class RateLimitApplication extends Application<Configuration> {
         //TODO move this cleanup into the tests
         environment.lifecycle().manage(new Managed() {
             @Override
-            public void start() throws Exception {
+            public void start() {
             }
 
             @Override
-            public void stop() throws Exception {
+            public void stop() {
                 flushRedis();
             }
 

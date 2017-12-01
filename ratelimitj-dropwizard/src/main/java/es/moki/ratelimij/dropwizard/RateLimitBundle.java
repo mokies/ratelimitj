@@ -38,14 +38,14 @@ public class RateLimitBundle implements ConfiguredBundle<Configuration> {
 
     @Override
     public void run(final Configuration configuration,
-                    final Environment environment) throws Exception {
+                    final Environment environment) {
 
         environment.jersey().register(new RateLimitingFactoryProvider.Binder(requestRateLimiterFactory));
         environment.jersey().register(new RateLimited429EnforcerFeature());
 
         environment.lifecycle().manage(new Managed() {
             @Override
-            public void start() throws Exception {
+            public void start() {
             }
 
             @Override

@@ -21,7 +21,7 @@ class SystemTimeSupplierTest {
     }
 
     @Test
-    void shouldGetReactiveSystemCurrentTime() throws Exception {
+    void shouldGetReactiveSystemCurrentTime() {
         Long time = new SystemTimeSupplier().getReactive().block();
         assertThat(time).isCloseTo(System.currentTimeMillis() / 1000L, Offset.offset(2L));
     }

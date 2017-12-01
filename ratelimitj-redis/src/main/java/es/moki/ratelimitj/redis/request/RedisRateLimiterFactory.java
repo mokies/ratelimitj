@@ -8,7 +8,6 @@ import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
 
-import java.io.IOException;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
@@ -42,7 +41,7 @@ public class RedisRateLimiterFactory extends AbstractRequestRateLimiterFactory<R
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         client.shutdownAsync();
     }
 

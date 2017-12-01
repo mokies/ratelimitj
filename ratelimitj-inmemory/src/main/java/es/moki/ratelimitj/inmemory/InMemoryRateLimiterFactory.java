@@ -8,7 +8,6 @@ import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.inmemory.request.InMemorySlidingWindowRequestRateLimiter;
 
-import java.io.IOException;
 import java.util.Set;
 
 public class InMemoryRateLimiterFactory extends AbstractRequestRateLimiterFactory<InMemorySlidingWindowRequestRateLimiter> {
@@ -34,7 +33,7 @@ public class InMemoryRateLimiterFactory extends AbstractRequestRateLimiterFactor
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
 
     }
 }

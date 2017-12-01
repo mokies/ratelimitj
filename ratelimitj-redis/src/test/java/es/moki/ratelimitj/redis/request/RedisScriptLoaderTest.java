@@ -44,9 +44,8 @@ class RedisScriptLoaderTest {
     @DisplayName("should fail if script not found")
     void shouldFailedIfScriptNotFound() {
 
-        Throwable exception = assertThrows(IllegalArgumentException.class, () -> {
-            new RedisScriptLoader(client.connect(), "not-found-script.lua", true);
-        });
+        Throwable exception = assertThrows(IllegalArgumentException.class,
+                () -> new RedisScriptLoader(client.connect(), "not-found-script.lua", true));
         assertThat(exception.getMessage()).contains("not found");
     }
 }
