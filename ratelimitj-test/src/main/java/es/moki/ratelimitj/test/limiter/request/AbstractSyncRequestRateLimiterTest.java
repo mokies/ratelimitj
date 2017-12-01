@@ -7,7 +7,6 @@ import es.moki.ratelimitj.core.time.TimeSupplier;
 import es.moki.ratelimitj.test.time.TimeBanditSupplier;
 import org.junit.jupiter.api.Test;
 
-
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
@@ -60,7 +59,7 @@ public abstract class AbstractSyncRequestRateLimiterTest {
             assertThat(requestRateLimiter.overLimitWhenIncremented("ip:127.0.1.2", 2)).isFalse();
         });
 
-        assertThat(requestRateLimiter.overLimitWhenIncremented("ip:127.0.1.2",2)).isTrue();
+        assertThat(requestRateLimiter.overLimitWhenIncremented("ip:127.0.1.2", 2)).isTrue();
     }
 
     @Test

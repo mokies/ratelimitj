@@ -11,21 +11,21 @@ public class ConcurrentLimitRule {
     private final String name;
 
     private ConcurrentLimitRule(int concurrentLimit, long timeoutMillis) {
-         this(concurrentLimit, timeoutMillis, null);
-     }
+        this(concurrentLimit, timeoutMillis, null);
+    }
 
-     private ConcurrentLimitRule(int concurrentLimit, long timeoutMillis, String name) {
-         this.concurrentLimit = concurrentLimit;
-         this.timeoutMillis = timeoutMillis;
-         this.name = name;
-     }
+    private ConcurrentLimitRule(int concurrentLimit, long timeoutMillis, String name) {
+        this.concurrentLimit = concurrentLimit;
+        this.timeoutMillis = timeoutMillis;
+        this.name = name;
+    }
 
     /**
      * Initialise a concurrent rate limit.
      *
      * @param concurrentLimit The concurrent limit.
-     * @param timeOutUnit The time unit.
-     * @param timeOut A timeOut for the checkout baton.
+     * @param timeOutUnit     The time unit.
+     * @param timeOut         A timeOut for the checkout baton.
      * @return A concurrent limit rule.
      */
     public static ConcurrentLimitRule of(int concurrentLimit, TimeUnit timeOutUnit, long timeOut) {
