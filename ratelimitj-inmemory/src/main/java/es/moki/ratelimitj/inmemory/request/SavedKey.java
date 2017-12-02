@@ -1,7 +1,5 @@
 package es.moki.ratelimitj.inmemory.request;
 
-import java.util.OptionalInt;
-
 public class SavedKey {
 
     public final long blockId;
@@ -10,9 +8,8 @@ public class SavedKey {
     public final String countKey;
     public final String tsKey;
 
-    public SavedKey(long now, int duration, OptionalInt precisionOpt) {
+    public SavedKey(long now, int duration, int precision) {
 
-        int precision = precisionOpt.orElse(duration);
         precision = Math.min(precision, duration);
 
         this.blocks = (long) Math.ceil(duration / (double) precision);

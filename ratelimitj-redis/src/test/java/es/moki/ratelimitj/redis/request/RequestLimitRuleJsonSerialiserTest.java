@@ -21,7 +21,7 @@ class RequestLimitRuleJsonSerialiserTest {
         ImmutableList<RequestLimitRule> rules = ImmutableList.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 10L),
                 RequestLimitRule.of(1, TimeUnit.MINUTES, 20L));
 
-        assertThat(serialiser.encode(rules)).isEqualTo("[[10,10],[60,20]]");
+        assertThat(serialiser.encode(rules)).isEqualTo("[[10,10,10],[60,20,60]]");
     }
 
     @Test

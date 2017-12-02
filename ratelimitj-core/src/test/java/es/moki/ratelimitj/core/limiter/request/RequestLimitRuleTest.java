@@ -23,6 +23,13 @@ class RequestLimitRuleTest {
     }
 
     @Test
+    void shouldDefaultPrecisionToEqualDuration() {
+        RequestLimitRule requestLimitRule = RequestLimitRule.of(1, TimeUnit.MINUTES, 5);
+
+        assertThat(requestLimitRule.getPrecision()).isEqualTo(60);
+    }
+
+    @Test
     void shouldHaveLimit5() {
         RequestLimitRule requestLimitRule = RequestLimitRule.of(1, TimeUnit.MINUTES, 5);
 
@@ -33,7 +40,7 @@ class RequestLimitRuleTest {
     void shouldHavePrecisionOf10() {
         RequestLimitRule requestLimitRule = RequestLimitRule.of(1, TimeUnit.SECONDS, 5).withPrecision(10);
 
-        assertThat(requestLimitRule.getPrecision()).isPresent().hasValue(10);
+        assertThat(requestLimitRule.getPrecision()).isEqualTo(10);
     }
 
     @Test

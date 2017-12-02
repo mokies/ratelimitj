@@ -5,8 +5,6 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 
-import java.util.OptionalInt;
-
 class LimitRuleJsonSerialiser {
 
     String encode(Iterable<RequestLimitRule> rules) {
@@ -16,12 +14,9 @@ class LimitRuleJsonSerialiser {
     }
 
     private JsonArray toJsonArray(RequestLimitRule rule) {
-        JsonArray array = Json.array().asArray().add(rule.getDurationSeconds()).add(rule.getLimit());
-
-        OptionalInt precision = rule.getPrecision();
-        if (precision.isPresent()) {
-            array.add(precision.getAsInt());
-        }
-        return array;
+        return Json.array().asArray()
+                .add(rule.getDurationSeconds())
+                .add(rule.getLimit())
+                .add(rule.getPrecision());
     }
 }

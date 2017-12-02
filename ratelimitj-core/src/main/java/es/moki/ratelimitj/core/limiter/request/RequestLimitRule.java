@@ -1,7 +1,6 @@
 package es.moki.ratelimitj.core.limiter.request;
 
 import java.util.Objects;
-import java.util.OptionalInt;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -11,14 +10,14 @@ public class RequestLimitRule {
 
     private final int durationSeconds;
     private final long limit;
-    private final OptionalInt precision;
+    private final int precision;
     private final String name;
 
-    private RequestLimitRule(int durationSeconds, long limit) {
-        this(durationSeconds, limit, OptionalInt.empty(), null);
+    private RequestLimitRule(int durationSeconds, long limit, int precision) {
+        this(durationSeconds, limit, precision, null);
     }
 
-    private RequestLimitRule(int durationSeconds, long limit, OptionalInt precision, String name) {
+    private RequestLimitRule(int durationSeconds, long limit, int precision, String name) {
         this.durationSeconds = durationSeconds;
         this.limit = limit;
         this.precision = precision;
@@ -34,7 +33,8 @@ public class RequestLimitRule {
      * @return A limit rule.
      */
     public static RequestLimitRule of(int duration, TimeUnit timeUnit, long limit) {
-        return new RequestLimitRule((int) timeUnit.toSeconds(duration), limit);
+        int durationSeconds = (int) timeUnit.toSeconds(duration);
+        return new RequestLimitRule(durationSeconds, limit, durationSeconds);
     }
 
     /**
@@ -45,7 +45,7 @@ public class RequestLimitRule {
      * @return a limit rule
      */
     public RequestLimitRule withPrecision(int precision) {
-        return new RequestLimitRule(this.durationSeconds, this.limit, OptionalInt.of(precision), this.name);
+        return new RequestLimitRule(this.durationSeconds, this.limit, precision, this.name);
     }
 
     /**
@@ -68,7 +68,7 @@ public class RequestLimitRule {
     /**
      * @return The limits precision.
      */
-    public OptionalInt getPrecision() {
+    public int getPrecision() {
         return precision;
     }
 
