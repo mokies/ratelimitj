@@ -51,7 +51,8 @@ Example for Maven:
 | In-memory sliding window rate limiter | stable |
 | In-memory concurrent rate limiter | beta |
 | Rate limiting toggles (dark launch) for framework integration | beta |
-| Hazelcast sliding window rate limiter | development |
+| Hazelcast sliding window rate limiter | beta/dev |
+| Redis concurrent rate limiter | dev/active |
 | Enhanced metrics logging | back log |
 | Whitelisting & blacklisting of keys | back log |
 | Rate limit HTTP header responses | back log |
