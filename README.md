@@ -56,6 +56,7 @@ Example for Maven:
 | Enhanced metrics logging | back log |
 | Whitelisting & blacklisting of keys | back log |
 | Rate limit HTTP header responses | back log |
+| Async in-memory rate limit buffer/cache (inspired by Google's SRE book) | back log |
 | Spring integration | back log |
 
 Building
