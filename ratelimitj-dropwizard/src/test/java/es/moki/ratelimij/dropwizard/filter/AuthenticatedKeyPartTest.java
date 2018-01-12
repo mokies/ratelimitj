@@ -14,8 +14,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Deprecated
-class AuthenticatedKeyTest {
+class AuthenticatedKeyPartTest {
     
     private ResourceInfo resource = mock(ResourceInfo.class);
 
@@ -27,30 +26,20 @@ class AuthenticatedKeyTest {
         when(resource.getResourceMethod()).thenReturn(Object.class.getMethod("wait"));
     }
 
-    @DisplayName("AUTHENTICATED key should start with 'rlj' prefix")
-    @Test
-    void shouldStartWithPrefix() {
-        when(securityContext.getUserPrincipal()).thenReturn(() -> "elliot");
-
-        Optional<CharSequence> keyName = Key.AUTHENTICATED.create(null, resource, securityContext);
-
-        assertThat(keyName.get()).startsWith("rlj:");
-    }
-
     @DisplayName("AUTHENTICATED key should include user id if available")
     @Test
     void shouldIncludeUserId() {
         when(securityContext.getUserPrincipal()).thenReturn(() -> "elliot");
 
-        Optional<CharSequence> keyName = Key.AUTHENTICATED.create(null, resource, securityContext);
+        Optional<CharSequence> keyName = KeyPart.AUTHENTICATED.create(null, resource, securityContext);
 
-        assertThat(keyName.get()).contains("usr#elliot");
+        assertThat(keyName).contains("usr#elliot");
     }
 
     @DisplayName("AUTHENTICATED key should return absent if no key available")
     @Test
     void shouldBeAbsent() {
-        Optional<CharSequence> keyName = Key.AUTHENTICATED.create(null, resource, securityContext);
+        Optional<CharSequence> keyName = KeyPart.AUTHENTICATED.create(null, resource, securityContext);
 
         assertThat(keyName).isNotPresent();
     }

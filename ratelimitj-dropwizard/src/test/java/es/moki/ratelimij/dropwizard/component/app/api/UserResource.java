@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 @Consumes(MediaType.APPLICATION_JSON)
 public class UserResource {
 
+
     @GET
     @Path("/{id}/default")
     @RateLimited(key = Key.ANY, rates = {@Rate(duration = 10, timeUnit = TimeUnit.HOURS, limit = 5)})

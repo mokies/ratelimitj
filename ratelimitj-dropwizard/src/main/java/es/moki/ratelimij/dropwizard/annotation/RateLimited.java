@@ -1,6 +1,7 @@
 package es.moki.ratelimij.dropwizard.annotation;
 
 import es.moki.ratelimij.dropwizard.filter.Key;
+import es.moki.ratelimij.dropwizard.filter.KeyPart;
 
 import javax.ws.rs.NameBinding;
 import java.lang.annotation.ElementType;
@@ -13,7 +14,10 @@ import java.lang.annotation.Target;
 @Target({ ElementType.METHOD})
 public @interface RateLimited {
 
-    Key key();
+    @Deprecated
+    Key key() default Key.NO_VALUE;
+
+    KeyPart[] keys() default {};
 
     Rate[] rates();
 

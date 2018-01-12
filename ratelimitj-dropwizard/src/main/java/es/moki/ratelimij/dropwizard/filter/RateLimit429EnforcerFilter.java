@@ -51,24 +51,52 @@ public class RateLimit429EnforcerFilter implements ContainerRequestFilter {
             RateLimited rateLimited = method.getAnnotation(RateLimited.class);
 
             RequestRateLimiter rateLimit = factory.getInstance(toLimitRules(rateLimited));
+
             KeyProvider keyProvider = rateLimited.key();
+            KeyPart[] keyParts = rateLimited.keys();
 
-            Optional<String> key = keyProvider.create(request, resource, securityContext);
-
-            if (key.isPresent()) {
-                boolean overLimit = rateLimit.overLimitWhenIncremented(key.get());
-                if (overLimit) {
-                    if (!rateLimited.reportOnly()) {
-                        LOG.info("rate-limit key '{}' over limit. HTTP Status 429 returned.", key);
-                        requestContext.abortWith(Response.status(HTTP_STATUS_TOO_MANY_REQUESTS).build());
-                    } else {
-                        LOG.info("rate-limit key '{}' over limit. ReportOnly is true, no action taken.", key);
-                    }
-                    LOG.debug("rate-limit key '{}' under limit.", key);
-                }
-            } else {
-                LOG.warn("No key was provided by the key provide '{}'", keyProvider.getClass());
+            if (keyProvider == Key.NO_VALUE && keyParts.length == 0) {
+                LOG.warn("No keys were provided by the key provide");
+                return;
             }
+
+            Optional<CharSequence> legacyKey = keyProvider.create(request, resource, securityContext);
+            CharSequence key;
+            if (legacyKey.isPresent()) {
+                key = legacyKey.get();
+
+            } else {
+
+                Optional<CharSequence> keyResult = KeyPart.combineKeysParts(Arrays.asList(keyParts), request, resource, securityContext);
+
+                if (keyResult.isPresent()) {
+                    key = keyResult.get();
+
+                } else {
+                    LOG.warn("No keys were provided by the key providers '{}'",
+                            Arrays.stream(keyParts)
+                                    .map(KeyPart::getClass)
+                                    .map(Object::toString)
+                                    .collect(Collectors.joining(", ")));
+                    return;
+                }
+
+            }
+
+//            if (legacyKey.isPresent()) {
+            boolean overLimit = rateLimit.overLimitWhenIncremented(key.toString());
+            if (overLimit) {
+                if (!rateLimited.reportOnly()) {
+                    LOG.info("rate-limit key '{}' over limit. HTTP Status 429 returned.", key);
+                    requestContext.abortWith(Response.status(HTTP_STATUS_TOO_MANY_REQUESTS).build());
+                } else {
+                    LOG.info("rate-limit key '{}' over limit. ReportOnly is true, no action taken.", key);
+                }
+                LOG.debug("rate-limit key '{}' under limit.", key);
+            }
+//            } else {
+//                //LOG.warn("No key was provided by the key provide '{}'", keyProvider.getClass());
+//            }
         } catch (Exception e) {
             LOG.error("Error occurred checking rate-limit. Assuming under limit", e);
         }

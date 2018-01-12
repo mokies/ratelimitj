@@ -13,8 +13,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Deprecated
-class ResourceKeyTest {
+class ResourceKeyPartTest {
     
     private ResourceInfo resource = mock(ResourceInfo.class);
 
@@ -24,22 +23,12 @@ class ResourceKeyTest {
         when(resource.getResourceMethod()).thenReturn(Object.class.getMethod("wait"));
     }
 
-    @DisplayName("RESOURCE key should start with 'rlj' prefix")
-    @Test
-    void shouldStartWithPrefix() {
-
-        Optional<CharSequence> keyName = Key.RESOURCE.create(null, resource, null);
-
-        assertThat(keyName.get()).startsWith("rlj:");
-    }
-
     @DisplayName("RESOURCE key should include Class and Method names in key")
     @Test
     void shouldIncludeResourceInKey() {
-        Optional<CharSequence> keyName = Key.RESOURCE.create(null, resource, null);
+        Optional<CharSequence> keyName = KeyPart.RESOURCE_NAME.create(null, resource, null);
 
-        assertThat(keyName.get()).contains("java.lang.Object#wait");
+        assertThat(keyName.get()).isEqualTo("java.lang.Object#wait");
     }
-
 
 }

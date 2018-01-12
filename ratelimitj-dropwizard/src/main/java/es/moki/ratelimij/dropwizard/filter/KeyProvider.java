@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface KeyProvider {
 
-    Optional<String> create(HttpServletRequest request, ResourceInfo resourceInfo, SecurityContext securityContext);
+    Optional<CharSequence> create(HttpServletRequest request, ResourceInfo resourceInfo, SecurityContext securityContext);
 
 }
