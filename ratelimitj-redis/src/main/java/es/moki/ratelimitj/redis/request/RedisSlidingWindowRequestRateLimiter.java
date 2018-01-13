@@ -40,6 +40,9 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
     }
 
     public RedisSlidingWindowRequestRateLimiter(StatefulRedisConnection<String, String> connection, Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
+        requireNonNull(rules, "rules can not be null");
+        requireNonNull(timeSupplier, "time supplier can not be null");
+        requireNonNull(connection, "connection can not be null");
         this.connection = connection;
         scriptLoader = new RedisScriptLoader(connection, "sliding-window-ratelimit.lua");
         rulesJson = serialiserLimitRules(rules);

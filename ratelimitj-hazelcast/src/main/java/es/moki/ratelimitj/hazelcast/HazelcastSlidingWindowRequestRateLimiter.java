@@ -34,6 +34,9 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
     }
 
     public HazelcastSlidingWindowRequestRateLimiter(HazelcastInstance hz, Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
+        requireNonNull(hz, "hazelcast can not be null");
+        requireNonNull(rules, "rules can not be null");
+        requireNonNull(rules, "time supplier can not be null");
         this.hz = hz;
         this.rules = rules;
         this.timeSupplier = timeSupplier;

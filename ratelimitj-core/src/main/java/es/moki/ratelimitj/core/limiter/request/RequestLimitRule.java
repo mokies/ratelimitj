@@ -3,6 +3,8 @@ package es.moki.ratelimitj.core.limiter.request;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Defines a limit rule that can support regular and token bucket rate limits.
  */
@@ -33,6 +35,7 @@ public class RequestLimitRule {
      * @return A limit rule.
      */
     public static RequestLimitRule of(int duration, TimeUnit timeUnit, long limit) {
+        requireNonNull(timeUnit, "time unit can not be null");
         int durationSeconds = (int) timeUnit.toSeconds(duration);
         return new RequestLimitRule(durationSeconds, limit, durationSeconds);
     }

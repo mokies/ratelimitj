@@ -38,6 +38,8 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
     }
 
     public InMemorySlidingWindowRequestRateLimiter(Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
+        requireNonNull(rules, "rules can not be null");
+        requireNonNull(rules, "time supplier can not be null");
         this.rules = rules;
         this.timeSupplier = timeSupplier;
         this.expiringKeyMap = ExpiringMap.builder().variableExpiration().build();

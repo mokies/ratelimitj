@@ -4,6 +4,8 @@ package es.moki.ratelimitj.core.limiter.concurrent;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import static java.util.Objects.requireNonNull;
+
 public class ConcurrentLimitRule {
 
     private final int concurrentLimit;
@@ -29,6 +31,7 @@ public class ConcurrentLimitRule {
      * @return A concurrent limit rule.
      */
     public static ConcurrentLimitRule of(int concurrentLimit, TimeUnit timeOutUnit, long timeOut) {
+        requireNonNull(timeOutUnit, "time out unit can not be null");
         return new ConcurrentLimitRule(concurrentLimit, timeOutUnit.toMillis(timeOut));
     }
 

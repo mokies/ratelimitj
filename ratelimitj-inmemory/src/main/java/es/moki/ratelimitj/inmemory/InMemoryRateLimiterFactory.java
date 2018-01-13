@@ -10,10 +10,13 @@ import es.moki.ratelimitj.inmemory.request.InMemorySlidingWindowRequestRateLimit
 
 import java.util.Set;
 
+import static java.util.Objects.requireNonNull;
+
 public class InMemoryRateLimiterFactory extends AbstractRequestRateLimiterFactory<InMemorySlidingWindowRequestRateLimiter> {
 
     @Override
     public RequestRateLimiter getInstance(Set<RequestLimitRule> rules) {
+        requireNonNull(rules);
         return lookupInstance(rules);
     }
 
