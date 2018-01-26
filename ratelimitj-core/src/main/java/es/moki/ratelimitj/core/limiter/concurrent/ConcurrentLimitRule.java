@@ -1,11 +1,13 @@
 package es.moki.ratelimitj.core.limiter.concurrent;
 
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.Objects.requireNonNull;
 
+@ParametersAreNonnullByDefault
 public class ConcurrentLimitRule {
 
     private final int concurrentLimit;

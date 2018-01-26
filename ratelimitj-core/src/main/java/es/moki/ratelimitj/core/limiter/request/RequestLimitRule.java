@@ -1,5 +1,6 @@
 package es.moki.ratelimitj.core.limiter.request;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -8,6 +9,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Defines a limit rule that can support regular and token bucket rate limits.
  */
+@ParametersAreNonnullByDefault
 public class RequestLimitRule {
 
     private final int durationSeconds;

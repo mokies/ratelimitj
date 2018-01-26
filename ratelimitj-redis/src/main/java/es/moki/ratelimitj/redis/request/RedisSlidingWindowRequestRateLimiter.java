@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.ThreadSafe;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -21,6 +22,7 @@ import java.util.concurrent.CompletionStage;
 import static io.lettuce.core.ScriptOutputType.VALUE;
 import static java.util.Objects.requireNonNull;
 
+@ParametersAreNonnullByDefault
 @ThreadSafe
 public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter, AsyncRequestRateLimiter, ReactiveRequestRateLimiter {
 
