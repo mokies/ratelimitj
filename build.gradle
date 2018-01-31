@@ -12,7 +12,7 @@ buildscript {
 defaultTasks 'check'
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.4'
+    gradleVersion = '4.5'
 }
 
 ext.junitJupiterVersion  = '5.0.2'
