@@ -67,7 +67,7 @@ public class RateLimit429EnforcerFilter implements ContainerRequestFilter {
 
             } else {
 
-                Optional<CharSequence> keyResult = KeyPart.combineKeysParts(Arrays.asList(keyParts), request, resource, securityContext);
+                Optional<CharSequence> keyResult = KeyPart.combineKeysParts(rateLimited.groupKeyPrefix(), Arrays.asList(keyParts), request, resource, securityContext);
 
                 if (keyResult.isPresent()) {
                     key = keyResult.get();

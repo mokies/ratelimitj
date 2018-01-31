@@ -32,4 +32,5 @@ public class UserResource {
     public Response getLimitedByAuthenticatedUser(@Auth PrincipalImpl principle, @PathParam("id") final Integer id) {
         return Response.ok().build();
     }
+
 }

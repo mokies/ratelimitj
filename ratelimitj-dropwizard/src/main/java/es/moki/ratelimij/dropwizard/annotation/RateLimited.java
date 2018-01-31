@@ -19,6 +19,13 @@ public @interface RateLimited {
 
     KeyPart[] keys() default {};
 
+    /**
+     * An optional group key prefix allows for a grouped rate limit across multiple dropwizard resources.
+     * Note the group key name will have no impact if using the deprecated key.
+     * @return
+     */
+    String groupKeyPrefix() default "";
+
     Rate[] rates();
 
     /**

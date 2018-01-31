@@ -73,6 +73,22 @@ public class DropwizardRateLimitComponentTest {
         assertThat(client.getLimitedByAuthenticatedUser().getStatus()).isEqualTo(429);
     }
 
+    @Test
+    public void shouldLimitedGroupedKeyParts() {
+        final RestClient client = new RestClient();
+
+        IntStream.rangeClosed(1, 5)
+                .forEach(i -> assertThat(client.getVulcans().getStatus()).isEqualTo(200));
+
+        IntStream.rangeClosed(1, 5)
+                .forEach(i -> assertThat(client.getKlingons().getStatus()).isEqualTo(200));
+
+        assertThat(client.getVulcans().getStatus()).isEqualTo(429);
+
+        assertThat(client.getKlingons().getStatus()).isEqualTo(429);
+
+    }
+
     private static class RestClient {
 
         private final Client client = ClientBuilder.newBuilder().build();
@@ -102,9 +118,27 @@ public class DropwizardRateLimitComponentTest {
                     .get();
         }
 
+        Response getKlingons() {
+             return client.target(
+                     String.format("http://localhost:%d/application/klingons", RULE.getLocalPort()))
+                     .request()
+                     .header(HttpHeaders.AUTHORIZATION, "Bearer secret")
+                     .get();
+         }
+
+        Response getVulcans() {
+             return client.target(
+                     String.format("http://localhost:%d/application/vulcans", RULE.getLocalPort()))
+                     .request()
+                     .header(HttpHeaders.AUTHORIZATION, "Bearer secret")
+                     .get();
+         }
+
         private LoginRequest loginForm() {
             return new LoginRequest("heisenberg", "abc123");
         }
     }
+
+
 
 }

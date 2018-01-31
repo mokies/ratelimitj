@@ -1,5 +1,6 @@
 package es.moki.ratelimij.dropwizard.filter;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.SecurityContext;
@@ -13,12 +14,11 @@ import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
 
+@ParametersAreNonnullByDefault
 public enum KeyPart implements KeyProvider {
 
     /**
      * The 'any' key will be the first of:
-     * <p>
-     * <p>
      * <ul>
      * <li>authenticated principle (Dropwizard auth)</li>
      * <li>X-Forwarded-For Header IP address</li>
@@ -28,8 +28,8 @@ public enum KeyPart implements KeyProvider {
     ANY {
         @Override
         public Optional<CharSequence> create(final HttpServletRequest request,
-                                       final ResourceInfo resource,
-                                       final SecurityContext securityContext) {
+                                             final ResourceInfo resource,
+                                             final SecurityContext securityContext) {
             return selectOptional(
                     () -> userRequestKey(securityContext),
                     () -> xForwardedForRequestKey(request),
@@ -43,8 +43,8 @@ public enum KeyPart implements KeyProvider {
     AUTHENTICATED {
         @Override
         public Optional<CharSequence> create(final HttpServletRequest request,
-                                       final ResourceInfo resource,
-                                       final SecurityContext securityContext) {
+                                             final ResourceInfo resource,
+                                             final SecurityContext securityContext) {
             return userRequestKey(securityContext);
         }
     },
@@ -55,8 +55,8 @@ public enum KeyPart implements KeyProvider {
     IP {
         @Override
         public Optional<CharSequence> create(final HttpServletRequest request,
-                                       final ResourceInfo resource,
-                                       final SecurityContext securityContext) {
+                                             final ResourceInfo resource,
+                                             final SecurityContext securityContext) {
             return selectOptional(
                     () -> xForwardedForRequestKey(request),
                     () -> ipRequestKey(request));
@@ -70,8 +70,8 @@ public enum KeyPart implements KeyProvider {
     RESOURCE_NAME {
         @Override
         public Optional<CharSequence> create(final HttpServletRequest request,
-                                       final ResourceInfo resource,
-                                       final SecurityContext securityContext) {
+                                             final ResourceInfo resource,
+                                             final SecurityContext securityContext) {
             return Optional.of(resource.getResourceClass().getTypeName()
                     + "#" + resource.getResourceMethod().getName());
         }
@@ -113,15 +113,18 @@ public enum KeyPart implements KeyProvider {
                 .orElse(Optional::empty).get();
     }
 
-    public static Optional<CharSequence> combineKeysParts(List<KeyProvider> keyParts, HttpServletRequest request, ResourceInfo resource, SecurityContext securityContext) {
+    public static Optional<CharSequence> combineKeysParts(CharSequence groupKeyPrefix, List<KeyProvider> keyParts, HttpServletRequest request, ResourceInfo resource, SecurityContext securityContext) {
 
-        List<CharSequence> keys = keyParts.stream().map(keyPart -> keyPart.create(request, resource, securityContext))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
+        List<CharSequence> keys = Stream.concat(
+                Stream.of(groupKeyPrefix),
+                keyParts.stream()
+                        .map(keyPart -> keyPart.create(request, resource, securityContext))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+        ).collect(Collectors.toList());
 
         if (keys.isEmpty()) {
-           return Optional.empty();
+            return Optional.empty();
         }
         return Optional.of(keys.stream().collect(Collectors.joining(":", "rlj", "")));
     }

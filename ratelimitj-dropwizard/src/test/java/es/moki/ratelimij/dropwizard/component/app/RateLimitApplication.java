@@ -2,6 +2,7 @@ package es.moki.ratelimij.dropwizard.component.app;
 
 import es.moki.ratelimij.dropwizard.RateLimitBundle;
 import es.moki.ratelimij.dropwizard.component.app.api.LoginResource;
+import es.moki.ratelimij.dropwizard.component.app.api.TrekResource;
 import es.moki.ratelimij.dropwizard.component.app.api.UserResource;
 import es.moki.ratelimij.dropwizard.component.app.auth.TestOAuthAuthenticator;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiterFactory;
@@ -37,6 +38,7 @@ public class RateLimitApplication extends Application<Configuration> {
 
         environment.jersey().register(new LoginResource());
         environment.jersey().register(new UserResource());
+        environment.jersey().register(new TrekResource());
 
         environment.jersey().register(new AuthDynamicFeature(
                 new OAuthCredentialAuthFilter.Builder<PrincipalImpl>()
