@@ -4,15 +4,12 @@ buildscript {
         mavenCentral()
         jcenter()
     }
-    dependencies {
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.2'
-    }
 }
 
 defaultTasks 'check'
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.5'
+    gradleVersion = '4.6'
 }
 
 ext.junitJupiterVersion  = '5.0.2'
@@ -59,16 +56,8 @@ subprojects {
             findbugs: 'com.google.code.findbugs:jsr305:3.0.2'
     ]
 
-    apply plugin: 'org.junit.platform.gradle.plugin'
-
-
-    junitPlatform {
-        filters {
-            engines {
-    //            include 'junit-jupiter'
-    //            include 'junit-vintage'
-            }
-        }
+    test {
+        useJUnitPlatform()
     }
 
     dependencies {
