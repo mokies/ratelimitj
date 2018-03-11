@@ -6,6 +6,10 @@ buildscript {
     }
 }
 
+plugins {
+    id "com.avast.gradle.docker-compose" version "0.7.1"
+}
+
 defaultTasks 'check'
 
 task wrapper(type: Wrapper) {

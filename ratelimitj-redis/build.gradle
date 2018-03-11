@@ -24,3 +24,8 @@ dependencies {
     )
 
 }
+
+if (project.hasProperty('dockercompose.enabled')) {
+    dockerCompose.isRequiredBy(test)
+}
+
