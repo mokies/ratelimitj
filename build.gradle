@@ -68,9 +68,6 @@ subprojects {
         testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
         testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
 
-        testCompile("junit:junit:4.12")
-        testRuntime("org.junit.vintage:junit-vintage-engine:4.12.0")
-
         // To avoid compiler warnings about @API annotations in JUnit code
        	testCompileOnly('org.apiguardian:apiguardian-api:1.0.0')
     }
