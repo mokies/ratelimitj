@@ -62,15 +62,13 @@ Example for Maven:
 Building
 -----------
 
-RateLimitJ is built with Gradle and requires a local Redis for the Redis module. 
-Running `docker-compose up -d` will start Redis.
+RateLimitJ is built with Gradle and requires docker to spin up Redis for the Redis module. 
 
 To build:
 
 ```
 $ git clone https://github.com/mokies/ratelimij.git
 $ cd ratelimij/
-$ docker-compose up -d
 $ ./gradlew
 ```
 
