@@ -67,7 +67,7 @@ RateLimitJ is built with Gradle and requires docker to spin up Redis for the Red
 To build:
 
 ```
-$ git clone https://github.com/mokies/ratelimij.git
+$ git clone https://github.com/mokies/ratelimitj.git
 $ cd ratelimij/
 $ ./gradlew
 ```
