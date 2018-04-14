@@ -6,4 +6,5 @@ include 'ratelimitj-hazelcast'
 include 'ratelimitj-inmemory'
 include 'ratelimitj-dropwizard'
 include 'ratelimitj-test'
+include 'ratelimitj-examples'
 

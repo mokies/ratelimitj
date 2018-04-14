@@ -1,0 +1,18 @@
+description 'RateLimitJ Servlet Example'
+
+dependencies {
+
+    implementation(
+            project(':ratelimitj-inmemory'),
+            libraries.slf4j,
+            'javax.servlet:javax.servlet-api:4.0.0'
+    )
+
+    testImplementation(
+            libraries.assertj,
+            libraries.guava,
+            libraries.mockito,
+            libraries.logback,
+    )
+
+}

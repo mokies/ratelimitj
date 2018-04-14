@@ -12,10 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.concurrent.ThreadSafe;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +29,10 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
     private final TimeSupplier timeSupplier;
     private final ExpiringMap<String, ConcurrentMap<String, Long>> expiringKeyMap;
     private final KeyLockManager lockManager = KeyLockManagers.newLock();
+
+    public InMemorySlidingWindowRequestRateLimiter(RequestLimitRule rule) {
+        this(Collections.singleton(rule), new SystemTimeSupplier());
+    }
 
     public InMemorySlidingWindowRequestRateLimiter(Set<RequestLimitRule> rules) {
         this(rules, new SystemTimeSupplier());

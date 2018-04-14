@@ -16,6 +16,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.ThreadSafe;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CompletionStage;
 
@@ -36,6 +37,10 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
     private final RedisScriptLoader scriptLoader;
     private final String rulesJson;
     private final TimeSupplier timeSupplier;
+
+    public RedisSlidingWindowRequestRateLimiter(StatefulRedisConnection<String, String> connection, RequestLimitRule rule) {
+        this(connection, Collections.singleton(rule));
+    }
 
     public RedisSlidingWindowRequestRateLimiter(StatefulRedisConnection<String, String> connection, Set<RequestLimitRule> rules) {
         this(connection, rules, new SystemTimeSupplier());
