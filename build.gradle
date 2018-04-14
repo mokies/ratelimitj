@@ -16,7 +16,7 @@ task wrapper(type: Wrapper) {
     gradleVersion = '4.6'
 }
 
-ext.junitJupiterVersion  = '5.0.2'
+ext.junitJupiterVersion  = '5.1.1'
 
 allprojects {
     repositories {
