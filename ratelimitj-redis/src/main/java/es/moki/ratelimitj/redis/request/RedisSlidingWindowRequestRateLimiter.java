@@ -7,9 +7,12 @@ import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.core.time.SystemTimeSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
+import io.lettuce.core.api.StatefulConnection;
 import io.lettuce.core.api.StatefulRedisConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -33,20 +36,20 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
 
     private final LimitRuleJsonSerialiser serialiser = new LimitRuleJsonSerialiser();
 
-    private final StatefulRedisConnection<String, String> connection;
+    private final StatefulConnection<String, String> connection;
     private final RedisScriptLoader scriptLoader;
     private final String rulesJson;
     private final TimeSupplier timeSupplier;
 
-    public RedisSlidingWindowRequestRateLimiter(StatefulRedisConnection<String, String> connection, RequestLimitRule rule) {
+    public RedisSlidingWindowRequestRateLimiter(StatefulConnection<String, String> connection, RequestLimitRule rule) {
         this(connection, Collections.singleton(rule));
     }
 
-    public RedisSlidingWindowRequestRateLimiter(StatefulRedisConnection<String, String> connection, Set<RequestLimitRule> rules) {
+    public RedisSlidingWindowRequestRateLimiter(StatefulConnection<String, String> connection, Set<RequestLimitRule> rules) {
         this(connection, rules, new SystemTimeSupplier());
     }
 
-    public RedisSlidingWindowRequestRateLimiter(StatefulRedisConnection<String, String> connection, Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
+    public RedisSlidingWindowRequestRateLimiter(StatefulConnection<String, String> connection, Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
         requireNonNull(rules, "rules can not be null");
         requireNonNull(timeSupplier, "time supplier can not be null");
         requireNonNull(connection, "connection can not be null");
@@ -72,7 +75,10 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
 
     @Override
     public CompletionStage<Boolean> resetLimitAsync(String key) {
-        return connection.async().del(key).thenApply(result -> 1 == result);
+        if (StatefulRedisClusterConnection.class.isInstance(connection)) {
+            return StatefulRedisClusterConnection.class.cast(connection).async().del(key).thenApply(result -> 1 == (Long)result);
+        }
+        return StatefulRedisConnection.class.cast(connection).async().del(key).thenApply(result -> 1 == (Long)result);
     }
 
     @Override
@@ -132,7 +138,10 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
 
     @Override
     public Mono<Boolean> resetLimitReactive(String key) {
-        return connection.reactive().del(key).map(count -> count > 0);
+        if (StatefulRedisClusterConnection.class.isInstance(connection)) {
+            return StatefulRedisClusterConnection.class.cast(connection).reactive().del(key).map(count -> (Long)count > 0);
+        }
+        return StatefulRedisConnection.class.cast(connection).reactive().del(key).map(count -> (Long)count > 0);
     }
 
     private CompletionStage<Boolean> eqOrGeLimitAsync(String key, int weight, boolean strictlyGreater) {
@@ -146,15 +155,19 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
         // TODO handle scenario where script is not loaded, flush scripts and test scenario
         String sha = scriptLoader.scriptSha();
 
-        return timeSupplier.getReactive().flatMapMany(time ->
-                connection.reactive().evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight), toStringOneZero(strictlyGreater)))
-                .next()
-                .map("1"::equals)
-                .doOnSuccess(over -> {
-                    if (over) {
-                        LOG.debug("Requests matched by key '{}' incremented by weight {} are greater than {}the limit", key, weight, strictlyGreater ? "" : "or equal to ");
-                    }
-                });
+        return timeSupplier.getReactive().flatMapMany(time -> {
+            if (StatefulRedisClusterConnection.class.isInstance(this.connection)) {
+                return StatefulRedisClusterConnection.class.cast(this.connection).reactive().evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight), toStringOneZero(strictlyGreater));
+            } else {
+                return StatefulRedisConnection.class.cast(this.connection).reactive().evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight), toStringOneZero(strictlyGreater));
+            }
+        })  .next()
+            .map("1"::equals)
+            .doOnSuccess(over -> {
+                if ((Boolean)over) {
+                    LOG.debug("Requests matched by key '{}' incremented by weight {} are greater than {}the limit", key, weight, strictlyGreater ? "" : "or equal to ");
+                }
+            });
     }
 
     private String toStringOneZero(boolean strictlyGreater) {
