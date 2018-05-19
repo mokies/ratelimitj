@@ -8,17 +8,14 @@ jdk:
 
 matrix:
   include:
-# 8
     - env: JDK='Oracle JDK 8'
       jdk: oraclejdk8
     - env: JDK='OpenJDK 8'
       jdk: openjdk8
-# 9
     - env: JDK='Oracle JDK 9'
       jdk: oraclejdk9
-# 10
-    - env: JDK='Oracle JDK 10'
-      jdk: oraclejdk10
+#    - env: JDK='Oracle JDK 10'
+#      jdk: oraclejdk10
 
 #addons:
 #  apt:
