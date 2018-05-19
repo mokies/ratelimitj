@@ -10,10 +10,12 @@ plugins {
     id "com.avast.gradle.docker-compose" version "0.7.1"
 }
 
+
+
 defaultTasks 'check'
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.6'
+    gradleVersion = '4.7'
 }
 
 ext.junitJupiterVersion  = '5.1.1'
