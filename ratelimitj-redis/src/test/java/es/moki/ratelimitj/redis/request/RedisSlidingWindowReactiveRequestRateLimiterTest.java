@@ -25,6 +25,7 @@ public class RedisSlidingWindowReactiveRequestRateLimiterTest extends AbstractRe
     }
 
     @AfterAll
+    @SuppressWarnings("FutureReturnValueIgnored")
     static void afterAll() {
         client.shutdownAsync();
     }

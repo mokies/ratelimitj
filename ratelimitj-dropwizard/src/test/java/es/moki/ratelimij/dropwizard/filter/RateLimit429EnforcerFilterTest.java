@@ -126,6 +126,7 @@ public class RateLimit429EnforcerFilterTest {
                 return null;
             } else {
                 return new AbstractContainerRequestValueFactory<RequestRateLimiterFactory>() {
+                    @Override
                     public RequestRateLimiterFactory provide() {
                         return requestRateLimiterFactory;
                     }

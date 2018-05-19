@@ -20,6 +20,7 @@ class RedisTimeSupplierTest {
     }
 
     @AfterAll
+    @SuppressWarnings("FutureReturnValueIgnored")
     static void afterAll() {
         client.shutdownAsync();
     }

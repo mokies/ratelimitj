@@ -68,6 +68,7 @@ public class InMemoryConcurrentRequestRateLimiter implements ConcurrentRequestLi
             return acquired;
         }
 
+        @Override
         public <T> Optional<T> get(Supplier<T> action) {
             if (!acquired) {
                 return Optional.empty();

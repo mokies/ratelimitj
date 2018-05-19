@@ -75,6 +75,7 @@ public class RateLimitBundle implements ConfiguredBundle<Configuration> {
                 return null;
             } else {
                 return new AbstractContainerRequestValueFactory<RequestRateLimiterFactory>() {
+                    @Override
                     public RequestRateLimiterFactory provide() {
                         return requestRateLimiterFactory;
                     }
