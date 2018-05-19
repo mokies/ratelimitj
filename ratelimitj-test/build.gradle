@@ -7,7 +7,7 @@ dependencies {
             libraries.assertj,
             libraries.guava,
             libraries.slf4j,
-            'org.junit.jupiter:junit-jupiter-api:5.0.1'
+            "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
     )
 
 }
