@@ -2,7 +2,9 @@ language: java
 jdk:
   - oraclejdk8
   - oraclejdk9
+  - oraclejdk10
   - openjdk8
+  - openjdk9
 
 #addons:
 #  apt:
