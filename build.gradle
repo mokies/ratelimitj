@@ -4,13 +4,14 @@ buildscript {
         mavenCentral()
         jcenter()
     }
+    dependencies {
+        classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.0.14"
+    }
 }
 
 plugins {
     id "com.avast.gradle.docker-compose" version "0.7.1"
 }
-
-
 
 defaultTasks 'check'
 
@@ -33,9 +34,9 @@ allprojects {
 subprojects {
 
     sourceCompatibility = 1.8
-    
+
+    apply plugin: "net.ltgt.errorprone"
     apply plugin: 'pmd'
-    apply plugin: 'findbugs'
     apply plugin: 'checkstyle'
     apply plugin: 'maven-publish'
     apply plugin: 'maven'

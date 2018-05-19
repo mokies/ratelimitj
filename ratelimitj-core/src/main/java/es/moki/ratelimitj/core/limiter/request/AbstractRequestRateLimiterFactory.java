@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public abstract class AbstractRequestRateLimiterFactory<T> implements RequestRateLimiterFactory {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractRequestRateLimiterFactory.class.getClass());
+    private  final Logger LOG = LoggerFactory.getLogger(getClass());
 
     private final ConcurrentMap<Set<RequestLimitRule>, T> rateLimiterInstances = new ConcurrentHashMap<>();
 
