@@ -11,6 +11,8 @@ public interface RequestRateLimiter {
      * @return {@code true} if the key is over the limit, otherwise {@code false}
      */
     boolean overLimitWhenIncremented(String key);
+    
+	boolean incremementRegardless(String key, int weight);
 
     /**
      * Determine if the given key, after incrementing by the given weight, has exceeded the configured rate limit.
@@ -55,4 +57,5 @@ public interface RequestRateLimiter {
      * @return {@code true} if the key existed, otherwise {@code false} .
      */
     boolean resetLimit(String key);
+
 }

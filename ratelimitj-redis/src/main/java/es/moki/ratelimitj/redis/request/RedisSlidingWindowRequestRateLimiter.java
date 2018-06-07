@@ -82,7 +82,7 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
 
     @Override
     public boolean overLimitWhenIncremented(String key, int weight) {
-        return throwOnTimeout(eqOrGeLimitReactive(key, weight, true));
+        return throwOnTimeout(eqOrGeLimitReactive(key, weight, true, false));
     }
 
     @Override
@@ -92,7 +92,12 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
 
     @Override
     public boolean geLimitWhenIncremented(String key, int weight) {
-        return throwOnTimeout(eqOrGeLimitReactive(key, weight, false));
+        return throwOnTimeout(eqOrGeLimitReactive(key, weight, false, false));
+    }
+    
+    @Override
+    public boolean incremementRegardless(String key, int weight) {
+        return throwOnTimeout(eqOrGeLimitReactive(key, weight, false, true));
     }
 
 //    @Override
@@ -117,7 +122,7 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
 
     @Override
     public Mono<Boolean> overLimitWhenIncrementedReactive(String key, int weight) {
-        return eqOrGeLimitReactive(key, weight, true);
+        return eqOrGeLimitReactive(key, weight, true, false);
     }
 
     @Override
@@ -127,7 +132,12 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
 
     @Override
     public Mono<Boolean> geLimitWhenIncrementedReactive(String key, int weight) {
-        return eqOrGeLimitReactive(key, weight, false);
+        return eqOrGeLimitReactive(key, weight, false, false);
+    }
+
+    @Override
+    public Mono<Boolean> incremementRegardlessReactive(String key, int weight) {
+        return eqOrGeLimitReactive(key, weight, true, true);
     }
 
     @Override
@@ -136,18 +146,19 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
     }
 
     private CompletionStage<Boolean> eqOrGeLimitAsync(String key, int weight, boolean strictlyGreater) {
-        return eqOrGeLimitReactive(key, weight, strictlyGreater).toFuture();
+        return eqOrGeLimitReactive(key, weight, strictlyGreater, false).toFuture();
     }
 
-    private Mono<Boolean> eqOrGeLimitReactive(String key, int weight, boolean strictlyGreater) {
+    
+    
+    private Mono<Boolean> eqOrGeLimitReactive(String key, int weight, boolean strictlyGreater, boolean incremement_regardless) {
         requireNonNull(key);
 
         // TODO script load can be reactive
         // TODO handle scenario where script is not loaded, flush scripts and test scenario
         String sha = scriptLoader.scriptSha();
-
         return timeSupplier.getReactive().flatMapMany(time ->
-                connection.reactive().evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight), toStringOneZero(strictlyGreater)))
+                connection.reactive().evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight), toStringOneZero(strictlyGreater), toStringOneZero(incremement_regardless)))
                 .next()
                 .map("1"::equals)
                 .doOnSuccess(over -> {

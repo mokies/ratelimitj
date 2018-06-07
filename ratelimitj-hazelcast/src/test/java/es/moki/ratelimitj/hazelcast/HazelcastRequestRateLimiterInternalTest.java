@@ -59,10 +59,41 @@ class HazelcastRequestRateLimiterInternalTest {
         });
 
         IMap<Object, Object> map = hz.getMap(key);
+        
         while (map.size() != 0) {
             Thread.sleep(10);
         }
         assertThat(map.size()).isZero();
     }
 
+    
+    @Test
+    void shouldCheckIncrementAnyway() throws Exception {
+    	
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(20, TimeUnit.SECONDS, 5));
+        RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
+
+        String key = "ip:127.0.0.5";
+
+        timeBandit.addUnixTimeMilliSeconds(100L);
+        // Counter should be 0 now
+        assertThat(requestRateLimiter.overLimitWhenIncremented(key, 1)).isFalse();
+        // Counter should be 1 now and 'false', meaning not over limit
+        
+        timeBandit.addUnixTimeMilliSeconds(100L);
+        assertThat(requestRateLimiter.incremementRegardless(key, 10)).isTrue();
+        // Counter should be 11 now and 'true', meaning over limit
+        
+        timeBandit.addUnixTimeMilliSeconds(100L);
+        assertThat(requestRateLimiter.overLimitWhenIncremented(key, 1)).isTrue();
+        // Counter should be 11 now and 'true', meaning over limit
+        // If the increment regardless worked, then the value would have been 2
+        // which would not be under the limit.
+        
+        
+        
+        
+    }
+    
+    
 }

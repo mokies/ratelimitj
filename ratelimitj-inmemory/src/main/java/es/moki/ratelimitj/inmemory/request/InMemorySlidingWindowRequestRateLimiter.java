@@ -59,9 +59,14 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
 
     @Override
     public boolean overLimitWhenIncremented(String key, int weight) {
-        return eqOrGeLimit(key, weight, true);
+        return eqOrGeLimit(key, weight, true, false);
     }
 
+    @Override
+    public boolean incremementRegardless(String key, int weight) {
+        return eqOrGeLimit(key, weight, true, true);
+    }
+    
     @Override
     public boolean geLimitWhenIncremented(String key) {
         return geLimitWhenIncremented(key, 1);
@@ -69,8 +74,9 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
 
     @Override
     public boolean geLimitWhenIncremented(String key, int weight) {
-        return eqOrGeLimit(key, weight, false);
+        return eqOrGeLimit(key, weight, false, false);
     }
+    
 
 //    @Override
 //    public boolean isOverLimit(String key) {
@@ -100,7 +106,9 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
         });
     }
 
-    private boolean eqOrGeLimit(String key, int weight, boolean strictlyGreater) {
+    // Chris Fauerbach, adding a way to override the increment even if over limit
+    // @chrisfauerbach , https://fauie.com , github.com/chrisfauerbach
+    private boolean eqOrGeLimit(String key, int weight, boolean strictlyGreater, boolean incremement_regardless) {
 
         requireNonNull(key, "key cannot be null");
         requireNonNull(rules, "rules cannot be null");
@@ -157,7 +165,11 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
             // check our limits
             long count = coalesce(cur, 0L) + weight;
             if (count > rule.getLimit()) {
-                return true; // over limit, don't record request
+            	    if (incremement_regardless) {
+            	        geLimit = true;	
+            	    }else {
+                    return true; // over limit, don't record request
+            	    }
             } else if (!strictlyGreater && count == rule.getLimit()) {
                 geLimit = true; // at limit, do record request
             }

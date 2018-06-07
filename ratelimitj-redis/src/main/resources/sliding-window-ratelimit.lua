@@ -4,6 +4,11 @@ local limits = cjson.decode(ARGV[1])
 local now = tonumber(ARGV[2])
 local weight = tonumber(ARGV[3] or '1')
 local strictly_greater = tonumber(ARGV[4] or '1') == 1
+
+--Chris Fauerbach, adding a way to override the increment even if over limit
+--@chrisfauerbach , https://fauie.com , github.com/chrisfauerbach
+local incr_regardless = tonumber(ARGV[5] or '1') == 1
+
 local longest_duration = limits[1][1] or 0
 local saved_keys = {}
 local ge_limit = '0'
@@ -55,7 +60,12 @@ for i, limit in ipairs(limits) do
         -- check our limits
         local count = tonumber(cur or '0') + weight
         if count > limit[2] then
-            return '1' -- over limit, don't record request
+            -- Checking the overlimit, but allowing the increment
+            if incr_regardless then
+                ge_limit= '1' 
+            else
+                return '1' -- over limit, don't record request
+            end
         elseif count == limit[2] and not strictly_greater then
             ge_limit = '1' -- at limit, do record request
         end
