@@ -63,7 +63,7 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
     }
 
     @Override
-    public boolean incremementRegardless(String key, int weight) {
+    public boolean incrementRegardless(String key, int weight) {
         return eqOrGeLimit(key, weight, true, true);
     }
     
@@ -108,7 +108,7 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
 
     // Chris Fauerbach, adding a way to override the increment even if over limit
     // @chrisfauerbach , https://fauie.com , github.com/chrisfauerbach
-    private boolean eqOrGeLimit(String key, int weight, boolean strictlyGreater, boolean incremement_regardless) {
+    private boolean eqOrGeLimit(String key, int weight, boolean strictlyGreater, boolean increment_regardless) {
 
         requireNonNull(key, "key cannot be null");
         requireNonNull(rules, "rules cannot be null");
@@ -165,7 +165,7 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
             // check our limits
             long count = coalesce(cur, 0L) + weight;
             if (count > rule.getLimit()) {
-            	    if (incremement_regardless) {
+            	    if (increment_regardless) {
             	        geLimit = true;	
             	    }else {
                     return true; // over limit, don't record request

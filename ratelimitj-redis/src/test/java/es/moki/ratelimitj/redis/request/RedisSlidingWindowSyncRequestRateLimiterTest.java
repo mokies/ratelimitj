@@ -70,7 +70,7 @@ public class RedisSlidingWindowSyncRequestRateLimiterTest extends AbstractSyncRe
         // Counter should be 1 now and 'false', meaning not over limit
         LOG.debug("About to print add 10 to go over.");
         timeBandit.addUnixTimeMilliSeconds(100L);
-        assertThat(requestRateLimiter.incremementRegardless(key, 10)).isTrue();
+        assertThat(requestRateLimiter.incrementRegardless(key, 10)).isTrue();
         // Counter should be 11 now and 'true', meaning over limit
         
         LOG.debug("About to print add 1 that should be over..");

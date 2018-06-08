@@ -66,7 +66,7 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
     
     
     @Override
-	public boolean incremementRegardless(String key, int weight) {
+	public boolean incrementRegardless(String key, int weight) {
     	    return eqOrGeLimit(key, weight, false, true);
 	}
     

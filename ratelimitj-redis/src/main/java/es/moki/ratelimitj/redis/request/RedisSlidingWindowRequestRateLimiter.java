@@ -96,7 +96,7 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
     }
     
     @Override
-    public boolean incremementRegardless(String key, int weight) {
+    public boolean incrementRegardless(String key, int weight) {
         return throwOnTimeout(eqOrGeLimitReactive(key, weight, false, true));
     }
 
@@ -136,7 +136,7 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
     }
 
     @Override
-    public Mono<Boolean> incremementRegardlessReactive(String key, int weight) {
+    public Mono<Boolean> incrementRegardlessReactive(String key, int weight) {
         return eqOrGeLimitReactive(key, weight, true, true);
     }
 
