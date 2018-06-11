@@ -1,7 +1,8 @@
 package es.moki.ratelimitj.redis.request;
 
-
+import io.lettuce.core.api.StatefulConnection;
 import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,15 +15,15 @@ import static java.util.Objects.requireNonNull;
 
 public class RedisScriptLoader {
 
-    private final StatefulRedisConnection<String, String> connection;
+    private final StatefulConnection<String, String> connection;
     private final String scriptUri;
     private volatile String shaInstance;
 
-    public RedisScriptLoader(StatefulRedisConnection<String, String> connection, String scriptUri) {
+    public RedisScriptLoader(StatefulConnection<String, String> connection, String scriptUri) {
         this(connection, scriptUri, false);
     }
 
-    public RedisScriptLoader(StatefulRedisConnection<String, String> connection, String scriptUri, boolean eagerLoad) {
+    public RedisScriptLoader(StatefulConnection<String, String> connection, String scriptUri, boolean eagerLoad) {
         requireNonNull(connection);
         this.connection = connection;
         this.scriptUri = requireNonNull(scriptUri);
@@ -55,7 +56,11 @@ public class RedisScriptLoader {
             throw new RuntimeException("Unable to load Redis LUA script file", e);
         }
 
-        return connection.sync().scriptLoad(script);
+        if (StatefulRedisClusterConnection.class.isInstance(connection)) {
+            return StatefulRedisClusterConnection.class.cast(connection).sync().scriptLoad(script);
+        }
+
+        return StatefulRedisConnection.class.cast(connection).sync().scriptLoad(script);
     }
 
     private String readScriptFile() throws IOException {
