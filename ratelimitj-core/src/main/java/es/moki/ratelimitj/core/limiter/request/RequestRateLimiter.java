@@ -11,6 +11,15 @@ public interface RequestRateLimiter {
      * @return {@code true} if the key is over the limit, otherwise {@code false}
      */
     boolean overLimitWhenIncremented(String key);
+   
+    /**
+     * Regardless of being over limit, we still want to track the count, this is for a client that is going to act
+     * regardless of a limit, but, still needs to be counted towareds said limit.
+     * @param key
+     * @param weight
+     * @return {@code true} if the key is over the limit, otherwise {@code false}
+     */
+	boolean incrementRegardless(String key, int weight);
 
     /**
      * Determine if the given key, after incrementing by the given weight, has exceeded the configured rate limit.
@@ -55,4 +64,5 @@ public interface RequestRateLimiter {
      * @return {@code true} if the key existed, otherwise {@code false} .
      */
     boolean resetLimit(String key);
+
 }

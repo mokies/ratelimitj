@@ -11,6 +11,8 @@ public interface ReactiveRequestRateLimiter {
     Mono<Boolean> overLimitWhenIncrementedReactive(String key);
 
     Mono<Boolean> overLimitWhenIncrementedReactive(String key, int weight);
+    
+    Mono<Boolean> incrementRegardlessReactive(String key, int weight);
 
     Mono<Boolean> geLimitWhenIncrementedReactive(String key);
 

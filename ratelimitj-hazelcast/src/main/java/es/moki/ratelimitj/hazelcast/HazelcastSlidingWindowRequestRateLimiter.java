@@ -50,7 +50,7 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
     // TODO support muli keys
     @Override
     public boolean overLimitWhenIncremented(String key, int weight) {
-        return eqOrGeLimit(key, weight, true);
+        return eqOrGeLimit(key, weight, true, false);
     }
 
     @Override
@@ -60,20 +60,19 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
 
     @Override
     public boolean geLimitWhenIncremented(String key, int weight) {
-        return eqOrGeLimit(key, weight, false);
+        return eqOrGeLimit(key, weight, false, false);
     }
-
-//    @Override
-//    public boolean isOverLimit(String key) {
-//        return overLimitWhenIncremented(key, 0);
-//    }
-//
-//    @Override
-//    public boolean isGeLimit(String key) {
-//        return geLimitWhenIncremented(key, 0);
-//    }
-
+    
+    
+    
     @Override
+	public boolean incrementRegardless(String key, int weight) {
+    	    return eqOrGeLimit(key, weight, false, true);
+	}
+    
+    
+
+	@Override
     public boolean resetLimit(String key) {
         IMap<Object, Object> map = hz.getMap(key);
         if (map == null || map.isEmpty()) {
@@ -92,7 +91,7 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
         return hz.getMap(key);
     }
 
-    private boolean eqOrGeLimit(String key, int weight, boolean strictlyGreater) {
+    private boolean eqOrGeLimit(String key, int weight, boolean strictlyGreater, boolean increment_anyway) {
 
         requireNonNull(key, "key cannot be null");
         requireNonNull(rules, "rules cannot be null");
@@ -152,7 +151,10 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
             // check our limits
             long count = coalesce(cur, 0L) + weight;
             if (count > rule.getLimit()) {
-                return true; // over limit, don't record request
+            	    geLimit = true;
+            	    if (!increment_anyway) {
+                    return true; // over limit, don't record request
+            	    }
             } else if (!strictlyGreater && count == rule.getLimit()) {
                 geLimit = true; // at limit, do record request
             }
