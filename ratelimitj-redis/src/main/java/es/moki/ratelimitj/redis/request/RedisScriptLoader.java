@@ -46,7 +46,7 @@ public class RedisScriptLoader {
     }
 
     Mono<StoredScript> storedScript() {
-        return storedScript.take(1).single();
+        return storedScript.next();
     }
 
     private Mono<StoredScript> loadScript() {
