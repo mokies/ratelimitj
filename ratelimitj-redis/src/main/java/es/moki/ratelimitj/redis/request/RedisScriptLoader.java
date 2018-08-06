@@ -2,7 +2,6 @@ package es.moki.ratelimitj.redis.request;
 
 
 import io.lettuce.core.api.StatefulRedisConnection;
-import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -12,6 +11,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -20,9 +20,7 @@ public class RedisScriptLoader {
 
     private final StatefulRedisConnection<String, String> connection;
     private final String scriptUri;
-    private final Flux<StoredScript> storedScript;
-
-    private Disposable cacheDisposable;
+    private final AtomicReference<Flux<String>> storedScript;
 
     public RedisScriptLoader(StatefulRedisConnection<String, String> connection, String scriptUri) {
         this(connection, scriptUri, false);
@@ -33,33 +31,31 @@ public class RedisScriptLoader {
         this.connection = connection;
         this.scriptUri = requireNonNull(scriptUri);
 
-        this.storedScript = Flux
-                .defer(this::loadScript)
-                .replay(1)
-                .autoConnect(1, disposable -> {
-                    this.cacheDisposable = disposable;
-                });
+        this.storedScript = new AtomicReference<>(loadScript());
 
         if (eagerLoad) {
-            this.storedScript.blockFirst(Duration.ofSeconds(10));
+            this.storedScript.get().blockFirst(Duration.ofSeconds(10));
         }
     }
 
     Mono<StoredScript> storedScript() {
-        return storedScript.next();
+        return Mono.defer(() -> {
+            Flux<String> source = this.storedScript.get();
+            return source.next().map(sha -> new StoredScript(sha, source));
+        });
     }
 
-    private Mono<StoredScript> loadScript() {
-        String script;
-        try {
-            script = readScriptFile();
-        } catch (IOException e) {
-            return Mono.error(new RuntimeException("Unable to load Redis LUA script file", e));
-        }
+    private Flux<String> loadScript() {
+        return Flux.defer(() -> {
+            String script;
+            try {
+                script = readScriptFile();
+            } catch (IOException e) {
+                return Flux.error(new RuntimeException("Unable to load Redis LUA script file", e));
+            }
 
-        return connection.reactive()
-                .scriptLoad(script)
-                .map(sha -> new StoredScript(sha, cacheDisposable));
+            return connection.reactive().scriptLoad(script);
+        }).replay(1).autoConnect(1);
     }
 
     private String readScriptFile() throws IOException {
@@ -74,28 +70,25 @@ public class RedisScriptLoader {
         }
     }
 
-    static class StoredScript implements Disposable {
+    class StoredScript {
         private String sha;
 
-        private Disposable disposable;
+        private Flux<String> expected;
 
-        StoredScript(String sha, Disposable disposable) {
+        StoredScript(String sha, Flux<String> expected) {
             this.sha = sha;
-            this.disposable = disposable;
+            this.expected = expected;
         }
 
         public String getSha() {
             return sha;
         }
 
-        @Override
-        public boolean isDisposed() {
-            return disposable.isDisposed();
-        }
-
-        @Override
         public void dispose() {
-            disposable.dispose();
+            storedScript.weakCompareAndSet(
+                    expected,
+                    loadScript()
+            );
         }
     }
 
