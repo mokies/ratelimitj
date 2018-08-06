@@ -7,6 +7,7 @@ import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.core.time.SystemTimeSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
+import es.moki.ratelimitj.redis.request.RedisScriptLoader.StoredScript;
 import io.lettuce.core.api.StatefulRedisConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -142,12 +143,19 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
     private Mono<Boolean> eqOrGeLimitReactive(String key, int weight, boolean strictlyGreater) {
         requireNonNull(key);
 
-        // TODO script load can be reactive
-        // TODO handle scenario where script is not loaded, flush scripts and test scenario
-        String sha = scriptLoader.scriptSha();
-
-        return timeSupplier.getReactive().flatMapMany(time ->
-                connection.reactive().evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight), toStringOneZero(strictlyGreater)))
+        return Mono.zip(timeSupplier.getReactive(), scriptLoader.storedScript())
+                .flatMapMany(tuple -> {
+                    Long time = tuple.getT1();
+                    StoredScript script = tuple.getT2();
+                    return connection.reactive()
+                            .evalsha(script.getSha(), VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight), toStringOneZero(strictlyGreater))
+                            .doOnError(e -> {
+                                if (e.getMessage().startsWith("NOSCRIPT")) {
+                                    script.dispose();
+                                }
+                            });
+                })
+                .retry(e -> e.getMessage().startsWith("NOSCRIPT"))
                 .next()
                 .map("1"::equals)
                 .doOnSuccess(over -> {

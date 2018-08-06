@@ -8,6 +8,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+
 import static io.lettuce.core.ScriptOutputType.VALUE;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,6 +28,7 @@ class RedisScriptLoaderTest {
     @AfterAll
     @SuppressWarnings("FutureReturnValueIgnored")
     static void afterAll() {
+        connection.sync().flushdb();
         client.shutdownAsync();
     }
 
@@ -33,16 +36,35 @@ class RedisScriptLoaderTest {
     @DisplayName("should load rate limit lua script into Redis")
     void shouldLoadScript() {
         RedisScriptLoader scriptLoader = new RedisScriptLoader(connection, "hello-world.lua");
+        connection.sync().scriptFlush();
 
-        assertThat(scriptLoader.scriptSha()).isNotEmpty();
+        String sha = scriptLoader.storedScript().block(Duration.ofSeconds(5)).getSha();
+        assertThat(sha).isNotEmpty();
+        assertThat(connection.sync().scriptExists(sha)).containsOnly(true);
+    }
+
+    @Test
+    @DisplayName("should cache loaded sha")
+    void shouldCache() {
+        RedisScriptLoader scriptLoader = new RedisScriptLoader(connection, "hello-world.lua");
+
+        assertThat(scriptLoader.storedScript().block(Duration.ofSeconds(5)).getSha()).isNotEmpty();
+
+        connection.sync().scriptFlush();
+
+        assertThat(scriptLoader.storedScript().block(Duration.ofSeconds(5)).getSha()).isNotEmpty();
     }
 
     @Test
     @DisplayName("should eagerly load rate limit lua script into Redis")
     void shouldEagerlyLoadScript() {
         RedisScriptLoader scriptLoader = new RedisScriptLoader(connection, "hello-world.lua", true);
+        connection.sync().scriptFlush();
 
-        assertThat(scriptLoader.scriptSha()).isNotEmpty();
+        String sha = scriptLoader.storedScript().block(Duration.ofSeconds(5)).getSha();
+        assertThat(sha).isNotEmpty();
+
+        assertThat(connection.sync().scriptExists(sha)).containsOnly(false);
     }
 
     @Test
@@ -59,7 +81,7 @@ class RedisScriptLoaderTest {
     void shouldExecuteScript() {
 
         RedisScriptLoader scriptLoader = new RedisScriptLoader(connection, "hello-world.lua", true);
-        String sha = scriptLoader.scriptSha();
+        String sha = scriptLoader.storedScript().block(Duration.ofSeconds(5)).getSha();
 
         Object result = connection.sync().evalsha(sha, VALUE);
         assertThat((String) result).isEqualTo("hello world");
