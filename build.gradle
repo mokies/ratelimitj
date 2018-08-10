@@ -16,7 +16,7 @@ plugins {
 defaultTasks 'check'
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.8'
+    gradleVersion = '4.9'
 }
 
 ext.junitJupiterVersion  = '5.2.0'
