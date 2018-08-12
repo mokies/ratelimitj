@@ -2,6 +2,9 @@ package es.moki.ratelimitj.redis.request;
 
 
 import io.lettuce.core.api.StatefulRedisConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Mono;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,6 +17,7 @@ import static java.util.Objects.requireNonNull;
 
 public class RedisScriptLoader {
 
+    private static final Logger LOG = LoggerFactory.getLogger(RedisScriptLoader.class);
     private final StatefulRedisConnection<String, String> connection;
     private final String scriptUri;
     private volatile String shaInstance;
@@ -47,26 +51,33 @@ public class RedisScriptLoader {
         return sha;
     }
 
-    private String loadScript() {
-        String script;
-        try {
-            script = readScriptFile();
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to load Redis LUA script file", e);
-        }
-
-        return connection.sync().scriptLoad(script);
+    String forceScriptShaReload() {
+        LOG.info("force script reload");
+        shaInstance = null;
+        return scriptSha();
     }
 
-    private String readScriptFile() throws IOException {
+    private String loadScript() {
+        return connection.sync().scriptLoad(readScriptFile());
+    }
+
+    Mono<String> loadScriptReactive() {
+        return connection.reactive().scriptLoad(readScriptFile());
+    }
+
+    private String readScriptFile() {
         URL url = RedisScriptLoader.class.getClassLoader().getResource(scriptUri);
 
         if (url == null) {
             throw new IllegalArgumentException("script '" + scriptUri + "' not found");
         }
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8))) {
-            return reader.lines().collect(Collectors.joining("\n"));
+        try {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8))) {
+                return reader.lines().collect(Collectors.joining("\n"));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to load Redis LUA script file", e);
         }
     }
 

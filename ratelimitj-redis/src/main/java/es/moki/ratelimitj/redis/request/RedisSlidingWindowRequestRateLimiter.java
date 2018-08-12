@@ -7,15 +7,19 @@ import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.core.time.SystemTimeSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
+import io.lettuce.core.RedisCommandExecutionException;
 import io.lettuce.core.api.StatefulRedisConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.Exceptions;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.ThreadSafe;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CompletionStage;
@@ -143,13 +147,24 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
         requireNonNull(key);
 
         // TODO script load can be reactive
-        // TODO handle scenario where script is not loaded, flush scripts and test scenario
         String sha = scriptLoader.scriptSha();
 
         return timeSupplier.getReactive().flatMapMany(time ->
                 connection.reactive().evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight), toStringOneZero(strictlyGreater)))
-                .next()
+                .log()
+                .retryWhen(companion -> companion
+                        .zipWith(Flux.range(1, 2), (error, index) -> { // index up to 1 retries
+                            if (index < 2) {
+                                return index; //limit to 1 actual attempts
+                            } else {
+                                throw Exceptions.propagate(error); //terminate the source with the 2th `onError`
+                            }
+                        })
+                        .flatMap(index -> scriptLoader.loadScriptReactive())
+                )
+                .log()
                 .map("1"::equals)
+                .single()
                 .doOnSuccess(over -> {
                     if (over) {
                         LOG.debug("Requests matched by key '{}' incremented by weight {} are greater than {}the limit", key, weight, strictlyGreater ? "" : "or equal to ");

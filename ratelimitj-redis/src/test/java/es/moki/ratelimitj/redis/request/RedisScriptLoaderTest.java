@@ -64,4 +64,17 @@ class RedisScriptLoaderTest {
         Object result = connection.sync().evalsha(sha, VALUE);
         assertThat((String) result).isEqualTo("hello world");
     }
+
+    @Test
+    @DisplayName("should reload script if flushed")
+    void shouldForceScriptReload() {
+
+        RedisScriptLoader scriptLoader = new RedisScriptLoader(connection, "hello-world.lua", true);
+        String sha = scriptLoader.scriptSha();
+        assertThat((String) connection.sync().evalsha(sha, VALUE)).isEqualTo("hello world");
+
+        connection.sync().scriptFlush();
+        sha = scriptLoader.forceScriptShaReload();
+        assertThat((String) connection.sync().evalsha(sha, VALUE)).isEqualTo("hello world");
+    }
 }
