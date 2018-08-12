@@ -2,16 +2,16 @@ package es.moki.ratelimitj.redis.request;
 
 import com.google.common.collect.ImmutableSet;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
-import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
-import org.junit.jupiter.api.*;
-import reactor.core.publisher.Mono;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
 
 class RedisSlidingWindowRequestRateLimiterScriptLoadingTest {
 

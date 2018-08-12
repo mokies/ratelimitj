@@ -8,12 +8,9 @@ import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.core.time.SystemTimeSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import es.moki.ratelimitj.redis.request.RedisScriptLoader.StoredScript;
-import io.lettuce.core.RedisCommandExecutionException;
 import io.lettuce.core.api.StatefulRedisConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.core.Exceptions;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -23,6 +20,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CompletionStage;
+import java.util.function.Predicate;
 
 import static io.lettuce.core.ScriptOutputType.VALUE;
 import static java.util.Objects.requireNonNull;
@@ -35,7 +33,10 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
 
     private static final Duration BLOCK_TIMEOUT = Duration.of(5, ChronoUnit.SECONDS);
 
+    private static final Predicate<Throwable> STARTS_WITH_NO_SCRIPT_ERROR = e -> e.getMessage().startsWith("NOSCRIPT");
+
     private final LimitRuleJsonSerialiser serialiser = new LimitRuleJsonSerialiser();
+
 
     private final StatefulRedisConnection<String, String> connection;
     private final RedisScriptLoader scriptLoader;
@@ -152,23 +153,9 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
                     StoredScript script = tuple.getT2();
                     return connection.reactive()
                             .evalsha(script.getSha(), VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight), toStringOneZero(strictlyGreater))
-                            .doOnError(e -> {
-                                if (e.getMessage().startsWith("NOSCRIPT")) {
-                                    script.dispose();
-                                }
-                            });
+                            .doOnError(STARTS_WITH_NO_SCRIPT_ERROR, e -> script.dispose());
                 })
-                .retry(e -> e.getMessage().startsWith("NOSCRIPT"))
-//                .retryWhen(companion -> companion
-//                        .zipWith(Flux.range(1, 2), (error, index) -> { // index up to 1 retries
-//                            if (index < 2) {
-//                                return index; //limit to 1 actual attempts
-//                            } else {
-//                                throw Exceptions.propagate(error); //terminate the source with the 2th `onError`
-//                            }
-//                        })
-//                        .flatMap(index -> scriptLoader.loadScriptReactive())
-//                )
+                .retry(1, STARTS_WITH_NO_SCRIPT_ERROR)
                 .single()
                 .map("1"::equals)
                 .doOnSuccess(over -> {
