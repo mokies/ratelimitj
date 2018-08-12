@@ -51,13 +51,7 @@ public class RedisScriptLoader {
         return sha;
     }
 
-    String forceScriptShaReload() {
-        LOG.info("force script reload");
-        shaInstance = null;
-        return scriptSha();
-    }
-
-    private String loadScript() {
+    String loadScript() {
         return connection.sync().scriptLoad(readScriptFile());
     }
 
