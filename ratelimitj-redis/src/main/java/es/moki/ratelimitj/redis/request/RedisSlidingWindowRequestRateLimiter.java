@@ -7,6 +7,7 @@ import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.core.time.SystemTimeSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
+import es.moki.ratelimitj.redis.request.RedisScriptLoader.StoredScript;
 import io.lettuce.core.RedisCommandExecutionException;
 import io.lettuce.core.api.StatefulRedisConnection;
 import org.slf4j.Logger;
@@ -19,7 +20,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.ThreadSafe;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CompletionStage;
@@ -146,25 +146,31 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
     private Mono<Boolean> eqOrGeLimitReactive(String key, int weight, boolean strictlyGreater) {
         requireNonNull(key);
 
-        // TODO script load can be reactive
-        String sha = scriptLoader.scriptSha();
-
-        return timeSupplier.getReactive().flatMapMany(time ->
-                connection.reactive().evalsha(sha, VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight), toStringOneZero(strictlyGreater)))
-                .log()
-                .retryWhen(companion -> companion
-                        .zipWith(Flux.range(1, 2), (error, index) -> { // index up to 1 retries
-                            if (index < 2) {
-                                return index; //limit to 1 actual attempts
-                            } else {
-                                throw Exceptions.propagate(error); //terminate the source with the 2th `onError`
-                            }
-                        })
-                        .flatMap(index -> scriptLoader.loadScriptReactive())
-                )
-                .log()
-                .map("1"::equals)
+        return Mono.zip(timeSupplier.getReactive(), scriptLoader.storedScript())
+                .flatMapMany(tuple -> {
+                    Long time = tuple.getT1();
+                    StoredScript script = tuple.getT2();
+                    return connection.reactive()
+                            .evalsha(script.getSha(), VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight), toStringOneZero(strictlyGreater))
+                            .doOnError(e -> {
+                                if (e.getMessage().startsWith("NOSCRIPT")) {
+                                    script.dispose();
+                                }
+                            });
+                })
+                .retry(e -> e.getMessage().startsWith("NOSCRIPT"))
+//                .retryWhen(companion -> companion
+//                        .zipWith(Flux.range(1, 2), (error, index) -> { // index up to 1 retries
+//                            if (index < 2) {
+//                                return index; //limit to 1 actual attempts
+//                            } else {
+//                                throw Exceptions.propagate(error); //terminate the source with the 2th `onError`
+//                            }
+//                        })
+//                        .flatMap(index -> scriptLoader.loadScriptReactive())
+//                )
                 .single()
+                .map("1"::equals)
                 .doOnSuccess(over -> {
                     if (over) {
                         LOG.debug("Requests matched by key '{}' incremented by weight {} are greater than {}the limit", key, weight, strictlyGreater ? "" : "or equal to ");
