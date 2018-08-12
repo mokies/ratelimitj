@@ -51,7 +51,7 @@ subprojects {
             slf4j   : 'org.slf4j:slf4j-api:1.7.25',
             assertj : 'org.assertj:assertj-core:3.10.0',
             mockito : 'org.mockito:mockito-core:2.18.3',
-            guava   : 'com.google.guava:guava:25.0-jre',
+            guava   : 'com.google.guava:guava:26.0-jre',
             logback : 'ch.qos.logback:logback-classic:1.2.3',
             findbugs: 'com.google.code.findbugs:jsr305:3.0.2'
     ]
