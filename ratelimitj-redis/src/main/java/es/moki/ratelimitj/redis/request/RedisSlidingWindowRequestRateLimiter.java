@@ -33,6 +33,7 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
 
     private static final Duration BLOCK_TIMEOUT = Duration.of(5, ChronoUnit.SECONDS);
 
+    // TODO on upgrade to Lettuce 5.1.0 check for new RedisNoScriptException
     private static final Predicate<Throwable> STARTS_WITH_NO_SCRIPT_ERROR = e -> e.getMessage().startsWith("NOSCRIPT");
 
     private final LimitRuleJsonSerialiser serialiser = new LimitRuleJsonSerialiser();
