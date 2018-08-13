@@ -8,7 +8,5 @@ public interface RequestRateLimiterFactory extends Closeable {
 
     RequestRateLimiter getInstance(Set<RequestLimitRule> rules);
 
-    AsyncRequestRateLimiter getInstanceAsync(Set<RequestLimitRule> rules);
-
     ReactiveRequestRateLimiter getInstanceReactive(Set<RequestLimitRule> rules);
 }

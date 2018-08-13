@@ -1,7 +1,6 @@
 package es.moki.ratelimitj.redis.request;
 
 import es.moki.ratelimitj.core.limiter.request.AbstractRequestRateLimiterFactory;
-import es.moki.ratelimitj.core.limiter.request.AsyncRequestRateLimiter;
 import es.moki.ratelimitj.core.limiter.request.ReactiveRequestRateLimiter;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
@@ -23,11 +22,6 @@ public class RedisRateLimiterFactory extends AbstractRequestRateLimiterFactory<R
 
     @Override
     public RequestRateLimiter getInstance(Set<RequestLimitRule> rules) {
-        return lookupInstance(rules);
-    }
-
-    @Override
-    public AsyncRequestRateLimiter getInstanceAsync(Set<RequestLimitRule> rules) {
         return lookupInstance(rules);
     }
 

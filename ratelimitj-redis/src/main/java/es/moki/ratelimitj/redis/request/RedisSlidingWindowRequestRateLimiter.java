@@ -1,7 +1,6 @@
 package es.moki.ratelimitj.redis.request;
 
 
-import es.moki.ratelimitj.core.limiter.request.AsyncRequestRateLimiter;
 import es.moki.ratelimitj.core.limiter.request.ReactiveRequestRateLimiter;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
@@ -27,7 +26,7 @@ import static java.util.Objects.requireNonNull;
 
 @ParametersAreNonnullByDefault
 @ThreadSafe
-public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter, AsyncRequestRateLimiter, ReactiveRequestRateLimiter {
+public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter, ReactiveRequestRateLimiter {
 
     private static final Logger LOG = LoggerFactory.getLogger(RedisSlidingWindowRequestRateLimiter.class);
 
@@ -64,21 +63,6 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
 
     private String serialiserLimitRules(Set<RequestLimitRule> rules) {
         return serialiser.encode(rules);
-    }
-
-    // TODO support multi keys
-
-    public CompletionStage<Boolean> overLimitAsync(String key) {
-        return overLimitAsync(key, 1);
-    }
-
-    public CompletionStage<Boolean> overLimitAsync(String key, int weight) {
-        return eqOrGeLimitAsync(key, weight, true);
-    }
-
-    @Override
-    public CompletionStage<Boolean> resetLimitAsync(String key) {
-        return connection.async().del(key).thenApply(result -> 1 == result);
     }
 
     @Override
