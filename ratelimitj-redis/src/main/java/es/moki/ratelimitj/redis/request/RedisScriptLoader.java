@@ -1,7 +1,7 @@
 package es.moki.ratelimitj.redis.request;
 
 
-import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.reactive.RedisScriptingReactiveCommands;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -18,17 +18,17 @@ import static java.util.Objects.requireNonNull;
 
 public class RedisScriptLoader {
 
-    private final StatefulRedisConnection<String, String> connection;
+    private final RedisScriptingReactiveCommands<String, String> redisScriptingCommands;
     private final String scriptUri;
     private final AtomicReference<Flux<String>> storedScript;
 
-    public RedisScriptLoader(StatefulRedisConnection<String, String> connection, String scriptUri) {
-        this(connection, scriptUri, false);
+    public RedisScriptLoader(RedisScriptingReactiveCommands<String, String> redisScriptingCommands, String scriptUri) {
+        this(redisScriptingCommands, scriptUri, false);
     }
 
-    public RedisScriptLoader(StatefulRedisConnection<String, String> connection, String scriptUri, boolean eagerLoad) {
-        requireNonNull(connection);
-        this.connection = connection;
+    public RedisScriptLoader(RedisScriptingReactiveCommands<String, String> redisScriptingCommands, String scriptUri, boolean eagerLoad) {
+        requireNonNull(redisScriptingCommands);
+        this.redisScriptingCommands = redisScriptingCommands;
         this.scriptUri = requireNonNull(scriptUri);
 
         this.storedScript = new AtomicReference<>(loadScript());
@@ -54,7 +54,7 @@ public class RedisScriptLoader {
                 return Flux.error(new RuntimeException("Unable to load Redis LUA script file", e));
             }
 
-            return connection.reactive().scriptLoad(script);
+            return redisScriptingCommands.scriptLoad(script);
         }).replay(1).autoConnect(1);
     }
 
@@ -71,9 +71,9 @@ public class RedisScriptLoader {
     }
 
     class StoredScript {
-        private String sha;
+        private final String sha;
 
-        private Flux<String> expected;
+        private final Flux<String> expected;
 
         StoredScript(String sha, Flux<String> expected) {
             this.sha = sha;

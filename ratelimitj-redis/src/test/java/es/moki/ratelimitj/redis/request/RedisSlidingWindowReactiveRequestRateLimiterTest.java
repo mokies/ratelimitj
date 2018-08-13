@@ -45,7 +45,7 @@ public class RedisSlidingWindowReactiveRequestRateLimiterTest extends AbstractRe
 
     @Override
     protected ReactiveRequestRateLimiter getRateLimiter(Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
-        return new RedisSlidingWindowRequestRateLimiter(connect, rules, timeSupplier);
+        return new RedisSlidingWindowRequestRateLimiter(connect.reactive(), connect.reactive(), rules, timeSupplier);
     }
 
     @Test

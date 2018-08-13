@@ -7,7 +7,8 @@ import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.core.time.SystemTimeSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import es.moki.ratelimitj.redis.request.RedisScriptLoader.StoredScript;
-import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.reactive.RedisKeyReactiveCommands;
+import io.lettuce.core.api.reactive.RedisScriptingReactiveCommands;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
@@ -38,25 +39,28 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
     private final LimitRuleJsonSerialiser serialiser = new LimitRuleJsonSerialiser();
 
 
-    private final StatefulRedisConnection<String, String> connection;
+    private final RedisScriptingReactiveCommands<String, String> redisScriptingReactiveCommands;
+    private final RedisKeyReactiveCommands<String, String> redisKeyCommands;
     private final RedisScriptLoader scriptLoader;
     private final String rulesJson;
     private final TimeSupplier timeSupplier;
 
-    public RedisSlidingWindowRequestRateLimiter(StatefulRedisConnection<String, String> connection, RequestLimitRule rule) {
-        this(connection, Collections.singleton(rule));
+    public RedisSlidingWindowRequestRateLimiter(RedisScriptingReactiveCommands<String, String> redisScriptingReactiveCommands, RedisKeyReactiveCommands<String, String> redisKeyCommands, RequestLimitRule rule) {
+        this(redisScriptingReactiveCommands, redisKeyCommands, Collections.singleton(rule));
     }
 
-    public RedisSlidingWindowRequestRateLimiter(StatefulRedisConnection<String, String> connection, Set<RequestLimitRule> rules) {
-        this(connection, rules, new SystemTimeSupplier());
+    public RedisSlidingWindowRequestRateLimiter(RedisScriptingReactiveCommands<String, String> redisScriptingReactiveCommands, RedisKeyReactiveCommands<String, String> redisKeyCommands, Set<RequestLimitRule> rules) {
+        this(redisScriptingReactiveCommands, redisKeyCommands, rules, new SystemTimeSupplier());
     }
 
-    public RedisSlidingWindowRequestRateLimiter(StatefulRedisConnection<String, String> connection, Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
+    public RedisSlidingWindowRequestRateLimiter(RedisScriptingReactiveCommands<String, String> redisScriptingReactiveCommands, RedisKeyReactiveCommands<String, String> redisKeyCommands, Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
         requireNonNull(rules, "rules can not be null");
         requireNonNull(timeSupplier, "time supplier can not be null");
-        requireNonNull(connection, "connection can not be null");
-        this.connection = connection;
-        scriptLoader = new RedisScriptLoader(connection, "sliding-window-ratelimit.lua");
+        requireNonNull(redisScriptingReactiveCommands, "redisScriptingReactiveCommands can not be null");
+        requireNonNull(redisKeyCommands, "redisKeyCommands can not be null");
+        this.redisScriptingReactiveCommands = redisScriptingReactiveCommands;
+        this.redisKeyCommands = redisKeyCommands;
+        scriptLoader = new RedisScriptLoader(redisScriptingReactiveCommands, "sliding-window-ratelimit.lua");
         rulesJson = serialiserLimitRules(rules);
         this.timeSupplier = timeSupplier;
     }
@@ -122,7 +126,7 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
 
     @Override
     public Mono<Boolean> resetLimitReactive(String key) {
-        return connection.reactive().del(key).map(count -> count > 0);
+        return redisKeyCommands.del(key).map(count -> count > 0);
     }
 
     private CompletionStage<Boolean> eqOrGeLimitAsync(String key, int weight, boolean strictlyGreater) {
@@ -136,7 +140,7 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
                 .flatMapMany(tuple -> {
                     Long time = tuple.getT1();
                     StoredScript script = tuple.getT2();
-                    return connection.reactive()
+                    return redisScriptingReactiveCommands
                             .evalsha(script.getSha(), VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight), toStringOneZero(strictlyGreater))
                             .doOnError(STARTS_WITH_NO_SCRIPT_ERROR, e -> script.dispose());
                 })

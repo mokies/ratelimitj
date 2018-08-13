@@ -42,7 +42,7 @@ class RedisSlidingWindowRequestRateLimiterScriptLoadingTest {
     void shouldRetryWhenScriptIfFlushed() {
 
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 5));
-        RedisSlidingWindowRequestRateLimiter requestRateLimiter = new RedisSlidingWindowRequestRateLimiter(connect, rules);
+        RedisSlidingWindowRequestRateLimiter requestRateLimiter = new RedisSlidingWindowRequestRateLimiter(connect.reactive(), connect.reactive(), rules);
 
         assertThat(requestRateLimiter.overLimitWhenIncremented("ip:127.0.1.1")).isFalse();
 

@@ -1,22 +1,19 @@
 package es.moki.ratelimitj.redis.request;
 
-import es.moki.ratelimitj.core.limiter.request.AbstractRequestRateLimiterFactory;
-import es.moki.ratelimitj.core.limiter.request.ReactiveRequestRateLimiter;
-import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
-import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.api.StatefulRedisConnection;
+import es.moki.ratelimitj.core.limiter.request.*;
+import io.lettuce.core.cluster.RedisClusterClient;
+import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
 
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
-public class RedisRateLimiterFactory extends AbstractRequestRateLimiterFactory<RedisSlidingWindowRequestRateLimiter> {
+public class RedisClusterRateLimiterFactory extends AbstractRequestRateLimiterFactory<RedisSlidingWindowRequestRateLimiter> {
 
-    private final RedisClient client;
-    private StatefulRedisConnection<String, String> connection;
+    private final RedisClusterClient client;
+    private StatefulRedisClusterConnection<String, String> connection;
 
-    public RedisRateLimiterFactory(RedisClient client) {
+    public RedisClusterRateLimiterFactory(RedisClusterClient client) {
         this.client = requireNonNull(client);
     }
 
@@ -31,15 +28,16 @@ public class RedisRateLimiterFactory extends AbstractRequestRateLimiterFactory<R
     }
 
     protected RedisSlidingWindowRequestRateLimiter create(Set<RequestLimitRule> rules) {
+        getConnection().reactive();
         return new RedisSlidingWindowRequestRateLimiter(getConnection().reactive(), getConnection().reactive(), rules);
     }
 
     @Override
     public void close() {
-        client.shutdown();
+        client.shutdownAsync();
     }
 
-    private StatefulRedisConnection<String, String> getConnection() {
+    private StatefulRedisClusterConnection<String, String> getConnection() {
         // going to ignore race conditions at the cost of having multiple connections
         if (connection == null) {
             connection = client.connect();

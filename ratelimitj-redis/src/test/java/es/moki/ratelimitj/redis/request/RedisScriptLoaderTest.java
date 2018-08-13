@@ -3,6 +3,7 @@ package es.moki.ratelimitj.redis.request;
 
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.reactive.RedisScriptingReactiveCommands;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -20,11 +21,13 @@ class RedisScriptLoaderTest {
 
     private static RedisClient client;
     private static StatefulRedisConnection<String, String> connection;
+    private static RedisScriptingReactiveCommands<String, String> redisScriptingCommands;
 
     @BeforeAll
     static void beforeAll() {
         client = RedisClient.create("redis://localhost");
         connection = client.connect();
+        redisScriptingCommands = connection.reactive();
     }
 
     @AfterAll
@@ -37,7 +40,7 @@ class RedisScriptLoaderTest {
     @Test
     @DisplayName("should load rate limit lua script into Redis")
     void shouldLoadScript() {
-        RedisScriptLoader scriptLoader = new RedisScriptLoader(connection, "hello-world.lua");
+        RedisScriptLoader scriptLoader = new RedisScriptLoader(redisScriptingCommands, "hello-world.lua");
         connection.sync().scriptFlush();
 
         String sha = scriptLoader.storedScript().block(Duration.ofSeconds(5)).getSha();
@@ -48,7 +51,7 @@ class RedisScriptLoaderTest {
     @Test
     @DisplayName("should cache loaded sha")
     void shouldCache() {
-        RedisScriptLoader scriptLoader = new RedisScriptLoader(connection, "hello-world.lua");
+        RedisScriptLoader scriptLoader = new RedisScriptLoader(redisScriptingCommands, "hello-world.lua");
 
         assertThat(scriptLoader.storedScript().block(Duration.ofSeconds(5)).getSha()).isNotEmpty();
 
@@ -60,7 +63,7 @@ class RedisScriptLoaderTest {
     @Test
     @DisplayName("should eagerly load rate limit lua script into Redis")
     void shouldEagerlyLoadScript() {
-        RedisScriptLoader scriptLoader = new RedisScriptLoader(connection, "hello-world.lua", true);
+        RedisScriptLoader scriptLoader = new RedisScriptLoader(redisScriptingCommands, "hello-world.lua", true);
         connection.sync().scriptFlush();
 
         String sha = scriptLoader.storedScript().block(Duration.ofSeconds(5)).getSha();
@@ -74,7 +77,7 @@ class RedisScriptLoaderTest {
     void shouldFailedIfScriptNotFound() {
 
         Throwable exception = assertThrows(IllegalArgumentException.class,
-                () -> new RedisScriptLoader(connection, "not-found-script.lua", true));
+                () -> new RedisScriptLoader(redisScriptingCommands, "not-found-script.lua", true));
         assertThat(exception.getMessage()).contains("not found");
     }
 
@@ -82,7 +85,7 @@ class RedisScriptLoaderTest {
     @DisplayName("should fail if script not found")
     void shouldExecuteScript() {
 
-        RedisScriptLoader scriptLoader = new RedisScriptLoader(connection, "hello-world.lua", true);
+        RedisScriptLoader scriptLoader = new RedisScriptLoader(redisScriptingCommands, "hello-world.lua", true);
         String sha = scriptLoader.storedScript().block(Duration.ofSeconds(5)).getSha();
 
         Object result = connection.sync().evalsha(sha, VALUE);
@@ -93,7 +96,7 @@ class RedisScriptLoaderTest {
     @DisplayName("should dispose stored script if scripted flushed from redis")
     void shouldReloadScriptIfFlushed() {
 
-        RedisScriptLoader scriptLoader = new RedisScriptLoader(connection, "hello-world.lua", true);
+        RedisScriptLoader scriptLoader = new RedisScriptLoader(redisScriptingCommands, "hello-world.lua", true);
         RedisScriptLoader.StoredScript storedScript = scriptLoader.storedScript().block(Duration.of(2, ChronoUnit.SECONDS));
         assertThat((String) connection.sync().evalsha(storedScript.getSha(), VALUE)).isEqualTo("hello world");
 

@@ -6,6 +6,7 @@ import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.reactive.RedisReactiveCommands;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,6 +21,7 @@ class RedisRateLimiterFactoryTest {
     private RedisClient client = mock(RedisClient.class);
 
     private StatefulRedisConnection<String, String> connection = mock(StatefulRedisConnection.class);
+    private RedisReactiveCommands<String, String> commands = mock(RedisReactiveCommands.class);
 
     private RedisRateLimiterFactory factory;
 
@@ -27,6 +29,7 @@ class RedisRateLimiterFactoryTest {
     void beforeEach() {
         factory = new RedisRateLimiterFactory(client);
         when(client.connect()).thenReturn(connection);
+        when(connection.reactive()).thenReturn(commands);
     }
 
     @Test
