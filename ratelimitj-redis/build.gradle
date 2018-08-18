@@ -21,6 +21,7 @@ dependencies {
             libraries.guava,
             libraries.mockito,
             libraries.logback,
+            "org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion"
     )
 
 }

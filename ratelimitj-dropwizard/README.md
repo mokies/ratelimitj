@@ -25,7 +25,7 @@ The RateLimitJ Dropwizard module provides integration with Dropwizard and annota
 public class RateLimitApplication extends Application<Configuration> {
 
     public void initialize(Bootstrap<Configuration> bootstrap) {
-        RedisClient redisClient = RedisClient.create("redis://localhost");
+        RedisClient redisClient = RedisClient.create("redis://localhost:7006");
         RateLimiterFactory factory = new RedisRateLimiterFactory(redisClient);
 
         bootstrap.addBundle(new RateLimitBundle(factory));

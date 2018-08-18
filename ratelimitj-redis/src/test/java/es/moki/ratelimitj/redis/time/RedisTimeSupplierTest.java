@@ -15,7 +15,7 @@ class RedisTimeSupplierTest {
 
     @BeforeAll
     static void beforeAll() {
-        client = RedisClient.create("redis://localhost");
+        client = RedisClient.create("redis://localhost:7006");
         connect = client.connect();
     }
 

@@ -26,7 +26,7 @@ public class RateLimitApplication extends Application<Configuration> {
 
     @Override
     public void initialize(Bootstrap<Configuration> bootstrap) {
-        redisClient = RedisClient.create("redis://localhost");
+        redisClient = RedisClient.create("redis://localhost:7006");
         RequestRateLimiterFactory factory = new RedisRateLimiterFactory(redisClient);
 
         //RequestRateLimiterFactory factory = new InMemoryRateLimiterFactory();

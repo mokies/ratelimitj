@@ -1,14 +1,10 @@
 package es.moki.ratelimitj.redis.request;
 
 
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.reactive.RedisScriptingReactiveCommands;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import es.moki.ratelimitj.redis.extensions.RedisStandaloneConnectionSetupExtension;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Mono;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -19,43 +15,32 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class RedisScriptLoaderTest {
 
-    private static RedisClient client;
-    private static StatefulRedisConnection<String, String> connection;
-    private static RedisScriptingReactiveCommands<String, String> redisScriptingCommands;
+    @RegisterExtension
+    static RedisStandaloneConnectionSetupExtension extension = new RedisStandaloneConnectionSetupExtension();
 
-    @BeforeAll
-    static void beforeAll() {
-        client = RedisClient.create("redis://localhost");
-        connection = client.connect();
-        redisScriptingCommands = connection.reactive();
-    }
-
-    @AfterAll
-    @SuppressWarnings("FutureReturnValueIgnored")
-    static void afterAll() {
-        connection.sync().flushdb();
-        client.shutdownAsync();
+    private void scriptFlush() {
+        extension.getScriptingReactiveCommands().scriptFlush().block();
     }
 
     @Test
     @DisplayName("should load rate limit lua script into Redis")
     void shouldLoadScript() {
-        RedisScriptLoader scriptLoader = new RedisScriptLoader(redisScriptingCommands, "hello-world.lua");
-        connection.sync().scriptFlush();
+        RedisScriptLoader scriptLoader = new RedisScriptLoader(extension.getScriptingReactiveCommands(), "hello-world.lua");
+        scriptFlush();
 
         String sha = scriptLoader.storedScript().block(Duration.ofSeconds(5)).getSha();
         assertThat(sha).isNotEmpty();
-        assertThat(connection.sync().scriptExists(sha)).containsOnly(true);
+        assertThat(extension.getScriptingReactiveCommands().scriptExists(sha).blockFirst()).isTrue();
     }
 
     @Test
     @DisplayName("should cache loaded sha")
     void shouldCache() {
-        RedisScriptLoader scriptLoader = new RedisScriptLoader(redisScriptingCommands, "hello-world.lua");
+        RedisScriptLoader scriptLoader = new RedisScriptLoader(extension.getScriptingReactiveCommands(), "hello-world.lua");
 
         assertThat(scriptLoader.storedScript().block(Duration.ofSeconds(5)).getSha()).isNotEmpty();
 
-        connection.sync().scriptFlush();
+        scriptFlush();
 
         assertThat(scriptLoader.storedScript().block(Duration.ofSeconds(5)).getSha()).isNotEmpty();
     }
@@ -63,13 +48,13 @@ class RedisScriptLoaderTest {
     @Test
     @DisplayName("should eagerly load rate limit lua script into Redis")
     void shouldEagerlyLoadScript() {
-        RedisScriptLoader scriptLoader = new RedisScriptLoader(redisScriptingCommands, "hello-world.lua", true);
-        connection.sync().scriptFlush();
+        RedisScriptLoader scriptLoader = new RedisScriptLoader(extension.getScriptingReactiveCommands(), "hello-world.lua", true);
+        scriptFlush();
 
         String sha = scriptLoader.storedScript().block(Duration.ofSeconds(5)).getSha();
         assertThat(sha).isNotEmpty();
 
-        assertThat(connection.sync().scriptExists(sha)).containsOnly(false);
+        assertThat(extension.getScriptingReactiveCommands().scriptExists(sha).blockFirst()).isFalse();
     }
 
     @Test
@@ -77,7 +62,7 @@ class RedisScriptLoaderTest {
     void shouldFailedIfScriptNotFound() {
 
         Throwable exception = assertThrows(IllegalArgumentException.class,
-                () -> new RedisScriptLoader(redisScriptingCommands, "not-found-script.lua", true));
+                () -> new RedisScriptLoader(extension.getScriptingReactiveCommands(), "not-found-script.lua", true));
         assertThat(exception.getMessage()).contains("not found");
     }
 
@@ -85,10 +70,10 @@ class RedisScriptLoaderTest {
     @DisplayName("should fail if script not found")
     void shouldExecuteScript() {
 
-        RedisScriptLoader scriptLoader = new RedisScriptLoader(redisScriptingCommands, "hello-world.lua", true);
+        RedisScriptLoader scriptLoader = new RedisScriptLoader(extension.getScriptingReactiveCommands(), "hello-world.lua", true);
         String sha = scriptLoader.storedScript().block(Duration.ofSeconds(5)).getSha();
 
-        Object result = connection.sync().evalsha(sha, VALUE);
+        Object result = extension.getScriptingReactiveCommands().evalsha(sha, VALUE).blockFirst();
         assertThat((String) result).isEqualTo("hello world");
     }
 
@@ -96,14 +81,14 @@ class RedisScriptLoaderTest {
     @DisplayName("should dispose stored script if scripted flushed from redis")
     void shouldReloadScriptIfFlushed() {
 
-        RedisScriptLoader scriptLoader = new RedisScriptLoader(redisScriptingCommands, "hello-world.lua", true);
+        RedisScriptLoader scriptLoader = new RedisScriptLoader(extension.getScriptingReactiveCommands(), "hello-world.lua", true);
         RedisScriptLoader.StoredScript storedScript = scriptLoader.storedScript().block(Duration.of(2, ChronoUnit.SECONDS));
-        assertThat((String) connection.sync().evalsha(storedScript.getSha(), VALUE)).isEqualTo("hello world");
+        assertThat((String) extension.getScriptingReactiveCommands().evalsha(storedScript.getSha(), VALUE).blockFirst()).isEqualTo("hello world");
 
-        connection.sync().scriptFlush();
+        scriptFlush();
         storedScript.dispose();
 
         storedScript = scriptLoader.storedScript().block(Duration.of(2, ChronoUnit.SECONDS));
-        assertThat((String) connection.sync().evalsha(storedScript.getSha(), VALUE)).isEqualTo("hello world");
+        assertThat((String) extension.getScriptingReactiveCommands().evalsha(storedScript.getSha(), VALUE).blockFirst()).isEqualTo("hello world");
     }
 }

@@ -3,6 +3,9 @@ version: "3"
 services:
 
   redis:
-      image: redis:4.0-alpine
+#      image: redis:4.0-alpine
+      image: grokzen/redis-cluster
       ports:
-      - "6379:6379"
+      - '7000-7007:7000-7007'
+      environment:
+        - IP=0.0.0.0

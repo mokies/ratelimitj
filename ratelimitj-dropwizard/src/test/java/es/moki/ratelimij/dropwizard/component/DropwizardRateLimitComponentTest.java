@@ -28,7 +28,7 @@ public class DropwizardRateLimitComponentTest {
 //
 //    @BeforeAll
 //    public static void beforeAll() {
-//        client = RedisClient.create("redis://localhost");
+//        client = RedisClient.create("redis://localhost7006");
 //        connect = client.connect();
 //    }
 //
