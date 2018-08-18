@@ -5,7 +5,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.0.14"
+        classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.0.16"
     }
 }
 
