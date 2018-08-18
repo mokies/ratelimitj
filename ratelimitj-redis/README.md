@@ -27,6 +27,15 @@ The Redis Module support (RateLimiter)[], (AsyncRateLimiter)[] and (ReactiveRate
         boolean overLimit = requestRateLimiter.overLimitWhenIncremented("ip:127.0.0.2");
 ```
 
+#### Redis Cluster Example
+```java
+        RequestRateLimiterFactory factory = new RedisClusterRateLimiterFactory(RedisClusterClient.create("redis://localhost"));
+        Set<RequestLimitRule> rules = Collections.singleton(RequestLimitRule.of(1, TimeUnit.MINUTES, 50)); // 50 request per minute, per key
+        RequestRateLimiter requestRateLimiter = factory.getInstance(rules);
+
+        boolean overLimit = requestRateLimiter.overLimitWhenIncremented("ip:127.0.0.2");
+```
+
 #### Multi Rule Reactive Example
 ```java
     RedisRateLimiterFactory factory = new RedisRateLimiterFactory(RedisClient.create("redis://localhost"));;
