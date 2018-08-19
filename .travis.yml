@@ -20,8 +20,10 @@ matrix:
 #    packages:
 #      - oracle-java8-installer
 
+sudo: required
+
 services:
-  - redis-server
+  - docker
 
 before_install:
  - cp gradle.properties.ci gradle.properties
