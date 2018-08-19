@@ -2,3 +2,4 @@ org.gradle.jvmargs=-Xmx384m
 org.gradle.daemon=false
 ossrhUser=
 ossrhPassword=
+dockercompose.enabled=true
