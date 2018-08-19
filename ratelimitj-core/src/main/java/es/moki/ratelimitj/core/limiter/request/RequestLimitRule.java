@@ -1,6 +1,7 @@
 package es.moki.ratelimitj.core.limiter.request;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -32,13 +33,12 @@ public class RequestLimitRule {
      * Initialise a request rate limit. Imagine the whole duration window as being one large bucket with a single count.
      *
      * @param duration The time the limit will be applied over.
-     * @param timeUnit The time unit.
      * @param limit    A number representing the maximum operations that can be performed in the given duration.
      * @return A limit rule.
      */
-    public static RequestLimitRule of(int duration, TimeUnit timeUnit, long limit) {
-        requireNonNull(timeUnit, "time unit can not be null");
-        int durationSeconds = (int) timeUnit.toSeconds(duration);
+    public static RequestLimitRule of(Duration duration, long limit) {
+        requireNonNull(duration, "duration can not be null");
+        int durationSeconds = (int) duration.getSeconds();
         return new RequestLimitRule(durationSeconds, limit, durationSeconds);
     }
 

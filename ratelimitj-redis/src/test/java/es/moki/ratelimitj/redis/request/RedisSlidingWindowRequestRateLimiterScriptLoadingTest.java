@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,7 +24,7 @@ class RedisSlidingWindowRequestRateLimiterScriptLoadingTest {
     @Test
     void shouldRetryWhenScriptIfFlushed() {
 
-        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 5));
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(Duration.ofSeconds(10), 5));
         RedisSlidingWindowRequestRateLimiter requestRateLimiter = new RedisSlidingWindowRequestRateLimiter(extension.getScriptingReactiveCommands(), extension.getKeyReactiveCommands(), rules);
 
         assertThat(requestRateLimiter.overLimitWhenIncremented("ip:127.0.1.1")).isFalse();

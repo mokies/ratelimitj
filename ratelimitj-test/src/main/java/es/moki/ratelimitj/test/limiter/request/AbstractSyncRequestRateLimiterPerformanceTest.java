@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.NumberFormat;
+import java.time.Duration;
 import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
@@ -32,7 +33,7 @@ public abstract class AbstractSyncRequestRateLimiterPerformanceTest {
         Stopwatch watch = Stopwatch.createStarted();
 
         ImmutableSet<RequestLimitRule> rules =
-                ImmutableSet.of(RequestLimitRule.of(2, TimeUnit.SECONDS, 100), RequestLimitRule.of(10, TimeUnit.SECONDS, 100));
+                ImmutableSet.of(RequestLimitRule.of(Duration.ofSeconds(2), 100), RequestLimitRule.of(Duration.ofSeconds(10), 100));
         RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
         Random rand = new Random();
 

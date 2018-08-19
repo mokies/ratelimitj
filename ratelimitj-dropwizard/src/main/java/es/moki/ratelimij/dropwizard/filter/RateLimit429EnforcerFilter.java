@@ -19,6 +19,7 @@ import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
@@ -107,6 +108,6 @@ public class RateLimit429EnforcerFilter implements ContainerRequestFilter {
     }
 
     private RequestLimitRule toLimitRule(Rate rate) {
-        return RequestLimitRule.of(rate.duration(), rate.timeUnit(), rate.limit());
+        return RequestLimitRule.of(Duration.ofMillis(rate.timeUnit().toMillis(rate.duration())), rate.limit());
     }
 }

@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
@@ -42,7 +43,7 @@ class InMemoryRequestRateLimiterInternalTest {
     @Test
     @Disabled
     void shouldEventuallyCleanUpExpiredKeys() throws Exception {
-        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(1, TimeUnit.SECONDS, 5));
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(Duration.ofSeconds(1), 5));
         RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
 
         String key = "ip:127.0.0.5";

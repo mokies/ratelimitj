@@ -14,6 +14,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
@@ -48,7 +49,7 @@ class HazelcastRequestRateLimiterInternalTest {
 
     @Test
     void shouldEventuallyCleanUpExpiredKeys() throws Exception {
-        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(2, TimeUnit.SECONDS, 5));
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(Duration.ofSeconds(2), 5));
         RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
 
         String key = "ip:127.0.0.5";

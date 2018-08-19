@@ -8,6 +8,7 @@ import es.moki.ratelimitj.test.time.TimeBanditSupplier;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 
+import java.time.Duration;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -22,7 +23,7 @@ public abstract class AbstractReactiveRequestRateLimiterTest {
     @Test
     void shouldLimitSingleWindowReactive() {
 
-        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 5));
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(Duration.ofSeconds(10), 5));
         ReactiveRequestRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
 
         Flux<Boolean> overLimitFlux = Flux
@@ -41,7 +42,7 @@ public abstract class AbstractReactiveRequestRateLimiterTest {
     @Test
     void shouldGeLimitSingleWindowReactive() {
 
-        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 5));
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(Duration.ofSeconds(10), 5));
         ReactiveRequestRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
 
         Flux<Boolean> geLimitLimitFlux = Flux
@@ -60,7 +61,7 @@ public abstract class AbstractReactiveRequestRateLimiterTest {
     @Test
     void shouldLimitDualWindowReactive() {
 
-        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(1, TimeUnit.SECONDS, 5), RequestLimitRule.of(10, TimeUnit.SECONDS, 10));
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(Duration.ofSeconds(1), 5), RequestLimitRule.of(Duration.ofSeconds(10), 10));
         ReactiveRequestRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
 
         Flux
@@ -90,7 +91,7 @@ public abstract class AbstractReactiveRequestRateLimiterTest {
 
     @Test
     void shouldResetLimit() {
-        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(60, TimeUnit.SECONDS, 1));
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(Duration.ofSeconds(60), 1));
         ReactiveRequestRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
 
         String key =  "ip:127.1.0.1";

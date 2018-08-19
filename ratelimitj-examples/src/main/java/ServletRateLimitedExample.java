@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -18,7 +19,7 @@ public class ServletRateLimitedExample extends HttpServlet {
 
     // transient to keep findbugs happy.
     private final transient RequestRateLimiter rateLimiter = new InMemorySlidingWindowRequestRateLimiter(
-            RequestLimitRule.of(1, TimeUnit.MINUTES, 10) );
+            RequestLimitRule.of(Duration.ofMinutes(1), 10) );
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {

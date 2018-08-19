@@ -29,7 +29,7 @@ public abstract class RedisSlidingWindowReactiveRequestRateLimiterTest extends A
 
     @Test
     void shouldReloadMissingScript() {
-        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(60, TimeUnit.SECONDS, 1));
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(Duration.ofSeconds(60), 1));
         ReactiveRequestRateLimiter rateLimiter = getRateLimiter(rules, new SystemTimeSupplier());
 
         rateLimiter.overLimitWhenIncrementedReactive(UUID.randomUUID().toString()).block(Duration.ofSeconds(5));

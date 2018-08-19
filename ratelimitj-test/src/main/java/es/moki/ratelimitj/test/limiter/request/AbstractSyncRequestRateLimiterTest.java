@@ -7,6 +7,7 @@ import es.moki.ratelimitj.core.time.TimeSupplier;
 import es.moki.ratelimitj.test.time.TimeBanditSupplier;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
@@ -23,7 +24,7 @@ public abstract class AbstractSyncRequestRateLimiterTest {
     @Test
     void shouldLimitSingleWindowSync()  {
 
-        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 5));
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(Duration.ofSeconds(10), 5));
         RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
 
         IntStream.rangeClosed(1, 5).forEach(value -> {
@@ -37,7 +38,7 @@ public abstract class AbstractSyncRequestRateLimiterTest {
     @Test
     void shouldGeLimitSingleWindowSync() {
 
-        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 5));
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(Duration.ofSeconds(10), 5));
         RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
 
         IntStream.rangeClosed(1, 4).forEach(value -> {
@@ -51,7 +52,7 @@ public abstract class AbstractSyncRequestRateLimiterTest {
     @Test
     void shouldLimitWithWeightSingleWindowSync() {
 
-        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 10));
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(Duration.ofSeconds(10), 10));
         RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
 
         IntStream.rangeClosed(1, 5).forEach(value -> {
@@ -65,7 +66,7 @@ public abstract class AbstractSyncRequestRateLimiterTest {
     @Test
     void shouldLimitSingleWindowSyncWithMultipleKeys() {
 
-        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(10, TimeUnit.SECONDS, 5));
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(Duration.ofSeconds(10), 5));
         RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
 
         IntStream.rangeClosed(1, 5).forEach(value -> {
@@ -84,7 +85,7 @@ public abstract class AbstractSyncRequestRateLimiterTest {
 
     @Test
     void shouldResetLimit() {
-        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(60, TimeUnit.SECONDS, 1));
+        ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(Duration.ofSeconds(60), 1));
         RequestRateLimiter requestRateLimiter = getRateLimiter(rules, timeBandit);
 
         String key = "ip:127.1.0.1";
