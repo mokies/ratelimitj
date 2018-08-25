@@ -13,11 +13,9 @@ import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.auth.PrincipalImpl;
 import io.dropwizard.auth.oauth.OAuthCredentialAuthFilter;
-import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.lettuce.core.RedisClient;
-import io.lettuce.core.api.StatefulRedisConnection;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
 public class RateLimitApplication extends Application<Configuration> {
@@ -47,25 +45,5 @@ public class RateLimitApplication extends Application<Configuration> {
                         .buildAuthFilter()));
         environment.jersey().register(RolesAllowedDynamicFeature.class);
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(PrincipalImpl.class));
-
-        //TODO move this cleanup into the tests
-        environment.lifecycle().manage(new Managed() {
-            @Override
-            public void start() {
-            }
-
-            @Override
-            public void stop() {
-                flushRedis();
-            }
-
-            private void flushRedis() {
-                try (StatefulRedisConnection<String, String> connection = redisClient.connect()) {
-                    connection.sync().flushdb();
-                }
-                redisClient.shutdownAsync();
-            }
-        });
-
     }
 }
