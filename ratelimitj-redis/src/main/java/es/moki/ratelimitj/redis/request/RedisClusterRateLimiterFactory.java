@@ -27,6 +27,7 @@ public class RedisClusterRateLimiterFactory extends AbstractRequestRateLimiterFa
         return lookupInstance(rules);
     }
 
+    @Override
     protected RedisSlidingWindowRequestRateLimiter create(Set<RequestLimitRule> rules) {
         getConnection().reactive();
         return new RedisSlidingWindowRequestRateLimiter(getConnection().reactive(), getConnection().reactive(), rules);
@@ -34,7 +35,7 @@ public class RedisClusterRateLimiterFactory extends AbstractRequestRateLimiterFa
 
     @Override
     public void close() {
-        client.shutdownAsync();
+        client.shutdown();
     }
 
     private StatefulRedisClusterConnection<String, String> getConnection() {

@@ -30,6 +30,7 @@ public class RedisRateLimiterFactory extends AbstractRequestRateLimiterFactory<R
         return lookupInstance(rules);
     }
 
+    @Override
     protected RedisSlidingWindowRequestRateLimiter create(Set<RequestLimitRule> rules) {
         return new RedisSlidingWindowRequestRateLimiter(getConnection().reactive(), getConnection().reactive(), rules);
     }

@@ -2,11 +2,13 @@ package es.moki.ratelimij.dropwizard.component;
 
 import es.moki.ratelimij.dropwizard.component.app.RateLimitApplication;
 import es.moki.ratelimij.dropwizard.component.app.model.LoginRequest;
+import es.moki.ratelimitj.redis.extensions.RedisStandaloneFlushExtension;
 import io.dropwizard.Configuration;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -17,33 +19,12 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
+@ExtendWith(RedisStandaloneFlushExtension.class)
 public class DropwizardRateLimitComponentTest {
 
     @ClassRule
     public static final DropwizardAppRule<Configuration> RULE =
             new DropwizardAppRule<>(RateLimitApplication.class, ResourceHelpers.resourceFilePath("ratelimit-app.yml"));
-
-//    private static RedisClient client;
-//    private static StatefulRedisConnection connect;
-//
-//    @BeforeAll
-//    public static void beforeAll() {
-//        client = RedisClient.create("redis://localhost7006");
-//        connect = client.connect();
-//    }
-//
-//    @AfterAll
-//    public static void afterAll() {
-//        connect.close();
-//        client.shutdown();
-//    }
-//
-//    @AfterEach
-//    public void afterEach() {
-//        try (StatefulRedisConnection<String, String> connection = client.connect()) {
-//            connection.sync().flushdb();
-//        }
-//    }
 
     @Test
     public void loginHandlerRedirectsAfterPost() {
@@ -138,7 +119,5 @@ public class DropwizardRateLimitComponentTest {
             return new LoginRequest("heisenberg", "abc123");
         }
     }
-
-
 
 }
