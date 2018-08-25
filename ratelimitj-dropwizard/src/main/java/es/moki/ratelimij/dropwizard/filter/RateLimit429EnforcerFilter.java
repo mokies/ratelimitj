@@ -53,38 +53,24 @@ public class RateLimit429EnforcerFilter implements ContainerRequestFilter {
 
             RequestRateLimiter rateLimit = factory.getInstance(toLimitRules(rateLimited));
 
-            KeyProvider keyProvider = rateLimited.key();
             KeyPart[] keyParts = rateLimited.keys();
 
-            if (keyProvider == Key.NO_VALUE && keyParts.length == 0) {
-                LOG.warn("No keys were provided by the key provide");
+
+            Optional<CharSequence> keyResult = KeyPart.combineKeysParts(rateLimited.groupKeyPrefix(), Arrays.asList(keyParts), request, resource, securityContext);
+
+
+            CharSequence key;
+            if (keyResult.isPresent()) {
+                key = keyResult.get();
+            } else {
+                LOG.warn("No keys were provided by the key providers '{}'",
+                        Arrays.stream(keyParts)
+                                .map(KeyPart::getClass)
+                                .map(Object::toString)
+                                .collect(Collectors.joining(", ")));
                 return;
             }
 
-            Optional<CharSequence> legacyKey = keyProvider.create(request, resource, securityContext);
-            CharSequence key;
-            if (legacyKey.isPresent()) {
-                key = legacyKey.get();
-
-            } else {
-
-                Optional<CharSequence> keyResult = KeyPart.combineKeysParts(rateLimited.groupKeyPrefix(), Arrays.asList(keyParts), request, resource, securityContext);
-
-                if (keyResult.isPresent()) {
-                    key = keyResult.get();
-
-                } else {
-                    LOG.warn("No keys were provided by the key providers '{}'",
-                            Arrays.stream(keyParts)
-                                    .map(KeyPart::getClass)
-                                    .map(Object::toString)
-                                    .collect(Collectors.joining(", ")));
-                    return;
-                }
-
-            }
-
-//            if (legacyKey.isPresent()) {
             boolean overLimit = rateLimit.overLimitWhenIncremented(key.toString());
             if (overLimit) {
                 if (!rateLimited.reportOnly()) {
@@ -95,9 +81,6 @@ public class RateLimit429EnforcerFilter implements ContainerRequestFilter {
                 }
                 LOG.debug("rate-limit key '{}' under limit.", key);
             }
-//            } else {
-//                //LOG.warn("No key was provided by the key provide '{}'", keyProvider.getClass());
-//            }
         } catch (Exception e) {
             LOG.error("Error occurred checking rate-limit. Assuming under limit", e);
         }
