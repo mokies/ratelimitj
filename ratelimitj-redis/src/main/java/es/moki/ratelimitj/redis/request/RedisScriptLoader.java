@@ -2,6 +2,8 @@ package es.moki.ratelimitj.redis.request;
 
 
 import io.lettuce.core.api.reactive.RedisScriptingReactiveCommands;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -17,6 +19,8 @@ import java.util.stream.Collectors;
 import static java.util.Objects.requireNonNull;
 
 public class RedisScriptLoader {
+
+    private static final Logger LOG = LoggerFactory.getLogger(RedisScriptLoader.class);
 
     private final RedisScriptingReactiveCommands<String, String> redisScriptingCommands;
     private final String scriptUri;
@@ -34,7 +38,7 @@ public class RedisScriptLoader {
         this.storedScript = new AtomicReference<>(loadScript());
 
         if (eagerLoad) {
-            this.storedScript.get().blockFirst(Duration.ofSeconds(10));
+            this.storedScript.get().doOnComplete(() -> LOG.info("Redis Script eager load complete")).blockFirst(Duration.ofSeconds(10));
         }
     }
 

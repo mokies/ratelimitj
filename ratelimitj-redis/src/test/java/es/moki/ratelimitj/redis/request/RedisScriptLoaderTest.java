@@ -49,12 +49,13 @@ class RedisScriptLoaderTest {
     @DisplayName("should eagerly load rate limit lua script into Redis")
     void shouldEagerlyLoadScript() {
         RedisScriptLoader scriptLoader = new RedisScriptLoader(extension.getScriptingReactiveCommands(), "hello-world.lua", true);
-        scriptFlush();
-
         String sha = scriptLoader.storedScript().block(Duration.ofSeconds(5)).getSha();
         assertThat(sha).isNotEmpty();
+        scriptFlush();
 
-        assertThat(extension.getScriptingReactiveCommands().scriptExists(sha).blockFirst()).isFalse();
+        new RedisScriptLoader(extension.getScriptingReactiveCommands(), "hello-world.lua", true);
+
+        assertThat(extension.getScriptingReactiveCommands().scriptExists(sha).blockFirst()).isTrue();
     }
 
     @Test
