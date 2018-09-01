@@ -2,7 +2,10 @@ package es.moki.ratelimitj.core.limiter.request;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.Objects.requireNonNull;
@@ -17,16 +20,22 @@ public class RequestLimitRule {
     private final long limit;
     private final int precision;
     private final String name;
+    private final Set<String> keys;
 
     private RequestLimitRule(int durationSeconds, long limit, int precision) {
         this(durationSeconds, limit, precision, null);
     }
 
     private RequestLimitRule(int durationSeconds, long limit, int precision, String name) {
+        this(durationSeconds, limit, precision, name, null);
+    }
+
+    private RequestLimitRule(int durationSeconds, long limit, int precision, String name, Set<String> keys) {
         this.durationSeconds = durationSeconds;
         this.limit = limit;
         this.precision = precision;
         this.name = name;
+        this.keys = keys;
     }
 
     /**
@@ -50,7 +59,7 @@ public class RequestLimitRule {
      * @return a limit rule
      */
     public RequestLimitRule withPrecision(int precision) {
-        return new RequestLimitRule(this.durationSeconds, this.limit, precision, this.name);
+        return new RequestLimitRule(this.durationSeconds, this.limit, precision, this.name, this.keys);
     }
 
     /**
@@ -60,7 +69,28 @@ public class RequestLimitRule {
      * @return a limit rule
      */
     public RequestLimitRule withName(String name) {
-        return new RequestLimitRule(this.durationSeconds, this.limit, this.precision, name);
+        return new RequestLimitRule(this.durationSeconds, this.limit, this.precision, name, this.keys);
+    }
+
+    /**
+     * Applies a key to the rate limit that defines to which keys, the rule applies, empty for any unmatched key.
+     *
+     * @param keys Defines a set of keys to which the rule applies.
+     * @return a limit rule
+     */
+    public RequestLimitRule withKeys(String... keys) {
+        Set<String> keySet = keys.length > 0 ? new HashSet<>(Arrays.asList(keys)) : null;
+        return withKeys(keySet);
+    }
+
+    /**
+     * Applies a key to the rate limit that defines to which keys, the rule applies, null for any unmatched key.
+     *
+     * @param keys Defines a set of keys to which the rule applies.
+     * @return a limit rule
+     */
+    public RequestLimitRule withKeys(Set<String> keys) {
+        return new RequestLimitRule(this.durationSeconds, this.limit, this.precision, this.name, keys);
     }
 
     /**
@@ -91,6 +121,12 @@ public class RequestLimitRule {
         return limit;
     }
 
+    /**
+     * @return The keys.
+     */
+    public Set<String> getKeys() {
+        return keys;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -104,11 +140,12 @@ public class RequestLimitRule {
         return durationSeconds == that.durationSeconds
                 && limit == that.limit
                 && Objects.equals(precision, that.precision)
-                && Objects.equals(name, that.name);
+                && Objects.equals(name, that.name)
+                && Objects.equals(keys, that.keys);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(durationSeconds, limit, precision, name);
+        return Objects.hash(durationSeconds, limit, precision, name, keys);
     }
 }

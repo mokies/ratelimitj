@@ -1,6 +1,7 @@
 package es.moki.ratelimitj.redis.request;
 
 
+import es.moki.ratelimitj.core.limiter.request.*;
 import es.moki.ratelimitj.core.limiter.request.ReactiveRequestRateLimiter;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
@@ -36,13 +37,10 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
     // TODO on upgrade to Lettuce 5.1.0 check for new RedisNoScriptException
     private static final Predicate<Throwable> STARTS_WITH_NO_SCRIPT_ERROR = e -> e.getMessage().startsWith("NOSCRIPT");
 
-    private final LimitRuleJsonSerialiser serialiser = new LimitRuleJsonSerialiser();
-
-
     private final RedisScriptingReactiveCommands<String, String> redisScriptingReactiveCommands;
     private final RedisKeyReactiveCommands<String, String> redisKeyCommands;
     private final RedisScriptLoader scriptLoader;
-    private final String rulesJson;
+    private final RequestLimitRulesSupplier<String> requestLimitRulesSupplier;
     private final TimeSupplier timeSupplier;
 
     public RedisSlidingWindowRequestRateLimiter(RedisScriptingReactiveCommands<String, String> redisScriptingReactiveCommands, RedisKeyReactiveCommands<String, String> redisKeyCommands, RequestLimitRule rule) {
@@ -61,12 +59,8 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
         this.redisScriptingReactiveCommands = redisScriptingReactiveCommands;
         this.redisKeyCommands = redisKeyCommands;
         scriptLoader = new RedisScriptLoader(redisScriptingReactiveCommands, "sliding-window-ratelimit.lua");
-        rulesJson = serialiserLimitRules(rules);
+        requestLimitRulesSupplier = new SerializedRequestLimitRulesSupplier(rules);
         this.timeSupplier = timeSupplier;
-    }
-
-    private String serialiserLimitRules(Set<RequestLimitRule> rules) {
-        return serialiser.encode(rules);
     }
 
     @Override
@@ -129,12 +123,9 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
         return redisKeyCommands.del(key).map(count -> count > 0);
     }
 
-    private CompletionStage<Boolean> eqOrGeLimitAsync(String key, int weight, boolean strictlyGreater) {
-        return eqOrGeLimitReactive(key, weight, strictlyGreater).toFuture();
-    }
-
     private Mono<Boolean> eqOrGeLimitReactive(String key, int weight, boolean strictlyGreater) {
         requireNonNull(key);
+        String rulesJson = requestLimitRulesSupplier.getRules(key);
 
         return Mono.zip(timeSupplier.getReactive(), scriptLoader.storedScript())
                 .flatMapMany(tuple -> {
