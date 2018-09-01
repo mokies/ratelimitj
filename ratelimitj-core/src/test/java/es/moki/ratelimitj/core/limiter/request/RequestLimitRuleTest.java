@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class RequestLimitRuleTest {
 
@@ -50,6 +51,11 @@ class RequestLimitRuleTest {
         RequestLimitRule requestLimitRule = RequestLimitRule.of(Duration.ofSeconds(1), 5).withName("boom");
 
         assertThat(requestLimitRule.getName()).isEqualTo("boom");
+    }
+
+    @Test
+    public void shouldHaveLimitGreaterThanZero() {
+        assertThatThrownBy(() -> RequestLimitRule.of(Duration.ofSeconds(1), -1).withName("boom") );
     }
 
 }

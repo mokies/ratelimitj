@@ -47,6 +47,9 @@ public class RequestLimitRule {
      */
     public static RequestLimitRule of(Duration duration, long limit) {
         requireNonNull(duration, "duration can not be null");
+        if (limit < 0) {
+            throw new IllegalArgumentException("limit must be greater than zero.");
+        }
         int durationSeconds = (int) duration.getSeconds();
         return new RequestLimitRule(durationSeconds, limit, durationSeconds);
     }
