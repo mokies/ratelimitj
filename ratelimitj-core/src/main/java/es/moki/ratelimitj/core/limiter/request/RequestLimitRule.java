@@ -1,12 +1,12 @@
 package es.moki.ratelimitj.core.limiter.request;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import static java.util.Objects.requireNonNull;
 
@@ -78,9 +78,9 @@ public class RequestLimitRule {
      * @param keys Defines a set of keys to which the rule applies.
      * @return a limit rule
      */
-    public RequestLimitRule withKeys(String... keys) {
+    public RequestLimitRule matchingKeys(String... keys) {
         Set<String> keySet = keys.length > 0 ? new HashSet<>(Arrays.asList(keys)) : null;
-        return withKeys(keySet);
+        return matchingKeys(keySet);
     }
 
     /**
@@ -89,7 +89,7 @@ public class RequestLimitRule {
      * @param keys Defines a set of keys to which the rule applies.
      * @return a limit rule
      */
-    public RequestLimitRule withKeys(Set<String> keys) {
+    public RequestLimitRule matchingKeys(Set<String> keys) {
         return new RequestLimitRule(this.durationSeconds, this.limit, this.precision, this.name, keys);
     }
 
@@ -124,6 +124,7 @@ public class RequestLimitRule {
     /**
      * @return The keys.
      */
+    @Nullable
     public Set<String> getKeys() {
         return keys;
     }

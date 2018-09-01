@@ -3,6 +3,7 @@ package es.moki.ratelimitj.hazelcast;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
+import es.moki.ratelimitj.core.limiter.request.DefaultRequestLimitRulesSupplier;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.core.time.SystemTimeSupplier;
@@ -26,7 +27,7 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
     private static final Logger LOG = LoggerFactory.getLogger(HazelcastSlidingWindowRequestRateLimiter.class);
 
     private final HazelcastInstance hz;
-    private final Set<RequestLimitRule> rules;
+    private final DefaultRequestLimitRulesSupplier rulesSupplier;
     private final TimeSupplier timeSupplier;
 
     public HazelcastSlidingWindowRequestRateLimiter(HazelcastInstance hz, Set<RequestLimitRule> rules) {
@@ -36,9 +37,12 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
     public HazelcastSlidingWindowRequestRateLimiter(HazelcastInstance hz, Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
         requireNonNull(hz, "hazelcast can not be null");
         requireNonNull(rules, "rules can not be null");
+        if (rules.isEmpty()) {
+            throw new IllegalArgumentException("at least one rule must be provided");
+        }
         requireNonNull(rules, "time supplier can not be null");
         this.hz = hz;
-        this.rules = rules;
+        this.rulesSupplier = new DefaultRequestLimitRulesSupplier(rules);
         this.timeSupplier = timeSupplier;
     }
 
@@ -94,13 +98,8 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
 
     private boolean eqOrGeLimit(String key, int weight, boolean strictlyGreater) {
 
-        requireNonNull(key, "key cannot be null");
-        requireNonNull(rules, "rules cannot be null");
-        if (rules.isEmpty()) {
-            throw new IllegalArgumentException("at least one rule must be provided");
-        }
-
         final long now = timeSupplier.get();
+        final Set<RequestLimitRule> rules = rulesSupplier.getRules(key);
         // TODO implement cleanup
         final int longestDuration = rules.stream().map(RequestLimitRule::getDurationSeconds).reduce(Integer::max).orElse(0);
         List<SavedKey> savedKeys = new ArrayList<>(rules.size());

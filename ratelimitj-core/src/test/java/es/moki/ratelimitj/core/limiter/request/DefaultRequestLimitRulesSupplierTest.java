@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,9 +17,9 @@ class DefaultRequestLimitRulesSupplierTest {
 
     DefaultRequestLimitRulesSupplierTest() {
         allRules.add(RequestLimitRule.of(Duration.ofSeconds(1), 10).withName("localhostPerSeconds")
-                .withKeys("localhost", "127.0.0.1"));
+                .matchingKeys("localhost", "127.0.0.1"));
         allRules.add(RequestLimitRule.of(Duration.ofHours(1), 2000).withName("localhostPerHours")
-                .withKeys("localhost", "127.0.0.1"));
+                .matchingKeys("localhost", "127.0.0.1"));
         allRules.add(RequestLimitRule.of(Duration.ofSeconds(1), 5).withName("perSeconds"));
         allRules.add(RequestLimitRule.of(Duration.ofHours(1), 1000).withName("perHours"));
         requestLimitRulesSupplier = new DefaultRequestLimitRulesSupplier(allRules);

@@ -2,7 +2,9 @@ package es.moki.ratelimitj.inmemory.request;
 
 import de.jkeylockmanager.manager.KeyLockManager;
 import de.jkeylockmanager.manager.KeyLockManagers;
+import es.moki.ratelimitj.core.limiter.request.DefaultRequestLimitRulesSupplier;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
+import es.moki.ratelimitj.core.limiter.request.RequestLimitRulesSupplier;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.core.time.SystemTimeSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
@@ -25,10 +27,10 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
 
     private static final Logger LOG = LoggerFactory.getLogger(InMemorySlidingWindowRequestRateLimiter.class);
 
-    private final Set<RequestLimitRule> rules;
     private final TimeSupplier timeSupplier;
     private final ExpiringMap<String, ConcurrentMap<String, Long>> expiringKeyMap;
     private final KeyLockManager lockManager = KeyLockManagers.newLock();
+    private final DefaultRequestLimitRulesSupplier rulesSupplier;
 
     public InMemorySlidingWindowRequestRateLimiter(RequestLimitRule rule) {
         this(Collections.singleton(rule), new SystemTimeSupplier());
@@ -39,17 +41,18 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
     }
 
     public InMemorySlidingWindowRequestRateLimiter(Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
-        requireNonNull(rules, "rules can not be null");
-        requireNonNull(rules, "time supplier can not be null");
-        this.rules = rules;
-        this.timeSupplier = timeSupplier;
-        this.expiringKeyMap = ExpiringMap.builder().variableExpiration().build();
+        this(ExpiringMap.builder().variableExpiration().build(), rules, timeSupplier);
     }
 
     InMemorySlidingWindowRequestRateLimiter(ExpiringMap<String, ConcurrentMap<String, Long>> expiringKeyMap, Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
+        requireNonNull(rules, "rules can not be null");
+        requireNonNull(rules, "time supplier can not be null");
+        if (rules.isEmpty()) {
+            throw new IllegalArgumentException("at least one rule must be provided");
+        }
         this.expiringKeyMap = expiringKeyMap;
-        this.rules = rules;
         this.timeSupplier = timeSupplier;
+        this.rulesSupplier = new DefaultRequestLimitRulesSupplier(rules);
     }
 
     @Override
@@ -102,13 +105,8 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
 
     private boolean eqOrGeLimit(String key, int weight, boolean strictlyGreater) {
 
-        requireNonNull(key, "key cannot be null");
-        requireNonNull(rules, "rules cannot be null");
-        if (rules.isEmpty()) {
-            throw new IllegalArgumentException("at least one rule must be provided");
-        }
-
         final long now = timeSupplier.get();
+        final Set<RequestLimitRule> rules = rulesSupplier.getRules(key);
         // TODO implement cleanup
         final int longestDurationSeconds = rules.stream().map(RequestLimitRule::getDurationSeconds).reduce(Integer::max).orElse(0);
         List<SavedKey> savedKeys = new ArrayList<>(rules.size());

@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -81,6 +80,24 @@ public abstract class AbstractSyncRequestRateLimiterTest {
         timeBandit.addUnixTimeMilliSeconds(5000L);
         IntStream.rangeClosed(1, 10).forEach(
                 keySuffix -> assertThat(requestRateLimiter.overLimitWhenIncremented("ip:127.0.0." + keySuffix)).isFalse());
+    }
+
+    @Test
+    void shouldLimitSingleWindowSyncWithKeySpecificRules() {
+
+        RequestLimitRule rule1 = RequestLimitRule.of(Duration.ofSeconds(10), 5).matchingKeys("ip:127.9.0.0");
+        RequestLimitRule rule2 = RequestLimitRule.of(Duration.ofSeconds(10), 10);
+
+        RequestRateLimiter requestRateLimiter = getRateLimiter(ImmutableSet.of(rule1, rule2), timeBandit);
+
+        IntStream.rangeClosed(1, 5).forEach(value -> {
+            timeBandit.addUnixTimeMilliSeconds(1000L);
+            assertThat(requestRateLimiter.overLimitWhenIncremented("ip:127.9.0.0")).isFalse();
+        });
+        assertThat(requestRateLimiter.overLimitWhenIncremented("ip:127.9.0.0")).isTrue();
+
+        IntStream.rangeClosed(1, 10).forEach(value -> assertThat(requestRateLimiter.overLimitWhenIncremented("ip:127.9.1.0")).isFalse());
+        assertThat(requestRateLimiter.overLimitWhenIncremented("ip:127.9.1.0")).isTrue();
     }
 
     @Test
