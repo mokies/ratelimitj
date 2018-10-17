@@ -8,6 +8,7 @@ import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.core.time.SystemTimeSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import es.moki.ratelimitj.redis.request.RedisScriptLoader.StoredScript;
+import io.lettuce.core.RedisNoScriptException;
 import io.lettuce.core.api.reactive.RedisKeyReactiveCommands;
 import io.lettuce.core.api.reactive.RedisScriptingReactiveCommands;
 import org.slf4j.Logger;
@@ -34,8 +35,7 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
 
     private static final Duration BLOCK_TIMEOUT = Duration.of(5, ChronoUnit.SECONDS);
 
-    // TODO on upgrade to Lettuce 5.1.0 check for new RedisNoScriptException
-    private static final Predicate<Throwable> STARTS_WITH_NO_SCRIPT_ERROR = e -> e.getMessage().startsWith("NOSCRIPT");
+    private static final Predicate<Throwable> STARTS_WITH_NO_SCRIPT_ERROR = e -> e instanceof RedisNoScriptException;
 
     private final RedisScriptingReactiveCommands<String, String> redisScriptingReactiveCommands;
     private final RedisKeyReactiveCommands<String, String> redisKeyCommands;
@@ -132,7 +132,7 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
                     Long time = tuple.getT1();
                     StoredScript script = tuple.getT2();
                     return redisScriptingReactiveCommands
-                            .evalsha(script.getSha(), VALUE, new String[]{key}, rulesJson, Long.toString(time), Integer.toString(weight), toStringOneZero(strictlyGreater))
+                            .evalsha(script.getSha(), VALUE, new String[]{key}, rulesJson, time.toString(), Integer.toString(weight), toStringOneZero(strictlyGreater))
                             .doOnError(STARTS_WITH_NO_SCRIPT_ERROR, e -> script.dispose());
                 })
                 .retry(1, STARTS_WITH_NO_SCRIPT_ERROR)

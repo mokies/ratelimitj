@@ -10,7 +10,6 @@ import reactor.core.publisher.Flux;
 
 import java.time.Duration;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,7 +27,7 @@ public abstract class AbstractReactiveRequestRateLimiterTest {
 
         Flux<Boolean> overLimitFlux = Flux
                 .just("ip:127.0.1.5")
-                .repeat(5)
+                .repeat(4)
                 .flatMap(key -> {
                     timeBandit.addUnixTimeMilliSeconds(100);
                     return rateLimiter.overLimitWhenIncrementedReactive(key);
@@ -46,17 +45,17 @@ public abstract class AbstractReactiveRequestRateLimiterTest {
         ReactiveRequestRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
 
         Flux<Boolean> geLimitLimitFlux = Flux
-                        .just("ip:127.0.1.2")
-                        .repeat(4)
-                        .flatMap(key -> {
-                            timeBandit.addUnixTimeMilliSeconds(100);
-                            return rateLimiter.geLimitWhenIncrementedReactive(key);
-                        });
+                .just("ip:127.0.1.2")
+                .repeat(3)
+                .flatMap(key -> {
+                    timeBandit.addUnixTimeMilliSeconds(100);
+                    return rateLimiter.geLimitWhenIncrementedReactive(key);
+                });
 
         geLimitLimitFlux.toStream().forEach(result -> assertThat(result).isFalse());
 
         assertThat(rateLimiter.geLimitWhenIncrementedReactive("ip:127.0.1.2").block()).isTrue();
-    }
+}
 
     @Test
     void shouldLimitDualWindowReactive() {
@@ -66,7 +65,7 @@ public abstract class AbstractReactiveRequestRateLimiterTest {
 
         Flux
                 .just("ip:127.0.1.6")
-                .repeat(5)
+                .repeat(4)
                 .flatMap(key -> {
                     timeBandit.addUnixTimeMilliSeconds(100);
                     return rateLimiter.overLimitWhenIncrementedReactive(key);
@@ -78,7 +77,7 @@ public abstract class AbstractReactiveRequestRateLimiterTest {
 
         Flux
                 .just("ip:127.0.1.6")
-                .repeat(5)
+                .repeat(4)
                 .flatMap(key -> {
                     timeBandit.addUnixTimeMilliSeconds(100);
                     return rateLimiter.overLimitWhenIncrementedReactive(key);
@@ -94,7 +93,7 @@ public abstract class AbstractReactiveRequestRateLimiterTest {
         ImmutableSet<RequestLimitRule> rules = ImmutableSet.of(RequestLimitRule.of(Duration.ofSeconds(60), 1));
         ReactiveRequestRateLimiter rateLimiter = getRateLimiter(rules, timeBandit);
 
-        String key =  "ip:127.1.0.1";
+        String key = "ip:127.1.0.1";
 
         assertThat(rateLimiter.overLimitWhenIncrementedReactive(key).block()).isFalse();
         assertThat(rateLimiter.overLimitWhenIncrementedReactive(key).block()).isTrue();
