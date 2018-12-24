@@ -64,6 +64,7 @@ public class InMemoryConcurrentRequestRateLimiter implements ConcurrentRequestLi
             semaphore.release(weight);
         }
 
+        @Override
         public boolean hasAcquired() {
             return acquired;
         }
