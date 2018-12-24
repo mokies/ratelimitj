@@ -15,10 +15,6 @@ plugins {
 
 defaultTasks 'check'
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.10'
-}
-
 ext.junitJupiterVersion  = '5.2.0'
 
 allprojects {
@@ -45,6 +41,30 @@ subprojects {
     checkstyle {
         configFile = rootProject.file('gradle/config/checkstyle/checkstyle.xml')
         toolVersion = '8.5'
+    }
+
+    pmd {
+        ignoreFailures = true
+        pmdTest.enabled=false
+        ruleSets = [
+                'java-basic',
+                'java-braces',
+                'java-clone',
+                'java-codesize',
+                'java-comments',
+                'java-controversial',
+                'java-coupling',
+                'java-design',
+                'java-empty',
+                'java-finalizers',
+                'java-imports',
+                'java-optimizations',
+                'java-strictexception',
+                'java-strings',
+                'java-typeresolution',
+                'java-unnecessary',
+                'java-unusedcode'
+        ]
     }
 
     ext.libraries = [
