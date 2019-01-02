@@ -5,7 +5,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.0.16"
+        classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.6"
     }
 }
 
@@ -28,8 +28,6 @@ allprojects {
 }
 
 subprojects {
-
-    sourceCompatibility = 1.8
 
     apply plugin: "net.ltgt.errorprone"
     apply plugin: 'pmd'
@@ -84,10 +82,7 @@ subprojects {
 
         test.useJUnitPlatform()
 
-//        testRuntime("org.junit.platform:junit-platform-launcher:1.2.0")
-//        testCompile("junit:junit:4.12")
-//        testRuntime("org.junit.vintage:junit-vintage-engine:4.12.0")
-//        testRuntimeOnly "org.junit.vintage:junit-vintage-engine:4.12.0"
+//        errorproneJavac("com.google.errorprone:javac:$errorproneJavacVersion")
 
         testImplementation "org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion"
