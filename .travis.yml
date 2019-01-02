@@ -1,15 +1,14 @@
 language: java
 
-matrix:
-  include:
-    - env: JDK='Oracle JDK 8'
-      jdk: oraclejdk8
-    - env: JDK='OpenJDK 8'
-      jdk: openjdk8
-    - env: JDK='Oracle JDK 9'
-      jdk: oraclejdk9
-#    - env: JDK='Oracle JDK 10'
-#      jdk: oraclejdk10
+jdk:
+ - oraclejdk8
+ - oraclejdk9
+ - oraclejdk10
+ - oraclejdk11
+ - openjdk8
+ - openjdk9
+ - openjdk10
+ - openjdk11
 
 sudo: required
 
