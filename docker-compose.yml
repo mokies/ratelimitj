@@ -1,4 +1,3 @@
-
 version: "3"
 services:
 
@@ -9,3 +8,4 @@ services:
       - '7000-7007:7000-7007'
       environment:
         - IP=0.0.0.0
+        - STANDALONE=true

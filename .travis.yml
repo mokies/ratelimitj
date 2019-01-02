@@ -1,8 +1,4 @@
 language: java
-#jdk:
-#  - oraclejdk8
-#  - oraclejdk9
-#  - openjdk8
 
 matrix:
   include:
@@ -15,18 +11,10 @@ matrix:
 #    - env: JDK='Oracle JDK 10'
 #      jdk: oraclejdk10
 
-#addons:
-#  apt:
-#    packages:
-#      - oracle-java8-installer
-
 sudo: required
 
 services:
   - docker
-
-before_install:
- - cp gradle.properties.ci gradle.properties
 
 before_script:
   - chmod +x gradlew
