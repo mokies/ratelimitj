@@ -56,9 +56,9 @@ public class RequestLimitRule {
 
     /**
      * Configures as a sliding window rate limit. Imagine the duration window divided into a number of smaller buckets, each with it's own count.
-     * The number of smaller buckets is defined by the precision.
+     * The duration of the smaller buckets in seconds is defined by the precision.
      *
-     * @param precision Defines the number of buckets that will be used to approximate the sliding window.
+     * @param precision The duration of the smaller buckets in seconds that will be used to approximate the sliding window.
      * @return a limit rule
      */
     public RequestLimitRule withPrecision(int precision) {
