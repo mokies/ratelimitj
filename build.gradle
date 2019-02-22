@@ -4,13 +4,11 @@ buildscript {
         mavenCentral()
         jcenter()
     }
-    dependencies {
-        classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.6"
-    }
 }
 
 plugins {
     id "com.avast.gradle.docker-compose" version "0.8.12"
+    id "net.ltgt.errorprone" version "0.7"
 }
 
 defaultTasks 'check'
@@ -22,6 +20,10 @@ allprojects {
         mavenCentral()
         jcenter()
     }
+    
+//    dependencies {
+//        errorprone("com.google.errorprone:error_prone_core:2.3.2")
+//    }
 
     apply plugin: 'java-library'
     apply plugin: 'jacoco'
