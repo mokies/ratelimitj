@@ -12,5 +12,9 @@ public interface TimeSupplier {
 
     Mono<Long> getReactive();
 
+    /**
+     * Get unix time in seconds
+     * @return unix time seconds
+     */
     long get();
 }
