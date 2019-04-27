@@ -50,6 +50,9 @@ public class RequestLimitRule {
         if (limit < 0) {
             throw new IllegalArgumentException("limit must be greater than zero.");
         }
+        if (Duration.ofSeconds(1).compareTo(duration) >= 1) {
+            throw new IllegalArgumentException("duration must be great than 1 second");
+        }
         int durationSeconds = (int) duration.getSeconds();
         return new RequestLimitRule(durationSeconds, limit, durationSeconds);
     }

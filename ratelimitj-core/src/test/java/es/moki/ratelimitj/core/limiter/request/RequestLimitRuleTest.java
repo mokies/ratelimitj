@@ -54,8 +54,13 @@ class RequestLimitRuleTest {
     }
 
     @Test
-    public void shouldHaveLimitGreaterThanZero() {
+    void shouldHaveLimitGreaterThanZero() {
         assertThatThrownBy(() -> RequestLimitRule.of(Duration.ofSeconds(1), -1).withName("boom")).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void shouldHaveDurationGreaterThanOneSecond() {
+        assertThatThrownBy(() -> RequestLimitRule.of(Duration.ofMillis(100), 1).withName("boom")).isInstanceOf(IllegalArgumentException.class);
     }
 
 }
