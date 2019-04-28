@@ -14,7 +14,7 @@ plugins {
 
 defaultTasks 'check'
 
-ext.junitJupiterVersion  = '5.2.0'
+ext.junitJupiterVersion  = '5.4.2'
 
 allprojects {
     repositories {
