@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiFunction;
 import java.util.stream.IntStream;
 
@@ -116,6 +117,29 @@ public abstract class AbstractSyncRequestRateLimiterTest {
         assertThat(requestRateLimiter.resetLimit(key)).isFalse();
 
         assertThat(requestRateLimiter.overLimitWhenIncremented(key)).isFalse();
+    }
+
+
+    @Test
+    void shouldRateLimitOverTime() {
+        RequestLimitRule rule1 = RequestLimitRule.of(Duration.ofSeconds(5), 250).withPrecision(Duration.ofSeconds(1)).matchingKeys("ip:127.3.9.3");
+        RequestRateLimiter requestRateLimiter = getRateLimiter(ImmutableSet.of(rule1), timeBandit);
+        AtomicLong timeOfLastOperation = new AtomicLong();
+
+        IntStream.rangeClosed(1, 50).forEach(loop -> {
+
+            IntStream.rangeClosed(1, 250).forEach(value -> {
+                timeBandit.addUnixTimeMilliSeconds(14L);
+                boolean overLimit = requestRateLimiter.overLimitWhenIncremented("ip:127.3.9.3");
+                if (overLimit) {
+                    long timeSinceLastOperation = timeBandit.get() - timeOfLastOperation.get();
+                    assertThat(timeSinceLastOperation).isLessThan(3);
+                } else {
+                    timeOfLastOperation.set(timeBandit.get());
+                }
+            });
+
+        });
     }
 
     @Test @Disabled

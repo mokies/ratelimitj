@@ -132,7 +132,7 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
             List<String> dele = new ArrayList<>();
             long trim = Math.min(savedKey.trimBefore, oldTs + savedKey.blocks);
 
-            for (long oldBlock = oldTs; oldBlock == trim - 1; oldBlock++) {
+            for (long oldBlock = oldTs; oldBlock <= trim - 1; oldBlock++) {
                 String bkey = savedKey.countKey + oldBlock;
                 Long bcount = keyMap.get(bkey);
                 if (bcount != null) {
