@@ -8,8 +8,9 @@ buildscript {
 
 plugins {
     id "com.avast.gradle.docker-compose" version "0.8.12"
-    id "net.ltgt.errorprone" version "0.7"
+//    id "net.ltgt.errorprone" version "0.7"
 }
+
 
 defaultTasks 'check'
 
@@ -31,7 +32,7 @@ allprojects {
 
 subprojects {
 
-    apply plugin: "net.ltgt.errorprone"
+//    apply plugin: "net.ltgt.errorprone"
     apply plugin: 'pmd'
     apply plugin: 'checkstyle'
     apply plugin: 'maven-publish'
