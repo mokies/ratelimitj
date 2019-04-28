@@ -1,14 +1,17 @@
 package es.moki.ratelimitj.test.limiter.request;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.core.time.TimeSupplier;
 import es.moki.ratelimitj.test.time.TimeBanditSupplier;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
-import java.util.Set;
+import java.util.*;
+import java.util.function.BiFunction;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -114,5 +117,33 @@ public abstract class AbstractSyncRequestRateLimiterTest {
 
         assertThat(requestRateLimiter.overLimitWhenIncremented(key)).isFalse();
     }
+
+    @Test @Disabled
+    void shouldPreventThunderingHerdWithPrecision() {
+
+        RequestLimitRule rule1 = RequestLimitRule.of(Duration.ofSeconds(5), 250).withPrecision(Duration.ofSeconds(1)).matchingKeys("ip:127.9.9.9");
+        RequestRateLimiter requestRateLimiter = getRateLimiter(ImmutableSet.of(rule1), timeBandit);
+        Map<Long, Integer> underPerSecond = new LinkedHashMap<>();
+        Map<Long, Integer> overPerSecond = new HashMap<>();
+
+        IntStream.rangeClosed(1, 50).forEach(loop -> {
+
+            IntStream.rangeClosed(1, 250).forEach(value -> {
+                timeBandit.addUnixTimeMilliSeconds(14L);
+                boolean overLimit = requestRateLimiter.overLimitWhenIncremented("ip:127.9.9.9");
+                if (!overLimit) {
+                    underPerSecond.merge(timeBandit.get(), 1, Integer::sum);
+                } else {
+                    overPerSecond.merge(timeBandit.get(), 1, Integer::sum);
+                }
+            });
+
+        });
+
+        Set<Long> allSeconds = Sets.newTreeSet(Sets.union(underPerSecond.keySet(), overPerSecond.keySet()));
+
+        allSeconds.forEach((k)->System.out.println("Time seconds : " + k + " under count : " + underPerSecond.get(k) + " over count : " + overPerSecond.get(k)));
+    }
+
 
 }

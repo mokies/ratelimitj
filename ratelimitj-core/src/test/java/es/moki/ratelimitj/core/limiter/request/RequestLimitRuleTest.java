@@ -3,7 +3,6 @@ package es.moki.ratelimitj.core.limiter.request;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -29,7 +28,7 @@ class RequestLimitRuleTest {
     void shouldDefaultPrecisionToEqualDuration() {
         RequestLimitRule requestLimitRule = RequestLimitRule.of(Duration.ofMinutes(1), 5);
 
-        assertThat(requestLimitRule.getPrecision()).isEqualTo(60);
+        assertThat(requestLimitRule.getPrecisionSeconds()).isEqualTo(60);
     }
 
     @Test
@@ -41,9 +40,9 @@ class RequestLimitRuleTest {
 
     @Test
     void shouldHavePrecisionOf10() {
-        RequestLimitRule requestLimitRule = RequestLimitRule.of(Duration.ofSeconds(1), 5).withPrecision(10);
+        RequestLimitRule requestLimitRule = RequestLimitRule.of(Duration.ofSeconds(1), 5).withPrecision(Duration.ofSeconds(10));
 
-        assertThat(requestLimitRule.getPrecision()).isEqualTo(10);
+        assertThat(requestLimitRule.getPrecisionSeconds()).isEqualTo(10);
     }
 
     @Test

@@ -6,7 +6,7 @@
         </encoder>
     </appender>
 
-    <logger name="es.moki" level="debug"
+    <logger name="es.moki" level="info"
             additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>

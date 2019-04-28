@@ -110,7 +110,7 @@ public class HazelcastSlidingWindowRequestRateLimiter implements RequestRateLimi
         // TODO perform each rule calculation in parallel
         for (RequestLimitRule rule : rules) {
 
-            SavedKey savedKey = new SavedKey(now, rule.getDurationSeconds(), rule.getPrecision());
+            SavedKey savedKey = new SavedKey(now, rule.getDurationSeconds(), rule.getPrecisionSeconds());
             savedKeys.add(savedKey);
 
             Long oldTs = hcKeyMap.get(savedKey.tsKey);

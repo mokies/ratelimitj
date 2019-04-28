@@ -4,7 +4,6 @@ import de.jkeylockmanager.manager.KeyLockManager;
 import de.jkeylockmanager.manager.KeyLockManagers;
 import es.moki.ratelimitj.core.limiter.request.DefaultRequestLimitRulesSupplier;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
-import es.moki.ratelimitj.core.limiter.request.RequestLimitRulesSupplier;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.core.time.SystemTimeSupplier;
 import es.moki.ratelimitj.core.time.TimeSupplier;
@@ -117,7 +116,7 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
         // TODO perform each rule calculation in parallel
         for (RequestLimitRule rule : rules) {
 
-            SavedKey savedKey = new SavedKey(now, rule.getDurationSeconds(), rule.getPrecision());
+            SavedKey savedKey = new SavedKey(now, rule.getDurationSeconds(), rule.getPrecisionSeconds());
             savedKeys.add(savedKey);
 
             Long oldTs = keyMap.get(savedKey.tsKey);

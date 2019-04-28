@@ -29,8 +29,8 @@ class RequestLimitRuleJsonSerialiserTest {
     @DisplayName("should encode limit rule with precision in JSON array")
     void shouldEncodeWithPrecisions() {
 
-        ImmutableList<RequestLimitRule> rules = ImmutableList.of(RequestLimitRule.of(Duration.ofSeconds(10), 10L).withPrecision(4),
-                RequestLimitRule.of(Duration.ofMinutes(1), 20L).withPrecision(8));
+        ImmutableList<RequestLimitRule> rules = ImmutableList.of(RequestLimitRule.of(Duration.ofSeconds(10), 10L).withPrecision(Duration.ofSeconds(4)),
+                RequestLimitRule.of(Duration.ofMinutes(1), 20L).withPrecision(Duration.ofSeconds(8)));
 
         assertThat(serialiser.encode(rules)).isEqualTo("[[10,10,4],[60,20,8]]");
     }

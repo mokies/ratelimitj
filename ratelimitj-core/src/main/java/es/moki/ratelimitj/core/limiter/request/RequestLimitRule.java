@@ -38,34 +38,38 @@ public class RequestLimitRule {
         this.keys = keys;
     }
 
+    private static void checkDuration(Duration duration) {
+        requireNonNull(duration, "duration can not be null");
+        if (Duration.ofSeconds(1).compareTo(duration) >= 1) {
+            throw new IllegalArgumentException("duration must be great than 1 second");
+        }
+    }
+
     /**
      * Initialise a request rate limit. Imagine the whole duration window as being one large bucket with a single count.
      *
-     * @param duration The time the limit will be applied over.
+     * @param duration The time the limit will be applied over. The duration must be greater than 1 second.
      * @param limit    A number representing the maximum operations that can be performed in the given duration.
      * @return A limit rule.
      */
     public static RequestLimitRule of(Duration duration, long limit) {
-        requireNonNull(duration, "duration can not be null");
+        checkDuration(duration);
         if (limit < 0) {
             throw new IllegalArgumentException("limit must be greater than zero.");
-        }
-        if (Duration.ofSeconds(1).compareTo(duration) >= 1) {
-            throw new IllegalArgumentException("duration must be great than 1 second");
         }
         int durationSeconds = (int) duration.getSeconds();
         return new RequestLimitRule(durationSeconds, limit, durationSeconds);
     }
 
     /**
-     * Configures as a sliding window rate limit. Imagine the duration window divided into a number of smaller buckets, each with it's own count.
-     * The number of smaller buckets is defined by the precision.
+     * Controls (approximate) sliding window precision. A lower duration increases precision and minimises the Thundering herd problem - https://en.wikipedia.org/wiki/Thundering_herd_problem
      *
-     * @param precision Defines the number of buckets that will be used to approximate the sliding window.
+     * @param precision Defines the time precision that will be used to approximate the sliding window. The precision must be greater than 1 second.
      * @return a limit rule
      */
-    public RequestLimitRule withPrecision(int precision) {
-        return new RequestLimitRule(this.durationSeconds, this.limit, precision, this.name, this.keys);
+    public RequestLimitRule withPrecision(Duration precision) {
+        checkDuration(precision);
+        return new RequestLimitRule(this.durationSeconds, this.limit, (int) precision.getSeconds(), this.name, this.keys);
     }
 
     /**
@@ -107,9 +111,9 @@ public class RequestLimitRule {
     }
 
     /**
-     * @return The limits precision.
+     * @return The limits precision in seconds.
      */
-    public int getPrecision() {
+    public int getPrecisionSeconds() {
         return precision;
     }
 

@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class InMemoryRequestRateLimiterInternalTest {
 
-
     private final TimeBanditSupplier timeBandit = new TimeBanditSupplier();
 
     private final ExpiringMap expiryingKeyMap = ExpiringMap.builder().variableExpiration().build();
