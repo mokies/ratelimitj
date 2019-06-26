@@ -1,0 +1,29 @@
+description 'RateLimitJ Redis Redisson'
+
+project.ext.release = true
+
+dependencies {
+
+    api(
+            project(':ratelimitj-core'),
+            'org.redisson:redisson:3.10.7'
+    )
+
+    implementation(
+            'com.eclipsesource.minimal-json:minimal-json:0.9.4',
+            libraries.findbugs,
+            libraries.slf4j
+    )
+
+    testImplementation(
+            project(':ratelimitj-test'),
+            libraries.assertj,
+            libraries.guava,
+            libraries.mockito,
+            libraries.logback,
+            "org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion",
+    )
+
+}
+
+dockerCompose.isRequiredBy(test)
