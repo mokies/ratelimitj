@@ -22,7 +22,7 @@ The Inmemory Module supports (RequestRateLimiter)[], (ConcurrentRequestLimiter)[
 ```java
     import es.moki.ratelimitj.inmemory.request.InMemorySlidingWindowRequestRateLimiter;
 
-    Set<RequestLimitRule> rules = Collections.singleton(RequestLimitRule.of(1, TimeUnit.MINUTES, 50)); // 50 request per minute, per key
+    Set<RequestLimitRule> rules = Collections.singleton(RequestLimitRule.of(Duration.ofMinutes(1), 50)); // 50 request per minute, per key
     RequestRateLimiter requestRateLimiter = new InMemorySlidingWindowRequestRateLimiter(rules);
     
     boolean overLimit = requestRateLimiter.overLimitWhenIncremented("ip:127.0.0.2");
