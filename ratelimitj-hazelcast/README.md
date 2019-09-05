@@ -14,8 +14,8 @@ Usage
     import es.moki.ratelimitj.core.LimitRule;
 
     Hazelcast hz = Hazelcast.newHazelcastInstance();
-    Set<LimitRule> rules = Collections.singleton(LimitRule.of(1, TimeUnit.MINUTES, 50)); // 50 request per minute, per key
-    RateLimiter requestRateLimiter = new HazelcastSlidingWindowRateLimiter(hz, rules);
+    Set<RequestLimitRule> rules = Collections.singleton(RequestLimitRule.of(Duration.ofMinutes(1), 50)); // 50 request per minute, per key
+    RequestRateLimiter requestRateLimiter = new HazelcastSlidingWindowRequestRateLimiter(hz, rules);
     
     boolean overLimit = requestRateLimiter.overLimit("ip:127.0.0.2");
 ```
