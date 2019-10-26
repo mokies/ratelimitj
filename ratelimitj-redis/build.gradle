@@ -6,7 +6,7 @@ dependencies {
 
     api(
             project(':ratelimitj-core'),
-            'io.lettuce:lettuce-core:5.1.7.RELEASE'
+            'io.lettuce:lettuce-core:5.2.0.RELEASE'
     )
 
     implementation(
