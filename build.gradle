@@ -29,7 +29,7 @@ allprojects {
 subprojects {
 
     apply plugin: "net.ltgt.errorprone"
-//    apply plugin: 'pmd'
+    apply plugin: 'pmd'
     apply plugin: 'checkstyle'
     apply plugin: 'maven-publish'
     apply plugin: 'maven'
@@ -45,29 +45,17 @@ subprojects {
     }
 
 
-//    pmd {
-//        ignoreFailures = true
-//        pmdTest.enabled=false
-//        ruleSets = [
-//                'java-basic',
-//                'java-braces',
-//                'java-clone',
-//                'java-codesize',
-//                'java-comments',
-//                'java-controversial',
-//                'java-coupling',
-//                'java-design',
-//                'java-empty',
-//                'java-finalizers',
-//                'java-imports',
-//                'java-optimizations',
-//                'java-strictexception',
-//                'java-strings',
-//                'java-typeresolution',
-//                'java-unnecessary',
-//                'java-unusedcode'
-//        ]
-//    }
+    pmd {
+        ignoreFailures = true
+        pmdTest.enabled=false
+        ruleSets = [ "category/java/errorprone.xml",
+                      "category/java/bestpractices.xml",
+//                      "category/java/codestyle.xml",
+                      "category/java/performance.xml",
+                      "category/java/multithreading.xml",
+                      "category/java/design.xml"
+        ]
+    }
 
     ext.libraries = [
             slf4j   : 'org.slf4j:slf4j-api:1.7.25',

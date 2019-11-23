@@ -5,9 +5,9 @@ import java.util.Set;
 
 public class DefaultRequestLimitRulesSupplier implements RequestLimitRulesSupplier<Set<RequestLimitRule>> {
 
-    private Set<RequestLimitRule> defaultRules;
+    private final Set<RequestLimitRule> defaultRules;
 
-    private Map<String, Set<RequestLimitRule>> ruleMap;
+    private final Map<String, Set<RequestLimitRule>> ruleMap;
 
     public DefaultRequestLimitRulesSupplier(Set<RequestLimitRule> rules) {
         this.defaultRules = RequestLimitRulesSupplier.buildDefaultRuleSet(rules);
