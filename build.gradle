@@ -14,7 +14,7 @@ plugins {
 
 defaultTasks 'check'
 
-ext.junitJupiterVersion  = '5.5.2'
+ext.junitJupiterVersion = '5.5.2'
 
 allprojects {
     repositories {
@@ -47,23 +47,23 @@ subprojects {
 
     pmd {
         ignoreFailures = true
-        pmdTest.enabled=false
-        ruleSets = [ "category/java/errorprone.xml",
-                      "category/java/bestpractices.xml",
-//                      "category/java/codestyle.xml",
-                      "category/java/performance.xml",
-                      "category/java/multithreading.xml",
-                      "category/java/design.xml"
+        pmdTest.enabled = false
+        ruleSets = ["category/java/errorprone.xml",
+                    "category/java/bestpractices.xml",
+                    "category/java/performance.xml",
+                    "category/java/multithreading.xml",
+                    "category/java/design.xml",
+                    "category/java/codestyle.xml"
         ]
     }
 
     ext.libraries = [
-            slf4j   : 'org.slf4j:slf4j-api:1.7.25',
-            assertj : 'org.assertj:assertj-core:3.13.2',
-            mockito : 'org.mockito:mockito-core:3.1.0',
-            guava   : 'com.google.guava:guava:28.1-jre',
-            logback : 'ch.qos.logback:logback-classic:1.2.3',
-            jsr305: 'com.google.code.findbugs:jsr305:3.0.2'
+            slf4j  : 'org.slf4j:slf4j-api:1.7.25',
+            assertj: 'org.assertj:assertj-core:3.13.2',
+            mockito: 'org.mockito:mockito-core:3.1.0',
+            guava  : 'com.google.guava:guava:28.1-jre',
+            logback: 'ch.qos.logback:logback-classic:1.2.3',
+            jsr305 : 'com.google.code.findbugs:jsr305:3.0.2'
     ]
 
     test {
@@ -74,15 +74,13 @@ subprojects {
 
         test.useJUnitPlatform()
 
-//        errorproneJavac("com.google.errorprone:javac:$errorproneJavacVersion")
-
         testImplementation "org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion"
 
         // To avoid compiler warnings about @API annotations in JUnit code
-       	testCompileOnly('org.apiguardian:apiguardian-api:1.0.0')
+        testCompileOnly('org.apiguardian:apiguardian-api:1.0.0')
     }
-    
+
 }
 
 subprojects {
