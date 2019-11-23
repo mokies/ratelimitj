@@ -40,7 +40,7 @@ public class RequestLimitRule {
 
     private static void checkDuration(Duration duration) {
         requireNonNull(duration, "duration can not be null");
-        if (Duration.ofSeconds(1).compareTo(duration) >= 1) {
+        if (Duration.ofSeconds(1).compareTo(duration) > 0) {
             throw new IllegalArgumentException("duration must be great than 1 second");
         }
     }
@@ -144,7 +144,7 @@ public class RequestLimitRule {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || !(o instanceof RequestLimitRule)) {
             return false;
         }
         RequestLimitRule that = (RequestLimitRule) o;

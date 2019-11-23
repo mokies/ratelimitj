@@ -47,7 +47,6 @@ public class ConcurrentLimitRule {
         return new ConcurrentLimitRule(this.concurrentLimit, this.timeoutMillis, name);
     }
 
-
     public int getConcurrentLimit() {
         return concurrentLimit;
     }
@@ -65,7 +64,7 @@ public class ConcurrentLimitRule {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || !(o instanceof ConcurrentLimitRule)) {
             return false;
         }
         ConcurrentLimitRule that = (ConcurrentLimitRule) o;
