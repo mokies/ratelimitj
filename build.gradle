@@ -8,7 +8,7 @@ buildscript {
 
 plugins {
     id "com.avast.gradle.docker-compose" version "0.10.4"
-//    id "net.ltgt.errorprone" version "0.7"
+    id "net.ltgt.errorprone" version "1.1.1"
 }
 
 
@@ -21,10 +21,6 @@ allprojects {
         mavenCentral()
         jcenter()
     }
-    
-//    dependencies {
-//        errorprone("com.google.errorprone:error_prone_core:2.3.2")
-//    }
 
     apply plugin: 'java-library'
     apply plugin: 'jacoco'
@@ -32,8 +28,8 @@ allprojects {
 
 subprojects {
 
-//    apply plugin: "net.ltgt.errorprone"
-    apply plugin: 'pmd'
+    apply plugin: "net.ltgt.errorprone"
+//    apply plugin: 'pmd'
     apply plugin: 'checkstyle'
     apply plugin: 'maven-publish'
     apply plugin: 'maven'
@@ -44,29 +40,34 @@ subprojects {
         toolVersion = '8.5'
     }
 
-    pmd {
-        ignoreFailures = true
-        pmdTest.enabled=false
-        ruleSets = [
-                'java-basic',
-                'java-braces',
-                'java-clone',
-                'java-codesize',
-                'java-comments',
-                'java-controversial',
-                'java-coupling',
-                'java-design',
-                'java-empty',
-                'java-finalizers',
-                'java-imports',
-                'java-optimizations',
-                'java-strictexception',
-                'java-strings',
-                'java-typeresolution',
-                'java-unnecessary',
-                'java-unusedcode'
-        ]
+    dependencies {
+        errorprone("com.google.errorprone:error_prone_core:2.3.3")
     }
+
+
+//    pmd {
+//        ignoreFailures = true
+//        pmdTest.enabled=false
+//        ruleSets = [
+//                'java-basic',
+//                'java-braces',
+//                'java-clone',
+//                'java-codesize',
+//                'java-comments',
+//                'java-controversial',
+//                'java-coupling',
+//                'java-design',
+//                'java-empty',
+//                'java-finalizers',
+//                'java-imports',
+//                'java-optimizations',
+//                'java-strictexception',
+//                'java-strings',
+//                'java-typeresolution',
+//                'java-unnecessary',
+//                'java-unusedcode'
+//        ]
+//    }
 
     ext.libraries = [
             slf4j   : 'org.slf4j:slf4j-api:1.7.25',
