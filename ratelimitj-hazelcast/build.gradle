@@ -10,7 +10,10 @@ dependencies {
     implementation(
             project(':ratelimitj-inmemory'),
             libraries.slf4j,
-            libraries.findbugs
+    )
+
+    compileOnly(
+            libraries.jsr305,
     )
     
     testImplementation(

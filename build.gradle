@@ -75,7 +75,7 @@ subprojects {
             mockito : 'org.mockito:mockito-core:3.1.0',
             guava   : 'com.google.guava:guava:28.1-jre',
             logback : 'ch.qos.logback:logback-classic:1.2.3',
-            findbugs: 'com.google.code.findbugs:jsr305:3.0.2'
+            jsr305: 'com.google.code.findbugs:jsr305:3.0.2'
     ]
 
     test {

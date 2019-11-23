@@ -11,8 +11,11 @@ dependencies {
 
     implementation(
             'com.eclipsesource.minimal-json:minimal-json:0.9.4',
-            libraries.findbugs,
             libraries.slf4j
+    )
+
+    compileOnly(
+            libraries.jsr305,
     )
 
     testImplementation(

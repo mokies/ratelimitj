@@ -10,7 +10,10 @@ dependencies {
 
     implementation(
             libraries.slf4j,
-            libraries.findbugs
+    )
+
+    compileOnly(
+            libraries.jsr305,
     )
 
     testImplementation(
