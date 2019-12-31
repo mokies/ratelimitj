@@ -1,6 +1,5 @@
 buildscript {
     repositories {
-        mavenLocal()
         mavenCentral()
         jcenter()
     }
@@ -41,10 +40,9 @@ subprojects {
     }
 
     dependencies {
-        errorprone("com.google.errorprone:error_prone_core:2.3.3")
+        errorprone("com.google.errorprone:error_prone_core:2.3.4")
     }
-
-
+    
     pmd {
         ignoreFailures = true
         pmdTest.enabled = false
@@ -78,7 +76,7 @@ subprojects {
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion"
 
         // To avoid compiler warnings about @API annotations in JUnit code
-        testCompileOnly('org.apiguardian:apiguardian-api:1.0.0')
+//        testCompileOnly('org.apiguardian:apiguardian-api:1.0.0')
     }
 
 }
