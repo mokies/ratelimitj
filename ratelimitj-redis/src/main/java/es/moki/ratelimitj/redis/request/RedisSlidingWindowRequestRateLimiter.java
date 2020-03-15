@@ -21,7 +21,6 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import static io.lettuce.core.ScriptOutputType.VALUE;
 import static java.util.Objects.requireNonNull;
@@ -34,7 +33,6 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
 
     private static final Duration BLOCK_TIMEOUT = Duration.of(5, ChronoUnit.SECONDS);
 
-    private static final Predicate<Throwable> STARTS_WITH_NO_SCRIPT_ERROR = e -> e instanceof RedisNoScriptException;
 
     private final RedisScriptingReactiveCommands<String, String> redisScriptingReactiveCommands;
     private final RedisKeyReactiveCommands<String, String> redisKeyCommands;
@@ -60,6 +58,10 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
         scriptLoader = new RedisScriptLoader(redisScriptingReactiveCommands, "sliding-window-ratelimit.lua");
         requestLimitRulesSupplier = new SerializedRequestLimitRulesSupplier(rules);
         this.timeSupplier = timeSupplier;
+    }
+
+    private static boolean startWithNoScriptError(Throwable throwable) {
+        return throwable instanceof RedisNoScriptException;
     }
 
     @Override
@@ -132,9 +134,9 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
                     StoredScript script = tuple.getT2();
                     return redisScriptingReactiveCommands
                             .evalsha(script.getSha(), VALUE, new String[]{key}, rulesJson, time.toString(), Integer.toString(weight), toStringOneZero(strictlyGreater))
-                            .doOnError(STARTS_WITH_NO_SCRIPT_ERROR, e -> script.dispose());
+                            .doOnError(RedisSlidingWindowRequestRateLimiter::startWithNoScriptError, e -> script.dispose());
                 })
-                .retry(1, STARTS_WITH_NO_SCRIPT_ERROR)
+                .retry(1, RedisSlidingWindowRequestRateLimiter::startWithNoScriptError)
                 .single()
                 .map("1"::equals)
                 .doOnSuccess(over -> {
