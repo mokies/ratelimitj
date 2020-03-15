@@ -13,7 +13,7 @@ plugins {
 
 defaultTasks 'check'
 
-ext.junitJupiterVersion = '5.5.2'
+ext.junitJupiterVersion = '5.6.0'
 
 allprojects {
     repositories {
