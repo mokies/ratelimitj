@@ -49,6 +49,7 @@ public class RedisScriptLoader {
         });
     }
 
+    @SuppressWarnings("PreferJavaTimeOverload")
     private Flux<String> loadScript() {
         return Flux.defer(() -> {
             String script;
