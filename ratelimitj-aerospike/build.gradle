@@ -1,0 +1,27 @@
+description 'RateLimitJ Aerospike'
+
+dependencies {
+
+    api(
+            project(':ratelimitj-core'),
+            'com.aerospike:aerospike-client:4.4.10',
+    )
+
+    implementation(
+            project(':ratelimitj-inmemory'),
+            libraries.slf4j,
+    )
+
+    compileOnly(
+            libraries.jsr305,
+    )
+
+    testImplementation(
+            project(':ratelimitj-test'),
+            libraries.assertj,
+            libraries.guava,
+            libraries.mockito,
+            libraries.logback,
+    )
+
+}
