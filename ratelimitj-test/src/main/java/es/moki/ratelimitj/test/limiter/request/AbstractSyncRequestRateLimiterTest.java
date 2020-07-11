@@ -46,10 +46,10 @@ public abstract class AbstractSyncRequestRateLimiterTest {
 
         IntStream.rangeClosed(1, 4).forEach(value -> {
             timeBandit.addUnixTimeMilliSeconds(1000L);
-            assertThat(requestRateLimiter.geLimitWhenIncremented("ip:127.0.1.2")).isFalse();
+            assertThat(requestRateLimiter.geLimitWhenIncremented("ip:127.0.1.3")).isFalse();
         });
 
-        assertThat(requestRateLimiter.geLimitWhenIncremented("ip:127.0.1.2")).isTrue();
+        assertThat(requestRateLimiter.geLimitWhenIncremented("ip:127.0.1.3")).isTrue();
     }
 
     @Test
