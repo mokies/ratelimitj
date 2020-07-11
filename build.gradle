@@ -105,7 +105,7 @@ ext {
     osshrPassword = project.hasProperty('ossrhPassword') ? project.property('ossrhPassword') : ""
 }
 
-configure([project(':ratelimitj-redis'), project(':ratelimitj-inmemory'), project(':ratelimitj-core'), project(':ratelimitj-dropwizard')]) {
+configure([project(':ratelimitj-redis'), project(':ratelimitj-inmemory'), project(':ratelimitj-core'), project(':ratelimitj-dropwizard'),project(':ratelimitj-aerospike')]) {
 
     apply plugin: 'signing'
     apply plugin: 'maven'

@@ -11,7 +11,6 @@ import com.aerospike.client.cdt.MapPolicy;
 import com.aerospike.client.cdt.MapReturnType;
 import com.aerospike.client.policy.RecordExistsAction;
 import com.aerospike.client.policy.WritePolicy;
-import com.google.common.collect.Maps;
 import es.moki.ratelimitj.core.limiter.request.DefaultRequestLimitRulesSupplier;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
@@ -88,7 +87,7 @@ public class AerospikeSlidingWindowRateLimiter  implements RequestRateLimiter {
     final Key key = new Key(aerospikeContext.nameSpace,aerospikeContext.setName,userKey);
     final Record record = aerospikeContext.aerospikeClient.get(aerospikeClient.getReadPolicyDefault(),key);
 
-    return record != null ? (Map<String, Long>)record.getMap(BIN_NAME): Maps.newHashMap();
+    return record != null ? (Map<String, Long>)record.getMap(BIN_NAME): new HashMap<>();
   }
 
   private boolean eqOrGeLimit(String key, int weight, boolean strictlyGreater) {
