@@ -1,5 +1,13 @@
 version: "3"
 services:
+  aerospike:
+     image: aerospike/aerospike-server:latest
+     ports:
+       - 3000:3000
+     labels:
+       - "com.aerospike.cluster=ratelimiter"
+     environment:
+       - "affinity:com.aerospike.cluster!=ratelimiter"
 
   redis:
 #      image: redis:4.0-alpine

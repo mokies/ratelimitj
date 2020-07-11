@@ -23,12 +23,12 @@ public class AerospikeClientFactory {
     readPolicy.sendKey = true;
 
     WritePolicy writePolicy = new WritePolicy();
-    writePolicy.maxRetries = 1;
+    writePolicy.maxRetries = 2;
     writePolicy.readModeAP = ReadModeAP.ALL;
     writePolicy.replica = Replica.MASTER_PROLES;
     writePolicy.sleepBetweenRetries = 10;
     writePolicy.commitLevel = CommitLevel.COMMIT_ALL;
-    writePolicy.totalTimeout = 100;
+    writePolicy.totalTimeout = 10000;
     writePolicy.sendKey = true;
 
     ClientPolicy clientPolicy = new ClientPolicy();
@@ -36,10 +36,11 @@ public class AerospikeClientFactory {
     clientPolicy.readPolicyDefault = readPolicy;
     clientPolicy.writePolicyDefault = writePolicy;
     clientPolicy.failIfNotConnected = true;
+    clientPolicy.timeout = 30000;
     clientPolicy.threadPool = Executors.newFixedThreadPool(5);
 
     AerospikeClient aerospikeClient = new AerospikeClient(clientPolicy,
-        new Host("172.28.128.3", 3000));
+        new Host("127.0.0.1", 3000));
     return aerospikeClient;
   }
 }
