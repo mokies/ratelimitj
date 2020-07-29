@@ -2,7 +2,7 @@ description 'RateLimitJ Dropwizard'
 
 project.ext.release = true
 
-ext.dropWizardVersion = '1.3.16'
+ext.dropWizardVersion = '2.0.12'
 
 dependencies {
 
@@ -20,7 +20,7 @@ dependencies {
             project(':ratelimitj-inmemory'),
             project(':ratelimitj-test'),
             "io.dropwizard:dropwizard-testing:${dropWizardVersion}",
-            'org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:2.25.1',
+            'org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:2.31',
             libraries.assertj,
             libraries.guava,
             libraries.mockito,

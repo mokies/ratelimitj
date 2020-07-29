@@ -7,20 +7,14 @@ import io.dropwizard.ConfiguredBundle;
 import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import org.glassfish.hk2.api.Factory;
-import org.glassfish.hk2.api.InjectionResolver;
-import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.server.internal.inject.AbstractContainerRequestValueFactory;
-import org.glassfish.jersey.server.internal.inject.AbstractValueFactoryProvider;
-import org.glassfish.jersey.server.internal.inject.MultivaluedParameterExtractorProvider;
-import org.glassfish.jersey.server.internal.inject.ParamInjectionResolver;
+import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.model.Parameter;
-import org.glassfish.jersey.server.spi.internal.ValueFactoryProvider;
+import org.glassfish.jersey.server.spi.internal.ValueParamProvider;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
 
@@ -56,37 +50,27 @@ public class RateLimitBundle implements ConfiguredBundle<Configuration> {
     }
 
     @Singleton
-    public static class RateLimitingFactoryProvider extends AbstractValueFactoryProvider {
+    public static class RateLimitingFactoryProvider implements ValueParamProvider {
 
         private RequestRateLimiterFactory requestRateLimiterFactory;
 
         @Inject
-        public RateLimitingFactoryProvider(final MultivaluedParameterExtractorProvider extractorProvider,
-                                           final ServiceLocator injector,
-                                           final RateLimiterFactoryProvider rateLimiterFactoryProvider) {
-            super(extractorProvider, injector, Parameter.Source.UNKNOWN);
+        public RateLimitingFactoryProvider(final RateLimiterFactoryProvider rateLimiterFactoryProvider) {
             this.requestRateLimiterFactory = rateLimiterFactoryProvider.factory;
         }
 
         @Override
-        protected Factory<RequestRateLimiterFactory> createValueFactory(final Parameter parameter) {
+        public Function<ContainerRequest, RequestRateLimiterFactory> getValueProvider(Parameter parameter) {
             final RateLimiting annotation = parameter.getAnnotation(RateLimiting.class);
             if (null == annotation) {
                 return null;
-            } else {
-                return new AbstractContainerRequestValueFactory<RequestRateLimiterFactory>() {
-                    @Override
-                    public RequestRateLimiterFactory provide() {
-                        return requestRateLimiterFactory;
-                    }
-                };
             }
+            return containerRequest -> requestRateLimiterFactory;
         }
 
-        public static class RateLimitingInjectionResolver extends ParamInjectionResolver<RateLimiting> {
-            public RateLimitingInjectionResolver() {
-                super(RateLimitingFactoryProvider.class);
-            }
+        @Override
+        public PriorityType getPriority() {
+            return Priority.NORMAL;
         }
 
         @Singleton
@@ -110,10 +94,10 @@ public class RateLimitBundle implements ConfiguredBundle<Configuration> {
             @Override
             protected void configure() {
                 bind(new RateLimiterFactoryProvider(requestRateLimiterFactory)).to(RateLimiterFactoryProvider.class);
-                bind(RateLimitingFactoryProvider.class).to(ValueFactoryProvider.class).in(Singleton.class);
-                bind(RateLimitingFactoryProvider.RateLimitingInjectionResolver.class)
-                        .to(new TypeLiteral<InjectionResolver<RateLimiting>>() {}).in(Singleton.class);
+                bind(RateLimitingFactoryProvider.class).to(ValueParamProvider.class).in(Singleton.class);
             }
+
         }
     }
+
 }
