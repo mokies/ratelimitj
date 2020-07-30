@@ -3,7 +3,7 @@
 RateLimitJ
 ============
 
-[![Build Status](https://travis-ci.org/mokies/ratelimitj.svg)](https://travis-ci.org/mokies/ratelimitj)
+[![Build Status](https://travis-ci.com/mokies/ratelimitj.svg?branch=master)](https://travis-ci.com/mokies/ratelimitj)
 [![Codecov](https://codecov.io/github/mokies/ratelimitj/coverage.svg?branch=master)](https://codecov.io/github/mokies/ratelimitj?branch=master)
 [![Maven Central](https://img.shields.io/maven-central/v/es.moki.ratelimitj/ratelimitj-core.svg?style=flat-square)](https://maven-badges.herokuapp.com/maven-central/es.moki.ratelimitj/ratelimitj-core/)
 [![license](https://img.shields.io/github/license/mokies/ratelimitj.svg?style=flat-square)](https://github.com/mokies/ratelimitj/blob/master/LICENSE)
