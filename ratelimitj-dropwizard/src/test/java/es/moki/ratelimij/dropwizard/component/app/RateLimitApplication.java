@@ -22,7 +22,7 @@ public class RateLimitApplication extends Application<Configuration> {
 
     @Override
     public void initialize(Bootstrap<Configuration> bootstrap) {
-        var redisClient = RedisClient.create("redis://localhost:7006");
+        RedisClient redisClient = RedisClient.create("redis://localhost:7006");
         RequestRateLimiterFactory factory = new RedisRateLimiterFactory(redisClient);
         bootstrap.addBundle(new RateLimitBundle(factory));
     }
