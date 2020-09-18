@@ -1,16 +1,10 @@
 package es.moki.ratelimij.dropwizard.filter;
 
-import es.moki.ratelimij.dropwizard.RateLimiting;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiterFactory;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
 import io.dropwizard.testing.junit5.ResourceExtension;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.server.ContainerRequest;
-import org.glassfish.jersey.server.internal.inject.AbstractValueParamProvider;
-import org.glassfish.jersey.server.internal.inject.MultivaluedParameterExtractorProvider;
-import org.glassfish.jersey.server.model.Parameter;
-import org.glassfish.jersey.server.spi.internal.ValueParamProvider;
 import org.glassfish.jersey.test.grizzly.GrizzlyWebTestContainerFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,11 +12,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.function.Function;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.anySet;
@@ -40,7 +31,12 @@ public class RateLimit429EnforcerFilterTest {
 
     private final ResourceExtension resources = ResourceExtension.builder()
             .setTestContainerFactory(new GrizzlyWebTestContainerFactory())
-            .addProvider(new TestRateLimitingFactoryProvider.Binder())
+            .addProvider(new AbstractBinder() {
+                @Override
+                protected void configure() {
+                    bind(requestRateLimiterFactory).to(RequestRateLimiterFactory.class);
+                }
+            })
             .addProvider(new RateLimited429EnforcerFeature())
             .addResource(new TestResource())
             .build();
@@ -95,33 +91,5 @@ public class RateLimit429EnforcerFilterTest {
                 .get();
 
         assertThat(response.getStatus()).isEqualTo(200);
-    }
-
-    @Singleton
-    public static class TestRateLimitingFactoryProvider extends AbstractValueParamProvider {
-
-        @Inject
-        public TestRateLimitingFactoryProvider(
-                final javax.inject.Provider<MultivaluedParameterExtractorProvider> extractorProvider
-        ) {
-            super(extractorProvider, Parameter.Source.UNKNOWN);
-        }
-
-        @Override
-        protected Function<ContainerRequest, ?> createValueProvider(Parameter parameter) {
-            RateLimiting annotation = parameter.getAnnotation(RateLimiting.class);
-            if (annotation == null) {
-                return null;
-            }
-            return containerRequest -> requestRateLimiterFactory;
-        }
-
-        public static class Binder extends AbstractBinder {
-
-            @Override
-            protected void configure() {
-                bind(TestRateLimitingFactoryProvider.class).to(ValueParamProvider.class).in(Singleton.class);
-            }
-        }
     }
 }

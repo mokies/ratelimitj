@@ -1,6 +1,5 @@
 package es.moki.ratelimij.dropwizard.filter;
 
-import es.moki.ratelimij.dropwizard.RateLimiting;
 import es.moki.ratelimij.dropwizard.annotation.Rate;
 import es.moki.ratelimij.dropwizard.annotation.RateLimited;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
@@ -11,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Priority;
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -21,53 +21,47 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Priority(Priorities.AUTHENTICATION + 1)
 public class RateLimit429EnforcerFilter implements ContainerRequestFilter {
 
-    private static final int HTTP_STATUS_TOO_MANY_REQUESTS = 429;
-
     private static final Logger LOG = LoggerFactory.getLogger(RateLimit429EnforcerFilter.class);
 
-    @RateLimiting
-    private RequestRateLimiterFactory factory;
+    private static final int HTTP_STATUS_TOO_MANY_REQUESTS = 429;
 
-    @Context
-    private HttpServletRequest request;
+    @Inject private RequestRateLimiterFactory factory;
 
-    @Context
-    private ResourceInfo resource;
-
-    @Context
-    private SecurityContext securityContext;
+    @Context private HttpServletRequest request;
+    @Context private ResourceInfo resource;
+    @Context private SecurityContext securityContext;
 
     @Override
     public void filter(final ContainerRequestContext requestContext) {
-
         try {
             AnnotatedMethod method = new AnnotatedMethod(resource.getResourceMethod());
             RateLimited rateLimited = method.getAnnotation(RateLimited.class);
 
             RequestRateLimiter rateLimit = factory.getInstance(toLimitRules(rateLimited));
-
             KeyPart[] keyParts = rateLimited.keys();
 
-
-            Optional<CharSequence> keyResult = KeyPart.combineKeysParts(rateLimited.groupKeyPrefix(), Arrays.asList(keyParts), request, resource, securityContext);
-
-
-            CharSequence key;
-            if (keyResult.isPresent()) {
-                key = keyResult.get();
-            } else {
+            CharSequence key = KeyPart
+                    .combineKeysParts(
+                            rateLimited.groupKeyPrefix(),
+                            Arrays.asList(keyParts),
+                            request,
+                            resource,
+                            securityContext
+                    )
+                    .orElse(null);
+            if (key == null) {
                 LOG.warn("No keys were provided by the key providers '{}'",
                         Arrays.stream(keyParts)
                                 .map(KeyPart::getClass)
                                 .map(Object::toString)
-                                .collect(Collectors.joining(", ")));
+                                .collect(Collectors.joining(", "))
+                );
                 return;
             }
 
