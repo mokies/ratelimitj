@@ -5,9 +5,9 @@ import es.moki.ratelimij.dropwizard.component.app.model.LoginRequest;
 import es.moki.ratelimitj.redis.extensions.RedisStandaloneFlushExtension;
 import io.dropwizard.Configuration;
 import io.dropwizard.testing.ResourceHelpers;
-import io.dropwizard.testing.junit.DropwizardAppRule;
-import org.junit.ClassRule;
-import org.junit.Test;
+import io.dropwizard.testing.junit5.DropwizardAppExtension;
+import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import javax.ws.rs.client.Client;
@@ -17,18 +17,22 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import java.util.stream.IntStream;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith(RedisStandaloneFlushExtension.class)
+@ExtendWith({
+        DropwizardExtensionsSupport.class,
+        RedisStandaloneFlushExtension.class
+})
 public class DropwizardRateLimitComponentTest {
 
-    @ClassRule
-    public static final DropwizardAppRule<Configuration> RULE =
-            new DropwizardAppRule<>(RateLimitApplication.class, ResourceHelpers.resourceFilePath("ratelimit-app.yml"));
+    private final DropwizardAppExtension<Configuration> app = new DropwizardAppExtension<>(
+            RateLimitApplication.class,
+            ResourceHelpers.resourceFilePath("ratelimit-app.yml")
+    );
 
     @Test
     public void loginHandlerRedirectsAfterPost() {
-        final RestClient client = new RestClient();
+        final RestClient client = new RestClient(app.getLocalPort());
 
         IntStream.rangeClosed(1, 2)
                 .forEach(i -> assertThat(client.getLimitedByDefault().getStatus()).isEqualTo(200));
@@ -46,7 +50,7 @@ public class DropwizardRateLimitComponentTest {
 
     @Test
     public void shouldLimitAuthenticatedUser() {
-        final RestClient client = new RestClient();
+        RestClient client = new RestClient(app.getLocalPort());
 
         IntStream.rangeClosed(1, 10)
                 .forEach(i -> assertThat(client.getLimitedByAuthenticatedUser().getStatus()).isEqualTo(200));
@@ -56,7 +60,7 @@ public class DropwizardRateLimitComponentTest {
 
     @Test
     public void shouldLimitedGroupedKeyParts() {
-        final RestClient client = new RestClient();
+        final RestClient client = new RestClient(app.getLocalPort());
 
         IntStream.rangeClosed(1, 5)
                 .forEach(i -> assertThat(client.getVulcans().getStatus()).isEqualTo(200));
@@ -67,23 +71,25 @@ public class DropwizardRateLimitComponentTest {
         assertThat(client.getVulcans().getStatus()).isEqualTo(429);
 
         assertThat(client.getKlingons().getStatus()).isEqualTo(429);
-
     }
 
     private static class RestClient {
 
+        private final int localPort;
         private final Client client = ClientBuilder.newBuilder().build();
 
+        public RestClient(int localPort) {
+            this.localPort = localPort;
+        }
+
         Response login() {
-            return client.target(
-                    String.format("http://localhost:%d/application/login", RULE.getLocalPort()))
+            return client.target(String.format("http://localhost:%d/application/login", localPort))
                     .request()
                     .post(Entity.json(loginForm()));
         }
 
         Response getLimitedByDefault() {
-            return client.target(
-                    String.format("http://localhost:%d/application/user/{id}/default", RULE.getLocalPort()))
+            return client.target(String.format("http://localhost:%d/application/user/{id}/default", localPort))
                     .resolveTemplate("id", 1)
                     .request()
                     .header(HttpHeaders.AUTHORIZATION, "Bearer secret")
@@ -91,8 +97,7 @@ public class DropwizardRateLimitComponentTest {
         }
 
         Response getLimitedByAuthenticatedUser() {
-            return client.target(
-                    String.format("http://localhost:%d/application/user/{id}/authenticated", RULE.getLocalPort()))
+            return client.target(String.format("http://localhost:%d/application/user/{id}/authenticated", localPort))
                     .resolveTemplate("id", 1)
                     .request()
                     .header(HttpHeaders.AUTHORIZATION, "Bearer secret")
@@ -100,16 +105,14 @@ public class DropwizardRateLimitComponentTest {
         }
 
         Response getKlingons() {
-             return client.target(
-                     String.format("http://localhost:%d/application/klingons", RULE.getLocalPort()))
+             return client.target(String.format("http://localhost:%d/application/klingons", localPort))
                      .request()
                      .header(HttpHeaders.AUTHORIZATION, "Bearer secret")
                      .get();
          }
 
         Response getVulcans() {
-             return client.target(
-                     String.format("http://localhost:%d/application/vulcans", RULE.getLocalPort()))
+             return client.target(String.format("http://localhost:%d/application/vulcans", localPort))
                      .request()
                      .header(HttpHeaders.AUTHORIZATION, "Bearer secret")
                      .get();
@@ -119,5 +122,4 @@ public class DropwizardRateLimitComponentTest {
             return new LoginRequest("heisenberg", "abc123");
         }
     }
-
 }
