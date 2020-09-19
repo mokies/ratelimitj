@@ -7,7 +7,6 @@ import io.dropwizard.Configuration;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit5.DropwizardAppExtension;
 import io.dropwizard.testing.junit5.DropwizardExtensionsSupport;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -32,8 +31,7 @@ public class DropwizardRateLimitComponentTest {
     );
 
     @Test
-    @Disabled("Calculating # of calls vs rate limit seems to be bugged for limit < 10")
-    public void loginHandlerRedirectsAfterPost() {
+    void loginHandlerRedirectsAfterPost() {
         final RestClient client = new RestClient(app.getLocalPort());
 
         IntStream.rangeClosed(1, 2)
@@ -43,7 +41,7 @@ public class DropwizardRateLimitComponentTest {
                                 .isEqualTo(200)
                 );
 
-        IntStream.rangeClosed(1, 5)
+        IntStream.rangeClosed(1, 3)
                 .forEach(i ->
                         assertThat(client.login().getStatus())
                                 .describedAs("[login] call #%d should not exceed the rate limit", i)
@@ -51,19 +49,10 @@ public class DropwizardRateLimitComponentTest {
                 );
 
         assertThat(client.login().getStatus()).isEqualTo(429);
-
-        IntStream.rangeClosed(1, 3)
-                .forEach(i ->
-                        assertThat(client.getLimitedByDefault().getStatus())
-                                .describedAs("[getLimitedByDefault] call #%d should not exceed the rate limit", i + 2)
-                                .isEqualTo(200)
-                );
-
-        assertThat(client.getLimitedByDefault().getStatus()).isEqualTo(429);
     }
 
     @Test
-    public void shouldLimitAuthenticatedUser() {
+    void shouldLimitAuthenticatedUser() {
         RestClient client = new RestClient(app.getLocalPort());
 
         IntStream.rangeClosed(1, 10)
@@ -73,7 +62,7 @@ public class DropwizardRateLimitComponentTest {
     }
 
     @Test
-    public void shouldLimitedGroupedKeyParts() {
+    void shouldLimitedGroupedKeyParts() {
         final RestClient client = new RestClient(app.getLocalPort());
 
         IntStream.rangeClosed(1, 5)
@@ -92,7 +81,7 @@ public class DropwizardRateLimitComponentTest {
         private final int localPort;
         private final Client client = ClientBuilder.newBuilder().build();
 
-        public RestClient(int localPort) {
+        RestClient(int localPort) {
             this.localPort = localPort;
         }
 
