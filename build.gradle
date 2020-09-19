@@ -6,7 +6,7 @@ buildscript {
 }
 
 plugins {
-    id "com.avast.gradle.docker-compose" version "0.13.0"
+    id "com.avast.gradle.docker-compose" version "0.13.3"
     id "net.ltgt.errorprone" version "1.2.1" apply false
 }
 
