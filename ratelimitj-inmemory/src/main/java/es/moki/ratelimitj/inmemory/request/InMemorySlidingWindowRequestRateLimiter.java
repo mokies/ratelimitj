@@ -45,7 +45,7 @@ public class InMemorySlidingWindowRequestRateLimiter implements RequestRateLimit
 
     InMemorySlidingWindowRequestRateLimiter(ExpiringMap<String, ConcurrentMap<String, Long>> expiringKeyMap, Set<RequestLimitRule> rules, TimeSupplier timeSupplier) {
         requireNonNull(rules, "rules can not be null");
-        requireNonNull(rules, "time supplier can not be null");
+        requireNonNull(timeSupplier, "time supplier can not be null");
         if (rules.isEmpty()) {
             throw new IllegalArgumentException("at least one rule must be provided");
         }
