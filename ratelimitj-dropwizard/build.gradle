@@ -2,7 +2,7 @@ description 'RateLimitJ Dropwizard'
 
 project.ext.release = true
 
-ext.dropWizardVersion = '2.0.13'
+ext.dropWizardVersion = '2.0.19'
 
 dependencies {
 
