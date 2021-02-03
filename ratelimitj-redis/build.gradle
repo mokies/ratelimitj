@@ -6,11 +6,11 @@ dependencies {
 
     api(
             project(':ratelimitj-core'),
-            'io.lettuce:lettuce-core:5.3.4.RELEASE'
+            'io.lettuce:lettuce-core:6.0.2.RELEASE'
     )
 
     implementation(
-            'com.eclipsesource.minimal-json:minimal-json:0.9.4',
+            'com.eclipsesource.minimal-json:minimal-json:0.9.5',
             libraries.slf4j
     )
 

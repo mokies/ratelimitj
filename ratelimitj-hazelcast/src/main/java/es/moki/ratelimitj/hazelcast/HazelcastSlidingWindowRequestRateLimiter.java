@@ -2,7 +2,7 @@ package es.moki.ratelimitj.hazelcast;
 
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
+import com.hazelcast.map.IMap;
 import es.moki.ratelimitj.core.limiter.request.DefaultRequestLimitRulesSupplier;
 import es.moki.ratelimitj.core.limiter.request.RequestLimitRule;
 import es.moki.ratelimitj.core.limiter.request.RequestRateLimiter;

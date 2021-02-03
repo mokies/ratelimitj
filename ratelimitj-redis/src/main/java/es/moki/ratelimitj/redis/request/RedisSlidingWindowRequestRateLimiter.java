@@ -21,6 +21,7 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Set;
+import reactor.util.retry.Retry;
 
 import static io.lettuce.core.ScriptOutputType.VALUE;
 import static java.util.Objects.requireNonNull;
@@ -136,7 +137,7 @@ public class RedisSlidingWindowRequestRateLimiter implements RequestRateLimiter,
                             .evalsha(script.getSha(), VALUE, new String[]{key}, rulesJson, time.toString(), Integer.toString(weight), toStringOneZero(strictlyGreater))
                             .doOnError(RedisSlidingWindowRequestRateLimiter::startWithNoScriptError, e -> script.dispose());
                 })
-                .retry(1, RedisSlidingWindowRequestRateLimiter::startWithNoScriptError)
+                .retryWhen(Retry.max(1).filter(RedisSlidingWindowRequestRateLimiter::startWithNoScriptError))
                 .single()
                 .map("1"::equals)
                 .doOnSuccess(over -> {
