@@ -17,6 +17,7 @@ class LimitRuleJsonSerialiser {
         return Json.array().asArray()
                 .add(rule.getDurationSeconds())
                 .add(rule.getLimit())
-                .add(rule.getPrecisionSeconds());
+                .add(rule.getPrecisionSeconds())
+                .add(rule.getBackoffSeconds());
     }
 }

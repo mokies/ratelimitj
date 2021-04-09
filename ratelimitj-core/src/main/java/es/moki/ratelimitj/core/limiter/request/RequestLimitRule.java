@@ -17,6 +17,7 @@ import static java.util.Objects.requireNonNull;
 public class RequestLimitRule {
 
     private final int durationSeconds;
+    private final int backoffSeconds;
     private final long limit;
     private final int precision;
     private final String name;
@@ -27,21 +28,26 @@ public class RequestLimitRule {
     }
 
     private RequestLimitRule(int durationSeconds, long limit, int precision, String name) {
-        this(durationSeconds, limit, precision, name, null);
+        this(durationSeconds, limit, precision, name, null, 0);
     }
 
-    private RequestLimitRule(int durationSeconds, long limit, int precision, String name, Set<String> keys) {
+    private RequestLimitRule(int durationSeconds, long limit, int precision, String name, Set<String> keys, int backoffSeconds) {
         this.durationSeconds = durationSeconds;
         this.limit = limit;
         this.precision = precision;
         this.name = name;
         this.keys = keys;
+        this.backoffSeconds = backoffSeconds;
     }
 
-    private static void checkDuration(Duration duration) {
-        requireNonNull(duration, "duration can not be null");
-        if (Duration.ofSeconds(1).compareTo(duration) > 0) {
-            throw new IllegalArgumentException("duration must be great than 1 second");
+    private static void checkDuration(Duration duration, String source) {
+        checkDuration(duration, source, 1);
+    }
+
+    private static void checkDuration(Duration duration, String source, int minSeconds) {
+        requireNonNull(duration, source + " can not be null");
+        if (Duration.ofSeconds(minSeconds).compareTo(duration) > 0) {
+            throw new IllegalArgumentException(String.format("%s must be greater than %s second", source, minSeconds));
         }
     }
 
@@ -53,7 +59,7 @@ public class RequestLimitRule {
      * @return A limit rule.
      */
     public static RequestLimitRule of(Duration duration, long limit) {
-        checkDuration(duration);
+        checkDuration(duration, "duration");
         if (limit < 0) {
             throw new IllegalArgumentException("limit must be greater than zero.");
         }
@@ -68,8 +74,8 @@ public class RequestLimitRule {
      * @return a limit rule
      */
     public RequestLimitRule withPrecision(Duration precision) {
-        checkDuration(precision);
-        return new RequestLimitRule(this.durationSeconds, this.limit, (int) precision.getSeconds(), this.name, this.keys);
+        checkDuration(precision, "precision");
+        return new RequestLimitRule(this.durationSeconds, this.limit, (int) precision.getSeconds(), this.name, this.keys, this.backoffSeconds);
     }
 
     /**
@@ -79,7 +85,18 @@ public class RequestLimitRule {
      * @return a limit rule
      */
     public RequestLimitRule withName(String name) {
-        return new RequestLimitRule(this.durationSeconds, this.limit, this.precision, name, this.keys);
+        return new RequestLimitRule(this.durationSeconds, this.limit, this.precision, name, this.keys, this.backoffSeconds);
+    }
+
+    /**
+     * Applies a fixed backoff period that will be applied after the limit is reached.
+     *
+     * @param backoff Defines a fixed backoff period.
+     * @return a limit rule
+     */
+    public RequestLimitRule withBackoff(Duration backoff) {
+        checkDuration(backoff, "backoff", this.durationSeconds);
+        return new RequestLimitRule(this.durationSeconds, this.limit, this.precision, name, this.keys, (int) backoff.getSeconds());
     }
 
     /**
@@ -100,7 +117,7 @@ public class RequestLimitRule {
      * @return a limit rule
      */
     public RequestLimitRule matchingKeys(Set<String> keys) {
-        return new RequestLimitRule(this.durationSeconds, this.limit, this.precision, this.name, keys);
+        return new RequestLimitRule(this.durationSeconds, this.limit, this.precision, this.name, keys, this.backoffSeconds);
     }
 
     /**
@@ -115,6 +132,13 @@ public class RequestLimitRule {
      */
     public int getPrecisionSeconds() {
         return precision;
+    }
+
+    /**
+     * @return The limits backoff in seconds.
+     */
+    public int getBackoffSeconds() {
+        return backoffSeconds;
     }
 
     /**
@@ -152,11 +176,12 @@ public class RequestLimitRule {
                 && limit == that.limit
                 && Objects.equals(precision, that.precision)
                 && Objects.equals(name, that.name)
-                && Objects.equals(keys, that.keys);
+                && Objects.equals(keys, that.keys)
+                && Objects.equals(backoffSeconds, that.backoffSeconds);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(durationSeconds, limit, precision, name, keys);
+        return Objects.hash(durationSeconds, limit, precision, name, keys, backoffSeconds);
     }
 }

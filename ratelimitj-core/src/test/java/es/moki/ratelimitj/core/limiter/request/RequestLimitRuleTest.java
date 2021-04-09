@@ -46,6 +46,13 @@ class RequestLimitRuleTest {
     }
 
     @Test
+    void shouldHaveBackoffOf10() {
+        RequestLimitRule requestLimitRule = RequestLimitRule.of(Duration.ofSeconds(1), 5).withBackoff(Duration.ofSeconds(10));
+
+        assertThat(requestLimitRule.getBackoffSeconds()).isEqualTo(10);
+    }
+
+    @Test
     void shouldHaveNameOfBoom() {
         RequestLimitRule requestLimitRule = RequestLimitRule.of(Duration.ofSeconds(1), 5).withName("boom");
 
@@ -59,7 +66,23 @@ class RequestLimitRuleTest {
 
     @Test
     void shouldHaveDurationGreaterThanOneSecond() {
-        assertThatThrownBy(() -> RequestLimitRule.of(Duration.ofMillis(100), 1).withName("boom")).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> RequestLimitRule.of(Duration.ofMillis(100), 1).withName("boom"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("duration must be greater than 1 second");
+    }
+
+    @Test
+    void shouldHavePrecisionGreaterThanOneSecond() {
+        assertThatThrownBy(() -> RequestLimitRule.of(Duration.ofSeconds(20), 1).withPrecision(Duration.ofMillis(100)).withName("boom"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("precision must be greater than 1 second");
+    }
+
+    @Test
+    void shouldHaveBackoffGreaterThanDuration() {
+        assertThatThrownBy(() -> RequestLimitRule.of(Duration.ofSeconds(1), 1).withBackoff(Duration.ofMillis(100)).withName("boom"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("backoff must be greater than 1 second");
     }
 
 }
