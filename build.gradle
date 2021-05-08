@@ -111,7 +111,7 @@ configure([project(':ratelimitj-redis'), project(':ratelimitj-inmemory'), projec
     apply plugin: 'maven'
 
     project.group = 'es.moki.ratelimitj'
-    project.version = '0.7.0-RC3'
+    project.version = '0.7.0'
 
     // OSSRH publication
     if (ossrhUser != "") {
