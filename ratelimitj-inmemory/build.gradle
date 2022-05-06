@@ -10,7 +10,7 @@ dependencies {
 
     implementation(
             libraries.slf4j,
-            'net.jodah:expiringmap:0.5.8',
+            'net.jodah:expiringmap:0.5.10',
             'de.jkeylockmanager:jkeylockmanager:2.1.0',
     )
 
