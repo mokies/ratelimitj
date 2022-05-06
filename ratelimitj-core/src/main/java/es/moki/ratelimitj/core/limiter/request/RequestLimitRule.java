@@ -104,35 +104,35 @@ public class RequestLimitRule {
     }
 
     /**
-     * @return The limits duration in seconds.
+     * Returns the limits duration in seconds.
      */
     public int getDurationSeconds() {
         return durationSeconds;
     }
 
     /**
-     * @return The limits precision in seconds.
+     * Returns the limits precision in seconds.
      */
     public int getPrecisionSeconds() {
         return precision;
     }
 
     /**
-     * @return The name.
+     * Returns the name.
      */
     public String getName() {
         return name;
     }
 
     /**
-     * @return The limit.
+     * Returns the limit.
      */
     public long getLimit() {
         return limit;
     }
 
     /**
-     * @return The keys.
+     * Returns the keys.
      */
     @Nullable
     public Set<String> getKeys() {
