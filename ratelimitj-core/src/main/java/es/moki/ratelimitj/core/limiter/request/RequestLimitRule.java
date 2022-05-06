@@ -150,7 +150,7 @@ public class RequestLimitRule {
         RequestLimitRule that = (RequestLimitRule) o;
         return durationSeconds == that.durationSeconds
                 && limit == that.limit
-                && Objects.equals(precision, that.precision)
+                && precision == that.precision
                 && Objects.equals(name, that.name)
                 && Objects.equals(keys, that.keys);
     }
