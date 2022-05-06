@@ -66,14 +66,8 @@ subprojects {
     }
 
     dependencies {
-
-        test.useJUnitPlatform()
-
         testImplementation "org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion"
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion"
-
-        // To avoid compiler warnings about @API annotations in JUnit code
-//        testCompileOnly('org.apiguardian:apiguardian-api:1.0.0')
     }
 
 }
