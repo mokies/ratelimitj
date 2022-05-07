@@ -4,6 +4,16 @@ plugins {
     id "net.ltgt.errorprone" version "2.0.2" apply false
 }
 
+group = 'es.moki.ratelimitj'
+version = '0.7.0'
+
+nexusPublishing {
+    repositories {
+        sonatype ()
+        }
+    }
+
+
 defaultTasks 'check'
 
 ext.junitJupiterVersion = '5.8.2'
@@ -89,17 +99,8 @@ subprojects {
     }
 }
 
-ext {
-    // Credentials for publication repositories (needed only for publishing)
-    // Should be set in ${HOME}/.gradle/gradle.properties
-    ossrhUser = project.hasProperty('ossrhUser') ? project.property('ossrhUser') : ""
-    osshrPassword = project.hasProperty('ossrhPassword') ? project.property('ossrhPassword') : ""
-}
 
 configure([project(':ratelimitj-redis'), project(':ratelimitj-inmemory'), project(':ratelimitj-core'), project(':ratelimitj-dropwizard'),project(':ratelimitj-aerospike')]) {
-
-//    apply plugin: 'signing'
-//    apply plugin: 'maven'
 
     apply plugin:  'java-library'
     apply plugin:  'signing'
@@ -108,106 +109,40 @@ configure([project(':ratelimitj-redis'), project(':ratelimitj-inmemory'), projec
     project.group = 'es.moki.ratelimitj'
     project.version = '0.7.0'
 
-    // OSSRH publication
-    if (ossrhUser != "") {
+    // Signature of artifacts
+    signing {
+        sign configurations.archives
+    }
 
-        // Signature of artifacts
-        signing {
-            sign configurations.archives
-        }
-//        signing {
-//            sign publishing.publications.mavenJava
-//        }
-
-//        nexusPublishing {
-//            repositories {
-//                sonatype()
-//            }
-//        }
-        publishing {
-            publications {
-                mavenJava(MavenPublication) {
-                    from(components.java)
-                    pom {
-                        name = 'es.moki.ratelimitj'
-                        description = 'The RateLimitJ project aims to provide a modular rate limiting solution'
-                        url = 'https://github.com/mokies/ratelimitj'
-                        licenses {
-                            license {
-                                name = 'Apache License Version 2.0'
-                                url = 'http://www.apache.org/licenses/LICENSE-2.0'
-//                                distribution 'repo'
-                            }
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from(components.java)
+                pom {
+                    name = 'es.moki.ratelimitj'
+                    description = 'The RateLimitJ project aims to provide a modular rate limiting solution'
+                    url = 'https://github.com/mokies/ratelimitj'
+                    licenses {
+                        license {
+                            name = 'Apache License Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0'
                         }
-                        developers {
-                            developer {
-                                id = 'mokies'
-                                name = 'Craig Baker'
-                            }
+                    }
+                    developers {
+                        developer {
+                            id = 'mokies'
+                            name = 'Craig Baker'
                         }
-                        scm {
-                            connection = 'scm:git:https://github.com/mokies/ratelimitj.git'
-                            developerConnection = 'scm:git:git@github.com:mokies/ratelimitj.git'
-                            url = 'https://github.com/mokies/ratelimitj.git'
-                        }
+                    }
+                    scm {
+                        connection = 'scm:git:https://github.com/mokies/ratelimitj.git'
+                        developerConnection = 'scm:git:git@github.com:mokies/ratelimitj.git'
+                        url = 'https://github.com/mokies/ratelimitj.git'
                     }
                 }
             }
         }
-
-//        uploadArchives {
-//            repositories {
-//                mavenDeployer {
-//                    // POM signature
-//                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-//                    // Target repository
-//                    repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-//                        authentication(userName: ossrhUser, password: osshrPassword)
-//                    }
-//                    snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-//                        authentication(userName: ossrhUser, password: osshrPassword)
-//                    }
-//
-//                    pom.project {
-//                        name 'es.moki.ratelimitj'
-//                        description 'The RateLimitJ project aims to provide a modular rate limiting solution'
-//                        packaging 'jar'
-//                        url 'https://github.com/mokies/ratelimitj'
-//
-//                        scm {
-//                            connection 'scm:git:https://github.com/mokies/ratelimitj.git'
-//                            developerConnection 'scm:git:git@github.com:mokies/ratelimitj.git'
-//                            url 'https://github.com/mokies/ratelimitj.git'
-//                        }
-//
-//                        licenses {
-//                            license {
-//                                name 'Apache License Version 2.0'
-//                                url 'http://www.apache.org/licenses/LICENSE-2.0'
-//                                distribution 'repo'
-//                            }
-//                        }
-//
-//                        developers {
-//                            developer {
-//                                id = 'mokies'
-//                                name = 'Craig Baker'
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
     }
-//    else {
-//        uploadArchives {
-//            repositories {
-//                mavenLocal()
-//            }
-//        }
-//    }
-
-//    uploadArchives.dependsOn build
 }
 
 task codeCoverageReport(type: JacocoReport) {
@@ -234,9 +169,6 @@ task codeCoverageReport(type: JacocoReport) {
 codeCoverageReport.dependsOn {
     subprojects*.test
 }
-
-// http://nemerosa.ghost.io/2015/07/01/publishing-to-the-maven-central-using-gradle/
-// ./gradlew uploadArchives
 
 
 
