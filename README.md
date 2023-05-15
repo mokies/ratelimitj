@@ -1,3 +1,6 @@
+#### This project is no longer supported, please consider using [Bucket4j](https://github.com/bucket4j/bucket4j) instead
+
+
 ![RateLimitJ Logo](https://github.com/mokies/ratelimitj/blob/master/img/ratelimitj-logo-small.png "RateLimitJ")
 
 RateLimitJ
